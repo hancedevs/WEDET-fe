@@ -39,16 +39,16 @@ export default function Signupform() {
   return (
     <div style={{ fontFamily: "'Century Gothic', sans-serif", fontWeight: 300 }}>
         <Logo/>
-    <div className=" absolute  top-28 w-full bg-white flex flex-col border-2 rounded-t-3xl justify-center py-6 sm:px-6 lg:px-8">
+    <div className=" absolute top-30 w-full bg-white flex flex-col border-t-2 rounded-t-3xl justify-center py-6 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="text-xl px-10 font-bold text-[#959494]">
+        <h2 className="text-xl px-10 mt-3 font-bold text-[#959494]">
           Create your account
         </h2>
       </div>
       <div className="mt-4 sm:mx-auto sm:w-full sm:max-w-md">
         <div className=" px-10 sm:rounded-lg sm:px-10">
           <form className="space-y-4" onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-y-8 gap-x-4 sm:grid-cols-2">
               <div className="mt-1">
                 <Input
                   name="firstName"
@@ -149,7 +149,7 @@ export default function Signupform() {
             <div>
               <Button
                 type="submit"
-                className=" mx-auto flex justify-center py-2 px-20 rounded-3xl bg-green-500 font-semibold"
+                className=" mx-auto flex  p-6 px-20 rounded-3xl bg-green-500 font-semibold"
               >
                 Create account
               </Button>

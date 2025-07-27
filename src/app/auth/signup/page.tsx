@@ -3,7 +3,7 @@ import Signupform from '@/app/components/auth/signupform'
 function page() {
   return (
     <div>
-        <Signupform/>
+      <Signupform/>
     </div>
   )
 }
