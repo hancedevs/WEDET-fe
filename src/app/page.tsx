@@ -1,8 +1,5 @@
-export default function Home() {
-  return (
-    <div>
-      <div></div>
-      <h6>My app</h6>
-    </div>
-  );
+"use client";
+import { OnboardingScreen } from "./components/onboarding/onboarding-screen";
+export default function HomePage() {
+  return <OnboardingScreen />;
 }
