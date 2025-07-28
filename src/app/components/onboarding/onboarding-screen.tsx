@@ -18,12 +18,12 @@ export function OnboardingScreen() {
     if (currentStep < ONBOARDING_STEPS.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      router.push("/auth/signup");
+      router.push("/auth/login");
     }
   };
 
   const handleSkip = () => {
-    router.push("/auth/signup");
+    router.push("/auth/login");
   };
 
   return (
@@ -73,16 +73,16 @@ export function OnboardingScreen() {
         />
 
         {/* Continue button */}
-      <div className="flex justify-center">
-  <Button
-    onClick={handleContinue}
-    className="w-64 bg-green-500 hover:bg-green-600 text-white rounded-full py-2"
-  >
-    {currentStep === ONBOARDING_STEPS.length - 1
-      ? "Get Started"
-      : "Continue"}
-  </Button>
-</div>
+        <div className="flex justify-center">
+          <Button
+            onClick={handleContinue}
+            className="w-64 bg-green-500 hover:bg-green-600 text-white rounded-full py-2"
+          >
+            {currentStep === ONBOARDING_STEPS.length - 1
+              ? "Get Started"
+              : "Continue"}
+          </Button>
+        </div>
       </div>
     </div>
   );

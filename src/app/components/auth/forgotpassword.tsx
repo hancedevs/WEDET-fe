@@ -34,7 +34,7 @@ function Forgotpassword() {
                     type="submit"
                     className=" mx-auto flex justify-center py-6 px-27 rounded-3xl bg-green-600 font-medium text-lg"
                   >
-                   Send me link
+                    Send me link
                   </Button>
                 </div>
               </div>

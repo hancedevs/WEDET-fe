@@ -1,12 +1,5 @@
-import React from "react";
+"use client";
 import Forgotpassword from "@/app/components/auth/forgotpassword";
-
-function page() {
-  return (
-    <div>
-      <Forgotpassword />
-    </div>
-  );
+export default function forgotpassword() {
+  return <Forgotpassword />;
 }
-
-export default page();
