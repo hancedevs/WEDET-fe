@@ -10,6 +10,16 @@ export interface User {
   gender: "male" | "female";
   avatar?: string;
 }
+export interface SignupFormDatas {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  gender: string;
+  email: string;
+  password: string;
+  agreeToTerms: boolean;
+}
+
 
 export interface OnboardingStep {
   id: number;
