@@ -69,6 +69,18 @@ export const otpSchema = z.object({
     .regex(/^\d+$/, "OTP must contain only numbers"),
 });
 
+export const forgotPasswordSchema = z.object({
+  email: emailSchema,
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, "Token is required"),
+  password: passwordSchema,
+  confirmPassword: z.string().min(1, "Please confirm your password"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
 // Profile update schema 
 export const profileUpdateSchema = z.object({
   firstName: nameSchema,

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { loginSchema, signupSchema, otpSchema } from "@/lib/validation";
+import { loginSchema, signupSchema, otpSchema , forgotPasswordSchema , resetPasswordSchema } from "@/lib/validation";
 
 export interface User {
   id: string;
@@ -60,7 +60,8 @@ export interface FormErrors {
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type SignupFormData = z.infer<typeof signupSchema>;
 export type OTPFormData = z.infer<typeof otpSchema>;
-
+export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 // utility types
 export type Gender = "male" | "female"; 
 export type AuthType = "login" | "signup" | "forgot-password" | "otp";
