@@ -7,6 +7,7 @@ function Logo() {
       <Image 
       src={logoimage}
       alt='Logo slider'
+      quality={80}
       className='mx-auto'/>
     </div>
   )
