@@ -1,4 +1,5 @@
 "use client";
+import NavBar from "@/components/ui/navBar";
 import Header from "@/app/components/ui/Header";
 import TopRecomanded from "@/app/components/ui/TopRecomanded";
 function Page() {
@@ -11,6 +12,7 @@ function Page() {
       </div>
       <div className="pt-20">
         <TopRecomanded />
+        <NavBar />
       </div>
     </div>
   );
