@@ -1,3 +1,4 @@
+'use client'
 import React from 'react'
 import Signupform from '@/app/components/auth/signupform'
 function page() {

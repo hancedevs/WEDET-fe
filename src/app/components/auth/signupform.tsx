@@ -4,6 +4,7 @@ import Logo from "../ui/Logo";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 export default function Signupform() {
+  const [dateType, setDateType] = useState<"text" | "date">("text");
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -37,10 +38,10 @@ export default function Signupform() {
   };
 
   return (
-    <div style={{ fontFamily: "'Century Gothic', sans-serif", fontWeight: 300 }}>
+    <div  style={{ fontFamily: "'Century Gothic', sans-serif", fontWeight: 300 }}>
         <Logo/>
-    <div className=" absolute top-30 w-full bg-white flex flex-col border-t-2 rounded-t-3xl justify-center py-6 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+    <div className=" absolute top-30 w-full  bg-white flex flex-col  rounded-t-3xl justify-center py-6 sm:px-6 lg:px-8">
+      <div className="max-w-sm mx-auto">
         <h2 className="text-xl px-10 mt-3 font-bold text-[#959494]">
           Create your account
         </h2>
@@ -48,7 +49,7 @@ export default function Signupform() {
       <div className="mt-4 sm:mx-auto sm:w-full sm:max-w-md">
         <div className=" px-10 sm:rounded-lg sm:px-10">
           <form className="space-y-4" onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 gap-y-8 gap-x-4 sm:grid-cols-2">
+            <div className="grid grid-cols gap-y-8 gap-x-4 sm:grid-cols">
               <div className="mt-1">
                 <Input
                   name="firstName"
@@ -70,11 +71,14 @@ export default function Signupform() {
               <div className="mt-1">
                 <Input
                   name="dateOfBirth"
+                  type={dateType}
                   value={formData.dateOfBirth}
+                  onFocus={() => setDateType("date")}
+                  onBlur={() => formData.dateOfBirth === "" && setDateType("text")}
                   onChange={handleChange}
                   className=" rounded-3xl p-6 border-none shadow placeholder:text-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-300 focus:outline-none"
                   placeholder="Date of birth"
-                />
+                  />
               </div>
               <div>
                 <label className="block text-sm font-medium px-3 text-gray-300">
@@ -137,10 +141,10 @@ export default function Signupform() {
                 />
               </div>
             </div>
-            <div className="flex items-center max-w-80 ml-10 text-center">
+            <div className="flex items-center max-w-80  text-center">
               <label
                 htmlFor="agreeToTerms"
-                className="text-sm font-medium text-[#959494]"
+                className="text-sm font-medium mt-4 text-[#959494]"
               >
                 By selecting Create account I agree to wedet&apos;s terms of
                 service, policy and acknowledge the privacy policy.
@@ -149,7 +153,7 @@ export default function Signupform() {
             <div>
               <Button
                 type="submit"
-                className=" mx-auto flex  p-6 px-20 rounded-3xl bg-green-500 font-semibold"
+                className=" mx-auto flex  p-6 px-28 rounded-3xl bg-[#28b872] hover:bg-[#28b875] font-semibold"
               >
                 Create account
               </Button>
