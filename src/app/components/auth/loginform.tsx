@@ -1,16 +1,25 @@
 "use client";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
 import Logo from "../ui/Logo";
-
-function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+import { LoginFormData } from "@/app/types/type";
+import { loginSchema } from "@/lib/validation";
+export function LoginPage() {
   const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  const handleLogin = () => {
+  const onSubmit = (data: LoginFormData) => {
+    // Handle login logic here
+    console.log("Login data:", data);
     router.push("/home");
   };
 
@@ -21,15 +30,17 @@ function LoginPage() {
   const handleNavigateToforgotpassword = () => {
     router.push("/auth/forgotpassword");
   };
+
   return (
     <div
       className="min-h-screen bg-auth-background flex flex-col"
       style={{ fontFamily: "'Century Gothic', sans-serif", fontWeight: 300 }}
     >
+      {/* Logo */}
       <Logo />
 
       {/* Main Content */}
-      <div className="flex-1 bg-white rounded-t-3xl px-6 py-8">
+      <div className="flex-1 bg-white rounded-t-3xl px-6 py-8 absolute top-30 w-full  border-t-2 ">
         <div className="max-w-sm mx-auto">
           {/*  header */}
           <h1
@@ -42,14 +53,15 @@ function LoginPage() {
             Login to your account
           </h1>
 
-          <div className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <Input
                 id="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="rounded-full py-5 pl-6 border-gray-200 placeholder:text-gray-300 placeholder:pl-2"
+                {...register("email")}
+                className={`rounded-full py-5 pl-6 border-gray-200 placeholder:text-gray-300 placeholder:pl-2 ${
+                  errors.email ? "border-red-500" : ""
+                }`}
                 placeholder="Email Address"
                 style={{
                   fontFamily: "'Century Gothic'",
@@ -57,14 +69,21 @@ function LoginPage() {
                   paddingLeft: "0.5rem",
                 }}
               />
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-500 pl-2">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
+
             <div>
               <Input
                 id="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="rounded-full py-5 border-gray-200 placeholder:text-gray-300"
+                {...register("password")}
+                className={`rounded-full py-5 border-gray-200 placeholder:text-gray-300 ${
+                  errors.password ? "border-red-500" : ""
+                }`}
                 placeholder="Password"
                 style={{
                   fontFamily: "'Century Gothic'",
@@ -72,9 +91,16 @@ function LoginPage() {
                   paddingLeft: "1rem",
                 }}
               />
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-500 pl-2">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
+
             <div className="text-right">
               <button
+                type="button"
                 onClick={handleNavigateToforgotpassword}
                 className="text-sm text-gray-400 hover:underline"
                 style={{
@@ -85,8 +111,9 @@ function LoginPage() {
                 Forget Password?
               </button>
             </div>
+
             <Button
-              onClick={handleLogin}
+              type="submit"
               className="w-full rounded-full py-5 bg-[#28B872] hover:bg-[#1f9d62] text-white"
               style={{
                 fontFamily: "'Century Gothic', sans-serif",
@@ -95,6 +122,7 @@ function LoginPage() {
             >
               Login
             </Button>
+
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-200"></div>
@@ -113,6 +141,7 @@ function LoginPage() {
             </div>
 
             <Button
+              type="button"
               variant="outline"
               className="w-full rounded-full py-5 border-gray-200 text-gray-600 hover:bg-gray-100 flex items-center justify-center space-x-2"
               style={{
@@ -134,7 +163,9 @@ function LoginPage() {
               </svg>
               <span>Continue with phone</span>
             </Button>
+
             <Button
+              type="button"
               variant="outline"
               className="w-full rounded-full py-5 border-gray-200 text-gray-600 hover:bg-gray-100 flex items-center justify-center space-x-2"
               style={{
@@ -168,7 +199,9 @@ function LoginPage() {
               </svg>
               <span>Continue with Google</span>
             </Button>
+
             <Button
+              type="button"
               variant="outline"
               className="w-full rounded-full py-5 border-gray-200 text-gray-600 hover:bg-gray-100 flex items-center justify-center space-x-2"
               style={{
@@ -194,6 +227,7 @@ function LoginPage() {
               </svg>
               <span>Continue with Apple</span>
             </Button>
+
             <div className="text-center mt-6">
               <span
                 className="text-gray-500 text-sm"
@@ -204,6 +238,7 @@ function LoginPage() {
               >
                 Don&apos;t have an account?{" "}
                 <button
+                  type="button"
                   onClick={handleNavigateToSignup}
                   className="text-[#28B872] font-medium hover:underline"
                   style={{
@@ -215,10 +250,9 @@ function LoginPage() {
                 </button>
               </span>
             </div>
-          </div>
+          </form>
         </div>
       </div>
     </div>
   );
 }
-export default LoginPage;
