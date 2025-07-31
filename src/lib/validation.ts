@@ -91,14 +91,32 @@ export const profileUpdateSchema = z.object({
   avatar: z.string().url("Please enter a valid URL").optional(),
 });
  //booking steps schema
- export const step1Schema = z.object({
+
+
+export const step1Schema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email").min(1, "Email is required"),
+  email: z.string().superRefine((val, ctx) => {
+    if (!val || val.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Email is required",
+      });
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(val)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Invalid email",
+      });
+    }
+  }),
   phone: z.string().min(5, "Phone number is required"),
   dateOfBirth: z.string().min(1, "Date of birth is required"),
   nationality: z.string().min(1, "Nationality is required"),
 });
+
 
  export const step2Schema = z.object({
   numberOfPeople: z.string().min(1, "Select number of people"),
