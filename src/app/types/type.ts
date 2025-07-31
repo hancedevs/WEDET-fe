@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { loginSchema, signupSchema, otpSchema , forgotPasswordSchema , resetPasswordSchema } from "@/lib/validation";
+import { loginSchema, signupSchema, otpSchema , forgotPasswordSchema , resetPasswordSchema, step2Schema, step3Schema, step4Schema, step1Schema } from "@/lib/validation";
 
 export interface User {
   id: string;
@@ -69,6 +69,32 @@ export interface TravelCardProps {
   agencyName: string;
 }
 
+//BookingFormType
+export interface PersonalInfo {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  dateOfBirth: string;
+  nationality: string;
+}
+
+export interface TripSummary {
+  title: string;
+  location: string;
+  dateRange: string;
+  duration: string;
+  guide: string;
+}
+//Tips Summary
+export interface TripSummaryData {
+  imageUrl: string;
+  title: string;
+  location: string;
+  dateRange: string;
+  duration: string;
+  guide: string;
+}
 
 // Schema types 
 export type LoginFormData = z.infer<typeof loginSchema>;
@@ -76,6 +102,11 @@ export type SignupFormData = z.infer<typeof signupSchema>;
 export type OTPFormData = z.infer<typeof otpSchema>;
 export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
+export type Step1FormData = z.infer<typeof step1Schema>;
+export type Step2FormData = z.infer<typeof step2Schema>;
+export type Step3FormData = z.infer<typeof step3Schema>;
+export type Step4FormData = z.infer<typeof step4Schema>;
+
 // utility types
 export type Gender = "male" | "female"; 
 export type AuthType = "login" | "signup" | "forgot-password" | "otp";
