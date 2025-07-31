@@ -2,7 +2,6 @@
 import Image from "next/image";
 import { Heart, Star, MapPin, Calendar } from "lucide-react";
 import { TravelCardProps } from "@/app/types/type";
-
 export default function TravelCard({
   imageUrl,
   placeName,
@@ -19,7 +18,7 @@ export default function TravelCard({
     <div className="relative w-full max-w-sm sm:max-w-full rounded-3xl overflow-hidden shadow-lg">
       {/* Image background */}
       <div className="relative w-full h-60">
-        <Image src={imageUrl} alt={placeName} fill className="object-cover" />
+        <Image src={imageUrl} alt={placeName} fill className="object-cover"/>
 
         {/* Heart icon */}
         <div className="absolute top-3 right-3 bg-white/60 rounded-full p-2">

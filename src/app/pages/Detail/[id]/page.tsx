@@ -7,6 +7,7 @@ import ResortPage from "@/app/components/ui/Bilbord";
 import TravelCard from "../../../components/ui/travelcard";
 import Detailfilter from "@/app/components/ui/Detailfilter";
 import { useRouter } from "next/navigation";
+import NavBar from "@/app/components/ui/navBar";
 const Images = ["/image1.jpg", "/image2.jpg", "/tipsimage.png"];
 
 export default function TourPage() {
@@ -170,10 +171,12 @@ export default function TourPage() {
             reviews={400}
             agencyName="Simien Explore Tours"
           />
-          <button className="w-full bg-[#28B872] hover:bg-[#28B880] text-white py-3 mt-10 rounded-[35px] font-bold transition-colors mb-6">
+          <button className="w-full bg-[#28B872] hover:bg-[#28B880] text-white py-3 mt-10 mb-20 rounded-[35px] font-bold transition-colors"
+          onClick={()=> router.push('/book/step1')}>
             Book now!
           </button>
         </div>
+        <NavBar/>
       </div>
     </div>
   );

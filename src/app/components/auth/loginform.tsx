@@ -20,7 +20,7 @@ export function LoginPage() {
   const onSubmit = (data: LoginFormData) => {
     // Handle login logic here
     console.log("Login data:", data);
-    router.push("/home");
+    router.push("/pages/home");
   };
 
   const handleNavigateToSignup = () => {
