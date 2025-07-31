@@ -30,14 +30,14 @@ const topRecommendedData = [
 
 function TopRecommended() {
   return (
-    <div className="w-full py-25" style={{ fontFamily: "'Century Gothic', sans-serif", fontWeight: 300 }}>
-      <div className="flex gap-2 justify-between">
-        <h2 className="text-lg  text-[#959494]  font-bold mb-4 px-8">
+    <div className="w-full p-2 " style={{ fontFamily: "'Century Gothic', ,pt-8 sans-serif",  fontWeight: 200 }}>
+      <div className="flex gap-2 justify-between pt-4">
+        <h2 className="text-lg  text-[#959494]  font-bold mb-4 px-2">
           Top Recommended
         </h2>
         <span className="pr-6 text-[#959494]">See all</span>
       </div>
-      <div className="overflow-x-auto px-7">
+      <div className="overflow-x-auto px-3">
         <div className="flex gap-4 pb-4 snap-x snap-mandatory overflow-x-auto scroll-smooth">
           {topRecommendedData.map((item) => (
             <div key={item.id} className="snap-start shrink-0">

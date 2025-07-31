@@ -56,6 +56,20 @@ export interface FormErrors {
   [key: string]: string | undefined;
 }
 
+export interface TravelCardProps {
+  imageUrl: string;
+  placeName: string;
+  location: string;
+  tripDuration: string;
+  price: string | number;
+  oldPrice?: string | number;
+  discountPercent?: number;
+  rating: number;
+  reviews: number;
+  agencyName: string;
+}
+
+
 // Schema types 
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type SignupFormData = z.infer<typeof signupSchema>;
