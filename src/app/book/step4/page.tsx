@@ -36,6 +36,7 @@ export default function Step4() {
 
   const onSubmit = (data: Step4FormData) => {
     console.log("Final step data", data);
+    
     alert("Booking submitted!");
   };
 

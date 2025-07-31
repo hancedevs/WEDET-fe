@@ -114,10 +114,9 @@ export const step3Schema = z.object({
 });
 
 export const step4Schema = z.object({
-  agreed: z.boolean().default(false).refine(val => val === true, {
+  agreed: z.boolean().refine(val => val === true, {
     message: "Please agree to the terms and conditions",
   }),
 });
-
 
 
