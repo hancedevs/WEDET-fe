@@ -90,3 +90,34 @@ export const profileUpdateSchema = z.object({
   gender: genderSchema,
   avatar: z.string().url("Please enter a valid URL").optional(),
 });
+ //booking steps schema
+ export const step1Schema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Invalid email").min(1, "Email is required"),
+  phone: z.string().min(5, "Phone number is required"),
+  dateOfBirth: z.string().min(1, "Date of birth is required"),
+  nationality: z.string().min(1, "Nationality is required"),
+});
+
+ export const step2Schema = z.object({
+  numberOfPeople: z.string().min(1, "Select number of people"),
+  dietaryRestrictions: z.string().optional(),
+  medicalConditions: z.string().optional(),
+  specialRequests: z.string().optional(),
+});
+
+export const step3Schema = z.object({
+  contactName: z.string().min(1, "Full name is required"),
+  contactPhone: z.string().min(5, "Phone number is required"),
+  relationship: z.string().min(1, "Select a relationship"),
+});
+
+export const step4Schema = z.object({
+  agreed: z.boolean().default(false).refine(val => val === true, {
+    message: "Please agree to the terms and conditions",
+  }),
+});
+
+
+
