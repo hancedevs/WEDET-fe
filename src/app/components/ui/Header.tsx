@@ -22,13 +22,10 @@ function Header() {
           </div>
         </div>
        <div className="flex items-center gap-5">
-  {/* Notification Bell with Dot */}
   <div className="relative inline-block">
     <BellDot className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={1} />
     <span className="absolute top-0 right-0 h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-red-500 border border-white transform translate-x-1/4 -translate-y-1/4"></span>
   </div>
-  
-  {/* Message Icon */}
   <MessageCircle className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={1.5} />
 </div>
 

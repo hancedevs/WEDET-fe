@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { MapPin, Star } from "lucide-react";
+import { useRouter } from "next/navigation";
 interface PlaceNameCardProps {
   image: string;
   name: string;
@@ -8,7 +9,6 @@ interface PlaceNameCardProps {
   percentage: string | number;
   value: string | number;
 }
-
 const PlaceNameCard: React.FC<PlaceNameCardProps> = ({
   image,
   name,
@@ -16,6 +16,10 @@ const PlaceNameCard: React.FC<PlaceNameCardProps> = ({
   percentage,
   value,
 }) => {
+  const router = useRouter();
+  const handelclick = () => {
+     router.push('/pages/Detail/1');
+  }
   return (
     <div className="relative w-[244px] h-[231px] rounded-xl overflow-hidden shadow-md">
       <Image
@@ -24,6 +28,7 @@ const PlaceNameCard: React.FC<PlaceNameCardProps> = ({
         fill
         className="object-cover"
         quality={80}
+        onClick={handelclick}
       />
       <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-green-700/70 to-transparent z-10" />
       <div className="absolute bottom-0 left-0 w-full z-20 px-3 pb-3 text-white">
