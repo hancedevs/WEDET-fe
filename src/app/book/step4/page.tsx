@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { step4Schema } from "@/lib/validation";
@@ -16,14 +16,15 @@ const trip: TripSummaryData = {
   duration: "9 days",
   guide: "Abebe Balcha",
 };
-// Using a mock data for now 
+// Using a mock data for now
 const price = {
   perPerson: 2700,
   people: 1,
   serviceFee: 100,
   processingFee: 25,
 };
-const total = price.perPerson * price.people + price.serviceFee + price.processingFee;
+const total =
+  price.perPerson * price.people + price.serviceFee + price.processingFee;
 
 export default function Step4() {
   const router = useRouter();
@@ -33,12 +34,14 @@ export default function Step4() {
     formState: { errors },
   } = useForm<Step4FormData>({
     resolver: zodResolver(step4Schema),
+    defaultValues: {
+      agreed: false,
+    },
   });
 
   const onSubmit = (data: Step4FormData) => {
     console.log("Final step data", data);
-
-    alert("Booking submitted!");
+    router.push("/book/step5");
   };
 
   return (
@@ -54,12 +57,18 @@ export default function Step4() {
           className="bg-white rounded-3xl shadow-md border border-[#f0f0f0] px-5 py-5 mb-4"
           style={{ fontFamily: "'Century Gothic', sans-serif" }}
         >
-          <div className="text-lg font-bold text-black mb-2">Price Breakdown</div>
+          <div className="text-lg font-bold text-black mb-2">
+            Price Breakdown
+          </div>
 
           <div className="flex justify-between items-center mb-1 text-base">
-            <span className="text-black">{price.perPerson.toLocaleString()} Br x {price.people} Person</span>
+            <span className="text-black">
+              {price.perPerson.toLocaleString()} Br x {price.people} Person
+            </span>
             <span className="text-black">.</span>
-            <span className="text-black">{(price.perPerson * price.people).toLocaleString()}Br</span>
+            <span className="text-black">
+              {(price.perPerson * price.people).toLocaleString()}Br
+            </span>
           </div>
 
           <div className="flex justify-between items-center mb-1 text-sm">
@@ -75,33 +84,45 @@ export default function Step4() {
 
           <div className="flex justify-between items-center mt-1">
             <span className="text-lg font-bold text-black">Total</span>
-            <span className="text-lg font-bold text-[#26cc73]">{total.toLocaleString()}Br</span>
+            <span className="text-lg font-bold text-[#26cc73]">
+              {total.toLocaleString()}Br
+            </span>
           </div>
         </div>
 
         {/* Terms & Conditions */}
-        <div className="mt-7 ml-3"  style={{ fontFamily: "'Century Gothic', sans-serif" }}>
-          <div className="text-xl font-bold text-black mb-1">Terms & Conditions</div>
+        <div
+          className="mt-7 ml-3"
+          style={{ fontFamily: "'Century Gothic', sans-serif" }}
+        >
+          <div className="text-xl font-bold text-black mb-1">
+            Terms & Conditions
+          </div>
           <div className="flex items-start gap-2 mt-2">
             <Checkbox
               id="agree"
               className="mt-1  border-2 border-[#26cc73] focus:ring-0 focus:ring-offset-0"
               onCheckedChange={(checked) => setValue("agreed", !!checked)}
             />
-            <label htmlFor="agree" className="text-sm font-semibold text-gray-500 select-none">
+            <label
+              htmlFor="agree"
+              className="text-sm font-semibold text-gray-500 select-none"
+            >
               <span className="font-semibold text-green">
                 I agree to the Terms of Service and Privacy Policy.
               </span>{" "}
               <span className="font-normal text-gray-500">
-                I understand the cancellation policy and acknowledge that this adventure involves physical activity and inherent risks.
+                I understand the cancellation policy and acknowledge that this
+                adventure involves physical activity and inherent risks.
               </span>
             </label>
           </div>
-          {errors.agreed && <p className="text-red-500 text-xs mt-1">{errors.agreed.message}</p>}
+          {errors.agreed && (
+            <p className="text-red-500 text-xs mt-1">{errors.agreed.message}</p>
+          )}
         </div>
       </form>
-      <NavBar/>
+      <NavBar />
     </BookingStepLayout>
-
   );
 }

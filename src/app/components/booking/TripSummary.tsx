@@ -36,19 +36,28 @@ export default function TripSummary({
           </h3>
           <div className="flex items-center gap-1">
             <MapPin className="w-4 h-4 text-[#26cc73]" strokeWidth={2.5} />
-            <span className="text-gray-600" style={{ fontFamily: "'Century Gothic', sans-serif" }}>
+            <span
+              className="text-gray-600"
+              style={{ fontFamily: "'Century Gothic', sans-serif" }}
+            >
               {location}
             </span>
           </div>
           <div className="flex items-center gap-1">
             <Calendar className="w-4 h-4 text-[#26cc73]" strokeWidth={2.5} />
-            <span className="text-gray-600" style={{ fontFamily: "'Century Gothic', sans-serif" }}>
+            <span
+              className="text-gray-600"
+              style={{ fontFamily: "'Century Gothic', sans-serif" }}
+            >
               {dateRange}
             </span>
           </div>
           <div className="flex items-center gap-1">
             <Clock className="w-4 h-4 text-[#26cc73]" strokeWidth={2.5} />
-            <span className="text-gray-600" style={{ fontFamily: "'Century Gothic', sans-serif" }}>
+            <span
+              className="text-gray-600"
+              style={{ fontFamily: "'Century Gothic', sans-serif" }}
+            >
               {duration}
             </span>
           </div>

@@ -27,13 +27,19 @@ const trip: TripSummaryData = {
 export default function Step3() {
   const router = useRouter();
   const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<Step3FormData>({
-    resolver: zodResolver(step3Schema),
-  });
+  register,
+  handleSubmit,
+  setValue,
+  formState: { errors },
+} = useForm<Step3FormData>({
+  resolver: zodResolver(step3Schema),
+  defaultValues: {
+    contactName: "",
+    contactPhone: "",
+    relationship: "",  
+  },
+});
+
 
   const onSubmit = (data: Step3FormData) => {
     console.log("Step 3 data", data);
