@@ -6,6 +6,7 @@ import type { Step4FormData, TripSummaryData } from "@/app/types/type";
 import BookingStepLayout from "@/app/components/booking/BookingStepLayout";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useRouter } from "next/navigation";
+import NavBar from "@/app/components/ui/navBar";
 
 const trip: TripSummaryData = {
   imageUrl: "/image2.jpg",
@@ -36,7 +37,7 @@ export default function Step4() {
 
   const onSubmit = (data: Step4FormData) => {
     console.log("Final step data", data);
-    
+
     alert("Booking submitted!");
   };
 
@@ -99,6 +100,8 @@ export default function Step4() {
           {errors.agreed && <p className="text-red-500 text-xs mt-1">{errors.agreed.message}</p>}
         </div>
       </form>
+      <NavBar/>
     </BookingStepLayout>
+
   );
 }
