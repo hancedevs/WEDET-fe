@@ -12,7 +12,7 @@ import type { Variants } from "framer-motion";
 
 export function OnboardingScreen() {
   const [currentStep, setCurrentStep] = useState(0);
-  const [direction, setDirection] = useState(1); // 1 for forward, -1 for backward
+  const [direction, setDirection] = useState(1);
   const router = useRouter();
 
   const currentData: OnboardingStep = ONBOARDING_STEPS[currentStep];

@@ -14,7 +14,7 @@ export function PageIndicator({ totalSteps, currentStep, className }: PageIndica
           key={index}
           className={cn(
             "w-2 h-2 rounded-full transition-colors",
-            index === currentStep ? "bg-black" : "bg-gray-300",
+            index === currentStep ? "bg-green-500" : "bg-gray-300",
           )}
         />
       ))}
