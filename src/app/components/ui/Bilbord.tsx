@@ -36,7 +36,7 @@ const cards: CardContent[] = [
 export default function ResortPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   return (
-    <div className="relative max-w-4xl mx-auto">
+    <div className="relative max-w-4xl mt-5 mx-auto">
       <div className="relative border border-green-500 h-66 w-full overflow-hidden rounded-[35px]">
         {cards.map((card, index) => (
           <div
@@ -66,7 +66,7 @@ export default function ResortPage() {
           </div>
         ))}
       </div>
-      <div className=" mt-2 mx-auto w-fit transform -translate-x-1/2 flex gap-2">
+      <div className=" mt-2 mb-8 mx-auto w-fit transform -translate-x-1/2 flex gap-2">
         {cards.map((_, index) => (
           <button
             key={index}
@@ -78,10 +78,6 @@ export default function ResortPage() {
           />
         ))}
       </div>
-
-      <button className="w-full bg-[#28B872] hover:bg-[#28B880] text-white py-3 mt-4 rounded-[35px] font-bold transition-colors mb-6">
-        Book now!
-      </button>
     </div>
   );
 }
