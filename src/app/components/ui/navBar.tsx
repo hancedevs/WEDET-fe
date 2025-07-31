@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import { House, MapPin, Heart, User } from "lucide-react";
 
@@ -8,7 +9,7 @@ function NavBar() {
   const activeColor = "text-[#28B872]";
 
   return (
-    <div className="flex flex-row justify-around items-center  shadow-md fixed bottom-0 left-0 right-0 h-20">
+    <div className="flex justify-around items-center bg-white shadow-md fixed bottom-0 left-0 right-0 h-20 rounded-t-2xl pt-2">
       <div
         onClick={() => setActive("explore")}
         className={`flex flex-col items-center cursor-pointer ${

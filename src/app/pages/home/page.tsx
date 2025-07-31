@@ -1,12 +1,12 @@
 "use client";
-import NavBar from "@/components/ui/navBar";
+import NavBar from "@/app/components/ui/navBar";
 import Header from "@/app/components/ui/Header";
 import TopRecomanded from "@/app/components/ui/TopRecomanded";
 import CategorySelector from "@/app/components/ui/catagory";
 import TravelCard from "@/app/components/ui/travelcard";
 function Page() {
   return (
-    <div className="">
+    <div className="pb-28">
       <div className="">
         <div>
           <Header />
@@ -14,7 +14,7 @@ function Page() {
       </div>
       <div className="">
         <TopRecomanded />
-        <NavBar />
+        
       </div>
       <div>
         <CategorySelector />
@@ -67,6 +67,7 @@ function Page() {
           agencyName="Simien Explore Tours"
         />
       </div>
+    <div><NavBar /></div>
     </div>
   );
 }
