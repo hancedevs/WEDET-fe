@@ -118,8 +118,17 @@ export const step1Schema = z.object({
 });
 
 
- export const step2Schema = z.object({
-  numberOfPeople: z.string().min(1, "Select number of people"),
+export const step2Schema = z.object({
+  numberOfPeople: z
+    .string()
+    .refine(
+      (val) => {
+        const num = Number(val);
+        return !isNaN(num) && num >= 1 && num <= 10;
+      },
+      { message: "You must select at least one person" }
+    ),
+  people: z.array(z.any()).optional(),
   dietaryRestrictions: z.string().optional(),
   medicalConditions: z.string().optional(),
   specialRequests: z.string().optional(),
