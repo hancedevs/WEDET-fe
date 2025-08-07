@@ -19,9 +19,9 @@ function Page() {
       <div>
         <CategorySelector />
       </div>
-      <div className="flex items-center ml-7 justify-between mb-3 ">
+      <div className="flex items-center ml-5 justify-between mb-1 ">
         <h2
-          className="text-gray-500 text-base "
+          className="text-gray-500 text-xs "
           style={{
             fontFamily: "'Century Gothic', sans-serif",
             fontWeight: 500,
@@ -30,7 +30,7 @@ function Page() {
           Tips for you
         </h2>
         <button
-          className="text-gray-400 text-sm mr-7"
+          className="text-gray-400 text-xs mr-4"
           style={{
             fontFamily: "'Century Gothic', sans-serif",
             fontWeight: 300,
