@@ -54,9 +54,10 @@ const TabbedDetail = () => {
             {[1, 2, 3].map((_, index) => (
               <div key={index} className="flex gap-2">
                 <div className="flex relative flex-col items-center">
-                  <div className="w-4 h-4 bg-green-500 rounded-full" ></div>
-                  <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-white border border-white transform translate-x-1/4 -translate-y-1/4"></span>
-                  <div className="h-16 w-px bg-green-500 " />
+                  <div className="w-4 h-4 bg-[#28B872] rounded-full relative">
+                    <span className="absolute top-1/2 left-1/2 h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-white border border-white transform -translate-x-1/2 -translate-y-1/2"></span>
+                  </div>
+                  <div className="h-16 w-px bg-[#28B872]" />
                 </div>
                 <div className="grid">
                   <p className="font-semibold">8:30</p>
@@ -71,9 +72,9 @@ const TabbedDetail = () => {
       case "Included":
         return (
           <div className="relative p- space-y-6">
-              <p className="bg-green-500 relative top-7 text-white border w-fit px-8 py-1 rounded-3xl font-semibold mb-2">
-                 What&apos;s Included
-              </p>
+            <p className="bg-[#28B872] relative top-7 text-white border w-fit px-8 py-1 rounded-3xl font-semibold mb-2">
+              What&apos;s Included
+            </p>
             <div className="border border-green-500 p-6 marker:text-green-500 rounded-[35px]">
               <ul className="list-disc list-inside text-sm space-y-1 text-gray-800">
                 <li>Expert naturalist guide and local guides</li>
@@ -86,7 +87,10 @@ const TabbedDetail = () => {
                 <li>Cultural activities and demonstrations</li>
               </ul>
             </div>
-            <p className="bg-red-500 relative top-7 text-white border w-fit px-10 py-1 rounded-3xl font-semibold mb-2"> Not Included</p>
+            <p className="bg-red-500 relative top-7 text-white border w-fit px-10 py-1 rounded-3xl font-semibold mb-2">
+              {" "}
+              Not Included
+            </p>
             <div className="border border-red-400 p-6 marker:text-red-500 rounded-[35px]">
               <ul className="list-disc list-inside text-sm space-y-1 text-gray-700">
                 <li>International flights to Lima</li>
@@ -103,9 +107,9 @@ const TabbedDetail = () => {
       case "Prepare":
         return (
           <div className="mb-5 ">
-              <p className="bg-green-500 relative top-7 text-white border w-fit px-8 py-1 rounded-3xl font-semibold mb-2">
-                 Essential Equipment
-              </p>
+            <p className="bg-[#28B872] relative top-7 text-white border w-fit px-8 py-1 rounded-3xl font-semibold mb-2">
+              Essential Equipment
+            </p>
             <div className="border border-green-500 p-6  rounded-[35px]">
               <ul className="list-disc list-inside text-sm marker:text-green-500 space-y-1 text-gray-800">
                 <li>Lightweight, quick-dry clothing</li>
@@ -125,15 +129,15 @@ const TabbedDetail = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 ">
-      <div className="flex gap-4 mb-6 border p-1 rounded-3xl border-gray-300">
+    <div className="max-w-3xl mx-auto mt-6 sm:mt-10 px-2 sm:px-0">
+      <div className="flex gap-2 sm:gap-4 mb-4 sm:mb-6 border p-1 rounded-[35px] border-[#E9F4F4] bg-[#E9F4F4] overflow-x-auto">
         {TABS.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-2 py-2 rounded-3xl font-medium ${
+            className={`px-3 py-1 sm:px-4 sm:py-2 rounded-3xl font-medium text-sm sm:text-base whitespace-nowrap ${
               activeTab === tab
-                ? "bg-green-500 text-white"
+                ? "bg-[#28B872] text-white"
                 : "text-gray-600 hover:text-green-600"
             }`}
           >
@@ -141,7 +145,7 @@ const TabbedDetail = () => {
           </button>
         ))}
       </div>
-      <div className="bg-white">{renderContent()}</div>
+      <div className="bg-white px-2 sm:px-0">{renderContent()}</div>
     </div>
   );
 };
