@@ -9,10 +9,21 @@ export default function NavBar() {
   const activeColor = "text-[#28B872]";
 
   const navItems = [
-    { label: "Explore", key: "explore", icon: <House size={26} strokeWidth={1.5} /> },
-    { label: "My Trips", key: "trips", icon: <MapPin size={26} strokeWidth={1.5} /> },
-    { label: "Saved", key: "saved", icon: <Heart size={26} strokeWidth={1.5} /> },
-    { label: "Profile", key: "profile", icon: <User size={26} strokeWidth={1.5} /> },
+    {
+      label: "Explore",
+      key: "explore",
+      icon: <House size={26} strokeWidth={1.5} />,
+    },
+    {
+      label: "My Trips",
+      key: "trips",
+      icon: <MapPin size={26} strokeWidth={1.5} />,
+    },
+    {
+      label: "Profile",
+      key: "profile",
+      icon: <User size={26} strokeWidth={1.5} />,
+    },
   ];
 
   return (
