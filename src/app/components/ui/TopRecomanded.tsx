@@ -26,11 +26,19 @@ const topRecommendedData = [
     reviews: "400",
     image: "/fox.jpg",
   },
+  {
+    id: "4",
+    name: "Place name",
+    location: "Location",
+    rating: 4.5,
+    reviews: "400",
+    image: "/fox.jpg",
+  },
 ];
 
 function TopRecommended() {
   return (
-    <div className="w-full  " style={{ fontFamily: "'Century Gothic', ,pt-8 sans-serif",  fontWeight: 200 }}>
+    <div className="w-full  " style={{ fontFamily: "'Century Gothic' ,pt-8 sans-serif",  fontWeight: 200 }}>
       <div className="flex gap-2 justify-between pt-4">
         <h2 className="text-sm text-[#959494]  font-light mb-4 px-4">
           Top Recommended
