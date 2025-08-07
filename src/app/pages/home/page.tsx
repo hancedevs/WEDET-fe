@@ -6,7 +6,7 @@ import CategorySelector from "@/app/components/ui/catagory";
 import TravelCard from "@/app/components/ui/travelcard";
 function Page() {
   return (
-    <div className="pb-28">
+    <div className="pb-28 ">
       <div className="">
         <div>
           <Header />
@@ -39,7 +39,21 @@ function Page() {
           See all
         </button>
       </div>
-      <div className="p-4  grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-6">
+      <div className="p-2 grid  grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-6">
+        <TravelCard
+          imageUrl="/tipsimage.png"
+          placeName="Simien Mountains"
+          location="Gondar, Ethiopia"
+          tripDuration="2 day's trip"
+          price="2,700"
+          oldPrice="3,000"
+          discountPercent={15}
+          rating={4.3}
+          reviews={800}
+          agencyName="Simien Explore Tours"
+        />
+      </div>
+      <div className="p-2 grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-6">
         <TravelCard
           imageUrl="/tipsimage.png"
           placeName="Simien Mountains"
@@ -49,25 +63,11 @@ function Page() {
           oldPrice="3,000"
           discountPercent={15}
           rating={4.5}
-          reviews={400}
+          reviews={200}
           agencyName="Simien Explore Tours"
         />
       </div>
-      <div className="p-4  grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-6">
-        <TravelCard
-          imageUrl="/tipsimage.png"
-          placeName="Simien Mountains"
-          location="Gondar, Ethiopia"
-          tripDuration="2 day's trip"
-          price="2,700"
-          oldPrice="3,000"
-          discountPercent={15}
-          rating={4.5}
-          reviews={400}
-          agencyName="Simien Explore Tours"
-        />
-      </div>
-      <div className="p-4  grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-6">
+      <div className="p-2 grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-6">
         <TravelCard
           imageUrl="/tipsimage.png"
           placeName="Dafar Place"
@@ -76,7 +76,7 @@ function Page() {
           price="9,700"
           oldPrice="11,000"
           discountPercent={15}
-          rating={4.5}
+          rating={4.8}
           reviews={400}
           agencyName="Dafar Explore Tours"
         />
