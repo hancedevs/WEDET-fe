@@ -130,12 +130,12 @@ const TabbedDetail = () => {
 
   return (
     <div className="max-w-3xl mx-auto mt-6 sm:mt-10 px-2 sm:px-0">
-      <div className="flex gap-2 sm:gap-4 mb-4 sm:mb-6 border p-1 rounded-[35px] border-[#E9F4F4] bg-[#E9F4F4] overflow-x-auto">
+      <div className="flex gap-2 sm:gap-4 mb-4 sm:mb-6 border p-1 rounded-[35px] border-[#E9F4F4] bg-[#E9F4F4]">
         {TABS.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-3 py-1 sm:px-4 sm:py-2 rounded-3xl font-medium text-sm sm:text-base whitespace-nowrap ${
+            className={`flex-1 py-2 sm:py-2 rounded-3xl font-medium text-sm sm:text-base ${
               activeTab === tab
                 ? "bg-[#28B872] text-white"
                 : "text-gray-600 hover:text-green-600"
@@ -145,7 +145,8 @@ const TabbedDetail = () => {
           </button>
         ))}
       </div>
-      <div className="bg-white px-2 sm:px-0">{renderContent()}</div>
+
+      <div className="bg-white">{renderContent()}</div>
     </div>
   );
 };
