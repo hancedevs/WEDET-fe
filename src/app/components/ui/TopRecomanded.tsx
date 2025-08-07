@@ -26,19 +26,27 @@ const topRecommendedData = [
     reviews: "400",
     image: "/fox.jpg",
   },
+  {
+    id: "4",
+    name: "Place name",
+    location: "Location",
+    rating: 4.5,
+    reviews: "400",
+    image: "/fox.jpg",
+  },
 ];
 
 function TopRecommended() {
   return (
-    <div className="w-full p-2 " style={{ fontFamily: "'Century Gothic', ,pt-8 sans-serif",  fontWeight: 200 }}>
+    <div className="w-full  " style={{ fontFamily: "'Century Gothic' ,pt-8 sans-serif",  fontWeight: 200 }}>
       <div className="flex gap-2 justify-between pt-4">
-        <h2 className="text-lg  text-[#959494]  font-bold mb-4 px-2">
+        <h2 className="text-sm text-[#959494]  font-light mb-4 px-4">
           Top Recommended
         </h2>
-        <span className="pr-6 text-[#959494]">See all</span>
+        <span className="pr-5 text-sm font-light  text-[#959494]">See all</span>
       </div>
       <div className="overflow-x-auto px-3">
-        <div className="flex gap-4 pb-4 snap-x snap-mandatory overflow-x-auto scroll-smooth">
+        <div className="flex gap-2 pb-4  snap-mandatory  scroll-smooth">
           {topRecommendedData.map((item) => (
             <div key={item.id} className="snap-start shrink-0">
               <PlaceNameCard
