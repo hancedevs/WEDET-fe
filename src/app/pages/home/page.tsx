@@ -39,7 +39,7 @@ function Page() {
           See all
         </button>
       </div>
-      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="p-4  grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-6">
         <TravelCard
           imageUrl="/tipsimage.png"
           placeName="Simien Mountains"
@@ -53,7 +53,7 @@ function Page() {
           agencyName="Simien Explore Tours"
         />
       </div>
-      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="p-4  grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-6">
         <TravelCard
           imageUrl="/tipsimage.png"
           placeName="Simien Mountains"
@@ -65,6 +65,20 @@ function Page() {
           rating={4.5}
           reviews={400}
           agencyName="Simien Explore Tours"
+        />
+      </div>
+      <div className="p-4  grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-6">
+        <TravelCard
+          imageUrl="/tipsimage.png"
+          placeName="Dafar Place"
+          location="Afar, Ethiopia"
+          tripDuration="2 day's trip"
+          price="9,700"
+          oldPrice="11,000"
+          discountPercent={15}
+          rating={4.5}
+          reviews={400}
+          agencyName="Dafar Explore Tours"
         />
       </div>
     <div><NavBar /></div>
