@@ -51,7 +51,6 @@ const TabbedDetail = () => {
       case "Itinerary":
         return (
           <div className="p-6 font-semibold space-y-4">
-<<<<<<< HEAD
             {[1, 2, 3, 4].map((_, index) => (
               <div key={index} className="flex gap-x-2 items-start">
                 <div className="flex relative flex-col items-center h-[100px]">
@@ -69,15 +68,6 @@ const TabbedDetail = () => {
                   <div className="w-4 h-4 bg-[#28B872] rounded-full relative z-10">
                     <span className="absolute top-1/2 left-1/2 h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-white border border-white transform -translate-x-1/2 -translate-y-1/2"></span>
                   </div>
-=======
-            {[1, 2, 3].map((_, index) => (
-              <div key={index} className="flex gap-2">
-                <div className="flex relative flex-col items-center">
-                  <div className="w-4 h-4 bg-[#28B872] rounded-full relative">
-                    <span className="absolute top-1/2 left-1/2 h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-white border border-white transform -translate-x-1/2 -translate-y-1/2"></span>
-                  </div>
-                  <div className="h-16 w-px bg-[#28B872]" />
->>>>>>> d29128d6458d399b59fbc39a0a1f812092ff6c09
                 </div>
 
                 {/* Time & Date */}
@@ -126,10 +116,6 @@ const TabbedDetail = () => {
               </ul>
             </div>
             <p className="bg-red-500 relative top-7 text-white border w-fit px-10 py-1 rounded-3xl font-semibold mb-2">
-<<<<<<< HEAD
-=======
-              {" "}
->>>>>>> d29128d6458d399b59fbc39a0a1f812092ff6c09
               Not Included
             </p>
             <div className="border border-red-400 p-6 marker:text-red-500 rounded-[35px]">
