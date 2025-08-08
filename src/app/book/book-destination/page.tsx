@@ -37,12 +37,14 @@ export default function BookingPage() {
         <ArrowLeft size={24} className="text-[#28B872]" />
       </button>
 
-      {/* Main Scrollable Content */}
       <div
-        className="flex-1 w-full max-w-[380px] mx-auto flex flex-col gap-3 pt-16 pb-24 px-4"
+        className="
+          flex-1 w-full mx-auto flex flex-col gap-3
+          pt-16 pb-24 px-2 sm:px-3 md:px-4
+          max-w-[480px] sm:max-w-[560px] md:max-w-[680px] lg:max-w-[760px]
+        "
         style={{ minHeight: "100vh" }}
       >
-        {/* Available space label  */}
         <span className="text-sm font-bold text-[#BEBEBE] ml-2">
           Available space or seats
         </span>
@@ -92,12 +94,10 @@ export default function BookingPage() {
           </div>
         </div>
 
-        {/* Personalized booking label */}
         <span className="text-sm font-bold text-[#BEBEBE] ml-2 mt-4">
           Personalized booking
         </span>
 
-        {/* Personalized Booking Card */}
         <div className="bg-white rounded-[26px] border-2 border-[#E8E8E8] shadow-[0_2px_8px_#00000010] px-4 py-4">
           <div className="flex flex-col gap-3">
             {/* Team */}
@@ -161,7 +161,6 @@ export default function BookingPage() {
           </div>
         </div>
 
-        {/* Payment method  */}
         <span className="text-sm font-bold text-[#BEBEBE] ml-2 mt-4">
           Payment method
         </span>
