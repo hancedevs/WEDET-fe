@@ -15,7 +15,8 @@ export default function TravelCard({
   agencyName,
 }: TravelCardProps) {
   return (
-    <div className="relative w-full max-w-sm sm:max-w-full rounded-3xl overflow-hidden shadow-lg">
+   <div className="relative w-full rounded-3xl overflow-hidden shadow-lg">
+
       {/* Image background */}
       <div className="relative w-full h-60">
         <Image src={imageUrl} alt={placeName} fill className="object-cover"/>

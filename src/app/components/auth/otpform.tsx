@@ -135,11 +135,11 @@ export function OTPForm() {
       </div>
 
       {/* Verify Button */}
-      <div className="w-full max-w-[200px]">
+      <div className="w-full max-w-[250px]">
          <button
           onClick={handleSubmit}
           disabled={isLoading || otp.some((digit) => !digit)}
-          className="w-full bg-[#28B872] hover:bg-[#1f9d62] disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium py-2 rounded-4xl text-[11px] transition-colors duration-200"
+          className="w-[250px] justify-center   bg-[#28B872] hover:bg-[#1f9d62] disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium py-2 rounded-4xl text-[11px] transition-colors duration-200"
           style={{ fontFamily: "'Century Gothic', sans-serif", fontWeight: 300 }}
         >
           {isLoading ? "Verifying..." : "Verify"}

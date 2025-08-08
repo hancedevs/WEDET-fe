@@ -67,15 +67,19 @@ export default function ResortPage() {
                 {card.buttonText}
               </button>
             </div>
-            <div className="absolute -bottom-8  right-0 z-10">
+            <div className="absolute bottom-[-30px] right-[-14px] z-10">
               <Image
                 key={index}
                 src={card.image1}
                 alt="logo"
                 width={200}
-                height={100}
+                height={10}
                 quality={80}
-                className=""
+                className="w-[150px] sm:w-[150px] md:w-[200px] h-auto"
+                style={{
+                  maxWidth: "100%",
+                  height: "auto",
+                }}
               />
             </div>
           </div>
