@@ -66,7 +66,7 @@ export default function BookingPage() {
             <div className="flex items-center gap-2 mt-2">
               {/* Plus button */}
               <button
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#28B872] text-white text-xl font-bold active:scale-95 transition border border-[#28B872]"
+                className="w-8 h-8 flex  justify-center rounded-full bg-[#28B872] text-white text-xl font-bold active:scale-95 transition border border-[#28B872]"
                 onClick={() => setSeats((s) => Math.min(maxSeats, s + 1))}
                 aria-label="Add seat"
               >
@@ -74,7 +74,7 @@ export default function BookingPage() {
               </button>
               {/* Minus button  */}
               <button
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-[#28B872] text-xl font-bold active:scale-95 transition border border-[#28B872]"
+                className="w-8 h-8 flex justify-center rounded-full bg-white text-[#28B872] text-xl font-bold active:scale-95 transition border border-[#28B872]"
                 onClick={() => setSeats((s) => Math.max(1, s - 1))}
                 aria-label="Remove seat"
               >
