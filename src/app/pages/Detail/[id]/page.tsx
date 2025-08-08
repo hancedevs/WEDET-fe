@@ -14,8 +14,8 @@ export default function TourPage() {
   const [currentImage, setCurrentImage] = useState(0);
   const router = useRouter();
   const handeclick = () => {
-    router.push('/pages/home');
-  }
+    router.push("/pages/home");
+  };
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % Images.length);
@@ -40,7 +40,11 @@ export default function TourPage() {
         <div className="absolute inset-0 bg-black/40" />
         <div className="absolute top-4 left-4 flex items-center gap-2 z-10">
           <button className="p-2 bg-white/80 rounded-full hover:bg-white">
-            <ChevronLeft size={20} className="text-green-500" onClick={handeclick}/>
+            <ChevronLeft
+              size={20}
+              className="text-green-500"
+              onClick={handeclick}
+            />
           </button>
         </div>
         <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
@@ -89,18 +93,23 @@ export default function TourPage() {
               <span>Location</span>
             </div>
           </div>
-          <div className="mb-6">
-            <div className="flex flex-wrap gap-2">
-              {["Wildlife", "Jungle", "Culture", "Wildlife"].map((tag, i) => (
-                <span
-                  key={i}
-                  className="border border-gray-300 text-black font-semibold rounded-full px-3 py-1 text-sm"
-                >
-                  {tag}
-                </span>
-              ))}
+          <div className="w-full px-4 sm:px-6 lg:px-0">
+            {/* Scrollable container on small screens */}
+            <div className="overflow-x-auto">
+              {/* Inner scrollable flex container */}
+              <div className="flex gap-2 max-w-4xl pb-3 mx-auto sm:justify-center sm:flex-wrap sm:overflow-visible min-w-fit">
+                {["Wildlife", "Jungle", "Culture", "Wildlife"].map((tag, i) => (
+                  <span
+                    key={i}
+                    className="whitespace-nowrap border border-gray-300 text-black font-semibold rounded-full px-4 py-1 text-sm sm:text-base"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
+
           <div className="mb-6 border border-gray-300 px-10 py-4 rounded-4xl grid grid-cols-3 gap-6">
             <div>
               <div className="text-xs text-gray-500">Duration</div>
@@ -116,7 +125,7 @@ export default function TourPage() {
             </div>
           </div>
           <div className="shadow-lg flex flex-col rounded-[35px] p-3">
-            <div className="flex gap-2 justify-between items-center mb-4">
+            <div className="flex gap-2 justify-between items-center mb-2">
               <div className="flex items-center gap-2">
                 <Avatar className="h-15 w-15 border-2 border-green-500">
                   <AvatarImage
@@ -138,21 +147,26 @@ export default function TourPage() {
                 <span className="ml-1 text-sm font-medium">4.7</span>
               </div>
             </div>
-            <p className="text-gray-400 px-6 mb-4">
-              Carlos is a naturalist guide born in the Amazon basin. His
-              encyclopedic knowledge of rainforest ecology combined with his
-              ability to spot even the most elusive wildlife, makes him one of
-              Perus most respected jungle guides.
-            </p>
-            <div className="flex px-4 flex-wrap gap-1 mb-3">
-              {["Wildlife", "Jungle", "Culture", "Wildlife"].map((tag, i) => (
-                <span
-                  key={i}
-                  className="border border-gray-200 text-black rounded-full px-3 py-1 text-sm"
-                >
-                  {tag}
-                </span>
-              ))}
+
+            <div className="pl-11">
+              <p className="text-gray-400 px-6 mb-4">
+                Carlos is a naturalist guide born in the Amazon basin. His
+                encyclopedic knowledge of rainforest ecology combined with his
+                ability to spot even the most elusive wildlife, makes him one of
+                Perus most respected jungle guides.
+              </p>
+            </div>
+            <div className="overflow-x-auto">
+              <div className="flex gap-2 max-w-4xl pb-3 mx-auto sm:justify-center sm:flex-wrap sm:overflow-visible min-w-fit">
+                {["Wildlife", "Jungle", "Culture", "Wildlife"].map((tag, i) => (
+                  <span
+                    key={i}
+                    className="whitespace-nowrap border border-gray-300 text-black font-semibold rounded-full px-4 py-1 text-sm sm:text-base"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
           <div className="w-full max-w-full overflow-hidden">
@@ -171,12 +185,14 @@ export default function TourPage() {
             reviews={400}
             agencyName="Simien Explore Tours"
           />
-          <button className="w-full bg-[#28B872] hover:bg-[#28B880] text-white py-3 mt-10 mb-20 rounded-[35px] font-bold transition-colors"
-          onClick={()=> router.push('/book/step1')}>
+          <button
+            className="w-full bg-[#28B872] hover:bg-[#28B880] text-white py-3 mt-10 mb-20 rounded-[35px] font-bold transition-colors"
+            onClick={() => router.push("/book/step1")}
+          >
             Book now!
           </button>
         </div>
-        <NavBar/>
+        <NavBar />
       </div>
     </div>
   );
