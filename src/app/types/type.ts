@@ -96,6 +96,21 @@ export interface TripSummaryData {
   guide: string;
 }
 
+export type TripStatus = 'upcoming' | 'confirming' | 'wishlist';
+
+export type Trip = {
+  id: string;
+  title: string;
+  location: string;
+  priceBr: number;
+  durationDays: number;
+  imageUrl: string;
+  status: TripStatus;
+  available?: boolean; 
+};
+
+
+
 // Schema types 
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type SignupFormData = z.infer<typeof signupSchema>;
