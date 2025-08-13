@@ -1,19 +1,23 @@
 "use client";
 
-import { useRef, ChangeEvent } from "react";
+import React, { useRef, ChangeEvent } from "react";
 
 type Props = {
   value: string[];
   onChange: (arr: string[]) => void;
   error?: string;
+  max?: number; // default 10
 };
 
-export default function PhotoPicker({ value, onChange, error }: Props) {
-  const ref = useRef<HTMLInputElement>(null);
+const VISIBLE_TILES = 3;
+
+export default function PhotoPicker({ value, onChange, error, max = 10 }: Props) {
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const toDataUrls = async (files: FileList) => {
-    const arr = await Promise.all(
-      Array.from(files).map(
+    const items = Array.from(files);
+    const urls = await Promise.all(
+      items.map(
         (f) =>
           new Promise<string>((res) => {
             const r = new FileReader();
@@ -22,50 +26,111 @@ export default function PhotoPicker({ value, onChange, error }: Props) {
           })
       )
     );
-    return arr;
+    return urls;
   };
 
   const onFiles = async (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const picked = await toDataUrls(e.target.files);
-    onChange([...value, ...picked].slice(0, 10));
+    onChange([...value, ...picked].slice(0, max));
+    e.target.value = ""; // allow re-picking the same files
   };
+
+  const openPicker = () => fileRef.current?.click();
+
+  // Ensure we always show up to 3 tiles; if fewer images, fill with add-tiles
+  const remainingCapacity = Math.max(0, max - value.length);
+  const addTiles = Math.min(
+    Math.max(0, VISIBLE_TILES - value.length),
+    remainingCapacity
+  );
+  const showScroll = value.length + addTiles > VISIBLE_TILES; // informational, overflow is enabled regardless
 
   return (
     <div>
-      <div className="flex gap-3">
-        {value.map((src, i) => (
-          <div
-            key={i}
-            className="relative w-[88px] h-[62px] rounded-2xl overflow-hidden border-2 border-[#ECECEC]"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={src} alt="trip" className="w-full h-full object-cover" />
+      {/* Outer card */}
+      <div
+        className="
+          rounded-3xl bg-white border border-[#F0F0F0]
+          shadow-[0_6px_20px_rgba(0,0,0,0.08)] p-3
+        "
+      >
+        {/* Horizontal strip */}
+        <div
+          className="
+            flex flex-nowrap gap-3 overflow-x-auto overscroll-x-contain
+            px-1
+          "
+          style={{ scrollSnapType: showScroll ? "x mandatory" : undefined }}
+        >
+          {/* Image tiles */}
+          {value.map((src, i) => (
+            <div
+              key={i}
+              className="
+                relative shrink-0 w-[96px] h-[96px]
+                rounded-2xl overflow-hidden
+                bg-gray-100
+              "
+              style={{ scrollSnapAlign: "start" }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt={`photo-${i}`} className="w-full h-full object-cover" />
+              <button
+                type="button"
+                onClick={() => onChange(value.filter((_, idx) => idx !== i))}
+                aria-label="Remove photo"
+                className="
+                  absolute top-1.5 right-2 text-[#28B872]
+                  text-xl leading-none font-bold
+                  hover:scale-110 active:scale-95 transition
+                "
+              >
+                ×
+              </button>
+            </div>
+          ))}
+
+          {/* Add tiles to complete up to 3 visible slots */}
+          {Array.from({ length: addTiles }).map((_, k) => (
+            <button
+              key={`add-${k}`}
+              type="button"
+              onClick={openPicker}
+              className="
+                shrink-0 w-[96px] h-[96px] rounded-2xl
+                border-2 border-dashed border-[#28B872]/60
+                bg-[#F6FFFA] grid place-items-center
+                hover:bg-[#F0FFF7] active:scale-95 transition
+              "
+              style={{ scrollSnapAlign: "start" }}
+              aria-label="Add photos"
+            >
+              <ImagePlus className="w-9 h-9" />
+            </button>
+          ))}
+
+          {/* If there’s still capacity beyond the first 3, show an extra add tile at the end */}
+          {remainingCapacity > addTiles && (
             <button
               type="button"
-              className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-white border border-[#28B872] text-[#28B872] leading-none"
-              onClick={() => onChange(value.filter((_, x) => x !== i))}
-              aria-label="remove"
+              onClick={openPicker}
+              className="
+                shrink-0 w-[96px] h-[96px] rounded-2xl
+                border-2 border-dashed border-[#28B872]/60
+                bg-[#F6FFFA] grid place-items-center
+                hover:bg-[#F0FFF7] active:scale-95 transition
+              "
+              aria-label="Add more photos"
             >
-              ×
+              <ImagePlus className="w-9 h-9" />
             </button>
-          </div>
-        ))}
-
-        {[0, 1].map((k) => (
-          <button
-            key={k}
-            type="button"
-            onClick={() => ref.current?.click()}
-            className="w-[88px] h-[62px] rounded-2xl border-2 border-dashed border-[#28B872]/50 bg-[#F6FFFA] grid place-items-center"
-          >
-            <span className="text-[#28B872] text-xl">🖼️</span>
-          </button>
-        ))}
+          )}
+        </div>
       </div>
 
       <input
-        ref={ref}
+        ref={fileRef}
         type="file"
         accept="image/*"
         multiple
@@ -73,9 +138,27 @@ export default function PhotoPicker({ value, onChange, error }: Props) {
         onChange={onFiles}
       />
 
-      {error ? (
-        <div className="text-[11px] text-red-500 mt-1">{error}</div>
-      ) : null}
+      {error && <div className="text-[11px] text-red-500 mt-1">{error}</div>}
     </div>
+  );
+}
+
+/** Simple image-with-plus icon to match the mock */
+function ImagePlus({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="#28B872"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="3.5" y="5" width="13" height="12" rx="2.2" />
+      <path d="M5.5 14.5l3.2-3.2a1 1 0 011.4 0l3.4 3.4M10 10.2l1.6-1.6" />
+      <path d="M19 9v-2M19 8h2M19 8h-2M19 10v-2" />{/* plus */}
+    </svg>
   );
 }
