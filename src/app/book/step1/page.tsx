@@ -53,7 +53,7 @@ export default function Step1() {
                 </label>
                 <Input
                   id="firstName"
-                  className="rounded-full border-none bg-[#fafafa] shadow text-base px-5 py-2 focus:ring-2 focus:ring-[#26cc73] focus:border-none"
+                 className="rounded-full border-none bg-[#fafafa] shadow text-base px-5 py-2 focus:ring-2 focus:ring-[#26cc73] focus:border-none" 
                   placeholder="John"
                   {...register("firstName")}
                 />
