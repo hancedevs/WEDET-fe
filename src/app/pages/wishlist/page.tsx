@@ -1,5 +1,5 @@
 "use client";
-
+// This is a client component
 import { useMemo, useState } from "react";
 import SegmentedTabs from "@/app/components/ui/SegmentedTabs";
 import TripCard from "@/app/components/ui/TripCard";
@@ -81,9 +81,7 @@ export default function TripsPage() {
   const router = useRouter();
 
   return (
-   
     <div className="min-h-dvh flex flex-col  bg-white">
-    
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur px-3 py-2 border-b border-[#F0F0F0]">
         <div className="mx-auto mb-4 w-full max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg">
           <button
