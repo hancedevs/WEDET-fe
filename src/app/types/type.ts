@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { loginSchema, signupSchema, otpSchema , forgotPasswordSchema , resetPasswordSchema, step2Schema, step3Schema, step4Schema, step1Schema } from "@/lib/validation";
+import { LucideIcon } from "lucide-react";
 
 export interface User {
   id: string;
@@ -125,3 +126,5 @@ export type Step4FormData = z.infer<typeof step4Schema>;
 // utility types
 export type Gender = "male" | "female"; 
 export type AuthType = "login" | "signup" | "forgot-password" | "otp";
+
+
