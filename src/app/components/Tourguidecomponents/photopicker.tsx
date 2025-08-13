@@ -6,12 +6,17 @@ type Props = {
   value: string[];
   onChange: (arr: string[]) => void;
   error?: string;
-  max?: number; // default 10
+  max?: number;
 };
 
 const VISIBLE_TILES = 3;
 
-export default function PhotoPicker({ value, onChange, error, max = 10 }: Props) {
+export default function PhotoPicker({
+  value,
+  onChange,
+  error,
+  max = 20,
+}: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const toDataUrls = async (files: FileList) => {
@@ -75,7 +80,11 @@ export default function PhotoPicker({ value, onChange, error, max = 10 }: Props)
               style={{ scrollSnapAlign: "start" }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt={`photo-${i}`} className="w-full h-full object-cover" />
+              <img
+                src={src}
+                alt={`photo-${i}`}
+                className="w-full h-full object-cover"
+              />
               <button
                 type="button"
                 onClick={() => onChange(value.filter((_, idx) => idx !== i))}
@@ -143,22 +152,26 @@ export default function PhotoPicker({ value, onChange, error, max = 10 }: Props)
   );
 }
 
-/** Simple image-with-plus icon to match the mock */
-function ImagePlus({ className = "" }: { className?: string }) {
+
+function ImagePlus({ }: { className?: string }) {
   return (
     <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="70"
+      height="70"
       viewBox="0 0 24 24"
-      className={className}
       fill="none"
-      stroke="#28B872"
-      strokeWidth="1.8"
+      stroke="#4cc274"
+      strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
-      aria-hidden="true"
+      className="lucide lucide-image-plus-icon lucide-image-plus"
     >
-      <rect x="3.5" y="5" width="13" height="12" rx="2.2" />
-      <path d="M5.5 14.5l3.2-3.2a1 1 0 011.4 0l3.4 3.4M10 10.2l1.6-1.6" />
-      <path d="M19 9v-2M19 8h2M19 8h-2M19 10v-2" />{/* plus */}
+      <path d="M16 5h6" />
+      <path d="M19 2v6" />
+      <path d="M21 11.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7.5" />
+      <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+      <circle cx="9" cy="9" r="2" />
     </svg>
   );
 }
