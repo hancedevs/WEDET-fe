@@ -92,16 +92,10 @@ export default function Step2() {
           <Label className="block text-black font-medium mb-2">
             Group Number
           </Label>
-          <Select>
-            <SelectTrigger className="mb-4 w-full rounded-[35px] border-none shadow">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="text-green-500">
-              <SelectItem value="1">1</SelectItem>
-              <SelectItem value="2">2</SelectItem>
-              <SelectItem value="3">3</SelectItem>
-            </SelectContent>
-          </Select>
+          <Input
+            type="number"
+            className="p-2 rounded-[35px] shadow border-none mb-4"
+          />
 
           <Label className="block text-black font-medium mb-4">
             Daily activities
