@@ -22,7 +22,7 @@ export default function Step1Page() {
     formState: { errors, isSubmitting },
   } = useForm<Step1FormData>({
     resolver: zodResolver(step1Schema),
-    mode: "onSubmit",          
+    mode: "onSubmit",
     reValidateMode: "onChange",
     shouldFocusError: true,
     defaultValues: {
@@ -41,12 +41,11 @@ export default function Step1Page() {
     setValue("photos", arr, { shouldValidate: true, shouldDirty: true });
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const onSubmit = (data:Step1FormData) => {
-    // console.log("Step1", data);
+  const onSubmit = (data: Step1FormData) => {
+    
     router.push("/Tourguide/Tourtrip2");
   };
 
- 
   const submitOrFocus = handleSubmit(onSubmit, (errs) => {
     const first = Object.keys(errs)[0] as keyof Step1FormData | undefined;
     if (first) setFocus(first);
@@ -55,9 +54,14 @@ export default function Step1Page() {
   return (
     <div className="relative">
       <TourtripLayout progress={33} title="Trip post">
-        <form onSubmit={submitOrFocus} className="pb-[140px] max-w-[430px] mx-auto">
+        <form
+          onSubmit={submitOrFocus}
+          className="pb-[140px] max-w-[430px] mx-auto"
+        >
           <h3 className="text-sm font-semibold mb-2">Step 1</h3>
-          <div className="text-[13px] font-semibold mb-3">Basic Tour Information</div>
+          <div className="text-[13px] font-semibold mb-3">
+            Basic Tour Information
+          </div>
 
           {/* Tour name */}
           <label className="block text-[15px] text-black">Tour name</label>
@@ -72,23 +76,31 @@ export default function Step1Page() {
             "
             aria-invalid={!!errors.tourName}
           />
-          {errors.tourName && <p className="text-red-500 text-xs mb-2">{errors.tourName.message}</p>}
+          {errors.tourName && (
+            <p className="text-red-500 text-xs mb-2">
+              {errors.tourName.message}
+            </p>
+          )}
 
           {/* Tour type (select) */}
-          <label className="block text-[15px] font-semibold text-black">Tour type</label>
+          <label className="block text-[15px] font-semibold text-black">
+            Tour type
+          </label>
           <div className="relative mt-1 mb-1">
             <select
               {...register("tourType")}
               defaultValue=""
               className="
-                appearance-none w-full h-10 rounded-full bg-[#fafafa] shadow px-5 pr-10 text-base outline-none
+                appearance-none w-full h-10 rounded-full bg-[#fafafa] shadow px-5 pr-10 text-base outline-none mb-4
                 border-none focus:border-none focus:ring-2 focus:ring-[#26cc73]
                 placeholder:text-gray-400 caret-[#26cc73]
                 aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-500/60
               "
               aria-invalid={!!errors.tourType}
             >
-              <option value="" disabled>Select type</option>
+              <option value="" disabled>
+                Select type
+              </option>
               <option value="safari">Safari</option>
               <option value="hiking">Hiking</option>
               <option value="cultural">Cultural</option>
@@ -98,10 +110,16 @@ export default function Step1Page() {
               className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
             />
           </div>
-          {errors.tourType && <p className="text-red-500 text-xs mb-2">{errors.tourType.message}</p>}
+          {errors.tourType && (
+            <p className="text-red-500 text-xs mb-2">
+              {errors.tourType.message}
+            </p>
+          )}
 
           {/* Destination */}
-          <label className="block text-[15px] font-semibold text-black">Destination/Park</label>
+          <label className="block text-[15px] font-semibold text-black">
+            Destination/Park
+          </label>
           <input
             {...register("destination")}
             placeholder="Wenchi Lake"
@@ -113,7 +131,11 @@ export default function Step1Page() {
             "
             aria-invalid={!!errors.destination}
           />
-          {errors.destination && <p className="text-red-500 text-xs mb-2">{errors.destination.message}</p>}
+          {errors.destination && (
+            <p className="text-red-500 text-xs mb-2">
+              {errors.destination.message}
+            </p>
+          )}
 
           {/* Photos */}
           <div className="text-[15px] font-semibold text-black">Photos</div>
@@ -126,7 +148,9 @@ export default function Step1Page() {
           </div>
 
           {/* Starting point */}
-          <label className="block text-[15px] font-semibold text-black">Starting point</label>
+          <label className="block text-[15px] font-semibold text-black">
+            Starting point
+          </label>
           <input
             {...register("startingPoint")}
             placeholder="Addis Ababa"
@@ -138,10 +162,16 @@ export default function Step1Page() {
             "
             aria-invalid={!!errors.startingPoint}
           />
-          {errors.startingPoint && <p className="text-red-500 text-xs mb-2">{errors.startingPoint.message}</p>}
+          {errors.startingPoint && (
+            <p className="text-red-500 text-xs mb-2">
+              {errors.startingPoint.message}
+            </p>
+          )}
 
           {/* Overview */}
-          <label className="block text-[15px] font-semibold text-black">Overview</label>
+          <label className="block text-[15px] font-semibold text-black">
+            Overview
+          </label>
           <textarea
             {...register("overview")}
             placeholder="Brief description of the tour..."
@@ -153,10 +183,16 @@ export default function Step1Page() {
             "
             aria-invalid={!!errors.overview}
           />
-          {errors.overview && <p className="text-red-500 text-xs mb-2">{errors.overview.message}</p>}
+          {errors.overview && (
+            <p className="text-red-500 text-xs mb-2">
+              {errors.overview.message}
+            </p>
+          )}
 
           {/* Top highlights */}
-          <label className="block text-[15px] font-semibold text-black">Top highlights</label>
+          <label className="block text-[15px] font-semibold text-black">
+            Top highlights
+          </label>
           <input
             {...register("highlights")}
             placeholder="Sunset, boat ride, hot springs…"
@@ -168,14 +204,18 @@ export default function Step1Page() {
             "
             aria-invalid={!!errors.highlights}
           />
-          {errors.highlights && <p className="text-red-500 text-xs mb-2">{errors.highlights.message}</p>}
+          {errors.highlights && (
+            <p className="text-red-500 text-xs mb-2">
+              {errors.highlights.message}
+            </p>
+          )}
 
           {/* Step controller (prev/next) */}
           <div className="mt-23 pb-6">
             <StepController
               onPrev={() => router.back()}
-              onNext={submitOrFocus}     // <-- triggers validation & focuses first error
-              canNext={!isSubmitting}    // don't block validation; only disable while submitting
+              onNext={submitOrFocus} // <-- triggers validation & focuses first error
+              canNext={!isSubmitting} // don't block validation; only disable while submitting
               className="max-w-[430px] mx-auto"
             />
           </div>
