@@ -200,11 +200,11 @@ export default function TripPostStep3() {
 
           {renderCustomToggle()}
 
-          {/* Wenchi Card */}
-          <div className="relative bg-white rounded-2xl shadow-md p-4 mb-15 mt- w-full">
+          {/* schedule button */}
+          <div className="relative bg-white rounded-2xl shadow-md p-4 mb-15 w-full">
             <div className="flex items-center bg-[#F3F8F6] rounded-full w-full h-9 mx-auto -mt-6 mb-3 shadow-sm">
               <button
-                className={`flex-1 h-8 rounded-full font-medium text-sm shadow transition-all ${
+                className={`flex-1 h-8 rounded-full font-medium text-sm shadow  ${
                   cardTab === "oneTime"
                     ? "bg-[#28B872] text-white"
                     : "text-gray-400"
@@ -224,32 +224,28 @@ export default function TripPostStep3() {
                 Scheduled
               </button>
             </div>
-
-            <div className="relative bg-white rounded-2xl shadow p-3 pt-0">
-              <div className="flex flex-row gap-4 items-center">
+            {/* wenchi card */}
+            <div className="relative bg-white rounded-2xl w-full shadow p-3 pt-3">
+              <div className="flex flex-row gap-4 w-full items-center">
                 <Image
                   src="/tipsimage.png"
                   alt="Wenchi"
-                  width={200}
-                  height={200}
-                  className="w-35 h-45 object-cover rounded-xl"
+                  width={120}
+                  height={120}
+                  className="w-35 h-55 object-cover rounded-4xl"
                   priority
                 />
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl leading-tight">Wenchi</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start gap-90 relative">
                     <button
                       type="button"
                       onClick={() =>
                         dateInputRef.current?.showPicker &&
                         dateInputRef.current.showPicker()
                       }
-                      className="focus:outline-none"
+                      className="absolute -top-3 p-2 bg-white rounded-full justify-end w-30 h-10 flex items-center shadow-lg justify-center z-10"
                     >
-                      <Calendar
-                        className="w-8 h-5"
-                        style={{ color: "#28B872" }}
-                      />
+                      <Calendar className="w-6 h-6 text-[#28B872]" />
                     </button>
                     <input
                       ref={dateInputRef}
@@ -258,6 +254,7 @@ export default function TripPostStep3() {
                       onChange={(e) => setSelectedDate(e.target.value)}
                       className="hidden"
                     />
+                    <span className="mt-8 text-2xl font-bold mt-6">Wenchi</span>
                   </div>
                   <div className="flex flex-row flex-wrap gap-x-6 gap-y-2 items-center mt-2">
                     <div className="flex items-center text-gray-700 text-base">
