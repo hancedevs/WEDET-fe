@@ -1,6 +1,17 @@
 import { z } from "zod";
-import { loginSchema, signupSchema, otpSchema , forgotPasswordSchema , resetPasswordSchema, step2Schema, step3Schema, step4Schema, step1Schema } from "@/lib/validation";
+import type { SVGProps } from "react";
 import { LucideIcon } from "lucide-react";
+import {
+  loginSchema,
+  signupSchema,
+  otpSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  step2Schema,
+  step3Schema,
+  step4Schema,
+  step1Schema,
+} from "@/lib/validation";
 
 export interface User {
   id: string;
@@ -20,7 +31,6 @@ export interface SignupFormDatas {
   password: string;
   agreeToTerms: boolean;
 }
-
 
 export interface OnboardingStep {
   id: number;
@@ -97,7 +107,7 @@ export interface TripSummaryData {
   guide: string;
 }
 
-export type TripStatus = 'upcoming' | 'confirming' | 'wishlist';
+export type TripStatus = "upcoming" | "confirming" | "wishlist";
 
 export type Trip = {
   id: string;
@@ -107,12 +117,38 @@ export type Trip = {
   durationDays: number;
   imageUrl: string;
   status: TripStatus;
-  available?: boolean; 
+  available?: boolean;
 };
 
+// Tourguie type
 
+export type IconProps = SVGProps<SVGSVGElement> & { size?: number };
 
-// Schema types 
+export type StepControllerProps = {
+  prevHref?: string;
+  nextHref?: string;
+  showPrev?: boolean;
+  canPrev?: boolean;
+  canNext?: boolean;
+  onPrev?: () => void;
+  onNext?: () => void;
+  className?: string;
+};
+
+// Tourguide navbar
+export type NavValue = "explore" | "my-trips" | "profile";
+
+export type NavItem = {
+  href: string;
+  label: string;
+  value: NavValue;
+  Icon: LucideIcon;
+};
+
+export type NavbarProps = {
+  active?: NavValue;
+};
+// Schema types
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type SignupFormData = z.infer<typeof signupSchema>;
 export type OTPFormData = z.infer<typeof otpSchema>;
@@ -124,7 +160,5 @@ export type Step3FormData = z.infer<typeof step3Schema>;
 export type Step4FormData = z.infer<typeof step4Schema>;
 
 // utility types
-export type Gender = "male" | "female"; 
+export type Gender = "male" | "female";
 export type AuthType = "login" | "signup" | "forgot-password" | "otp";
-
-

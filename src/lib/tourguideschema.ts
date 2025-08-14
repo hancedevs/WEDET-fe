@@ -1,6 +1,4 @@
 import { z } from "zod";
-
-/** Zod schema for Step 1 */
 export const step1Schema = z.object({
   tourName: z.string().min(2, "Tour name is required"),
   tourType: z.string().min(1, "Select a tour type"),
@@ -15,8 +13,8 @@ export const step1Schema = z.object({
           "Invalid image"
         )
     )
-    .min(1, "Add at least one photo")
-    .max(10, "Max 10 photos"),
+    .min(2, "Add at least two photo")
+    .max(50, "Max 50 photos"),
   startingPoint: z.string().min(1, "Starting point is required"),
   overview: z.string().min(10, "Overview must be at least 10 characters"),
   highlights: z.string().min(2, "Add at least one highlight"),

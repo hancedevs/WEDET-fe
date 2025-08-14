@@ -2,21 +2,16 @@
 
 import Link from "next/link";
 import clsx from "clsx";
-import type { LucideIcon } from "lucide-react";
 import { House, MapPin, User } from "lucide-react";
-type Item = { href: string; label: string; value: string; Icon: LucideIcon };
+import type { NavItem, NavbarProps } from "@/app/types/type";
 
-const items: Item[] = [
-  { href: "/explore", label: "Explore", value: "explore", Icon: House },
+const items = [
+  { href: "/explore",  label: "Explore",  value: "explore",  Icon: House },
   { href: "/my-trips", label: "My Trips", value: "my-trips", Icon: MapPin },
-  { href: "", label: "Profile", value: "profile", Icon: User },
-];
+  { href: "/profile",  label: "Profile",  value: "profile",  Icon: User },
+] as const satisfies readonly NavItem[];
 
-export default function Navbar({
-  active = "explore",
-}: {
-  active?: Item["value"];
-}) {
+export default function Navbar({ active = "explore" }: NavbarProps) {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[#ECECEC]">
       <div
@@ -24,6 +19,7 @@ export default function Navbar({
           mx-auto max-w-[430px]
           px-8 pt-3 pb-4
           grid grid-cols-3 place-items-center
+          gap-x-12 md:gap-x-20
         "
         style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
       >
@@ -42,7 +38,7 @@ export default function Navbar({
               )}
             >
               <Icon
-                size={25}
+                size={29}
                 strokeWidth={1}
                 className="transition-colors"
                 style={{ color }}
@@ -50,7 +46,7 @@ export default function Navbar({
               />
               <span
                 className={clsx(
-                  "text-[10px] font-semibold tracking-tight",
+                  "text-[13px] font-semibold tracking-tight",
                   isActive ? "text-[#28B872]" : "text-gray-400"
                 )}
               >
