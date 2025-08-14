@@ -12,19 +12,19 @@ type Props = {
 export default function TourtripLayout({ title, progress = 0, children }: Props) {
   const pct = Math.max(0, Math.min(100, progress));
   // total header height we reserve (title row + progress + paddings)
-  const HEADER_H = 88; // tweak if you change paddings
+  const HEADER_H = 88; 
 
   return (
     <div className="min-h-screen bg-white">
-      {/* FIXED header */}
+      
       <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#ECECEC] shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
         <div
           className="mx-auto max-w-[430px] px-4 pt-6 pb-3"
-          // respect iOS notch
+          
           style={{ paddingTop: 'max(1.25rem, calc(env(safe-area-inset-top) + 0.5rem))' }}
         >
           <div className="flex items-center justify-between">
-            <h1 className="text-sm font-semibold tracking-tight">{title}</h1>
+            <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
             <button
               type="button"
               aria-label="Notifications"
