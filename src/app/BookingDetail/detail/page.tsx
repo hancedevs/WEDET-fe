@@ -33,7 +33,7 @@ const TripCard: React.FC<TripCardProps> = ({
 }) => {
   return (
     <div className="mx-4 my-2 p-4 border border-green-400 rounded-2xl bg-green-50">
-      <div className="flex justify-between text-sm text-gray-600 mb-2">
+      <div className="flex justify-between font-bold text-sm text-gray-600 mb-2">
         <span>{date}</span>
         <span>Duration: {duration}</span>
       </div>
@@ -91,11 +91,11 @@ export default function TourPage() {
           onClick={() => router.back()}
           className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200"
         >
-          <ArrowLeft className="text-green-500" size={20} />
+          <ArrowLeft className="text-green-600" size={30} />
         </button>
         <div>
-          <h1 className="text-lg font-bold">Trip Details</h1>
-          <p className="text-sm text-gray-500">Overview</p>
+          <h1 className="text-lg font-bold">Wenchi Trip</h1>
+          <p className="text-sm font-bold text-gray-500">Details</p>
         </div>
       </div>
 
@@ -114,7 +114,7 @@ export default function TourPage() {
       </div>
 
       {/* Edit Button */}
-      <div className="px-4 py-20 mb-4 flex items-center justify-center">
+      <div className="px-4 mt-3 mb-30 flex items-center justify-center">
         <button
           onClick={() => alert("Edit clicked")}
           className="w-20  gap-2 px-4 py-2 rounded-full bg-[#28B872] hover:bg-green-600 text-white font-semibold transition-colors"
