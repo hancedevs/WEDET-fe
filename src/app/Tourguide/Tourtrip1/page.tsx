@@ -77,7 +77,7 @@ export default function Step1Page() {
           <label className="block text-[15px] ">Tour type</label>
           <div className="relative mt-1 mb-1">
             <select
-              {...register("tourType")}
+              {...register("tourType")} 
               defaultValue=""
               className="
                 appearance-none w-full h-10 rounded-full bg-[#fafafa] shadow px-5 pr-10 text-base outline-none mb-4
