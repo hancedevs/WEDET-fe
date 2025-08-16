@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ArrowLeft, Edit3 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Detailfilter from "@/app/components/ui/Detailfilter";
 import Navbar from "@/app/components/Tourguidecomponents/TourGuideNavbar";
