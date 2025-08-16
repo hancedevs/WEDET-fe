@@ -34,9 +34,8 @@ export default function Step1Page() {
   const onPhotosChange = (arr: string[]) =>
     setValue("photos", arr, { shouldValidate: true, shouldDirty: true });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSubmit = (data: Step1FormData) => {
-    router.push("/Tourguide/Tourtrip2");
+    router.push("/Tourguide/Tourtip2");
   };
 
   const submitOrFocus = handleSubmit(onSubmit, (errs) => {
@@ -77,7 +76,7 @@ export default function Step1Page() {
           <label className="block text-[15px] ">Tour type</label>
           <div className="relative mt-1 mb-1">
             <select
-              {...register("tourType")}
+              {...register("tourType")} 
               defaultValue=""
               className="
                 appearance-none w-full h-10 rounded-full bg-[#fafafa] shadow px-5 pr-10 text-base outline-none mb-4
@@ -93,7 +92,7 @@ export default function Step1Page() {
               <option value="safari">Safari</option>
               <option value="hiking">Hiking</option>
               <option value="cultural">Cultural</option>
-              <option value="cultural">Adventure</option>
+              <option value="adventure">Adventure</option>
             </select>
             <ChevronDown
               size={16}
@@ -170,7 +169,7 @@ export default function Step1Page() {
 
           <label className="block text-[15px] ">Top highlights</label>
           <textarea
-            {...register("overview")}
+            {...register("highlights")}
             placeholder="Sunset, boat ride, hot springs…"
             className="
               mt-1 mb-4 w-full h-28 rounded-2xl bg-[#fafafa] shadow px-5 py-3 text-base outline-none
@@ -178,18 +177,17 @@ export default function Step1Page() {
               placeholder:text-gray-400 caret-[#26cc73]
               aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-500/60
             "
-            aria-invalid={!!errors.overview}
+            aria-invalid={!!errors.highlights}
           />
-          {errors.overview && (
+          {errors.highlights && (
             <p className="text-red-500 text-xs mb-2">
-              {errors.overview.message}
+              {errors.highlights.message}
             </p>
           )}
 
           <div className="mt-23 pb-6">
             <StepController
               showPrev={false}
-              onNext={submitOrFocus}
               canNext={!isSubmitting}
               className="max-w-[430px] mx-auto"
             />
