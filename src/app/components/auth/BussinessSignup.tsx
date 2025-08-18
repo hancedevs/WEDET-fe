@@ -230,17 +230,21 @@ export default function Signupform() {
                         />
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="w-10 h-10 text-green-500"
-                          fill="none"
+                          width="70"
+                          height="70"
                           viewBox="0 0 24 24"
-                          stroke="currentColor"
+                          fill="none"
+                          stroke="#4cc274"
+                          strokeWidth="1.25"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="lucide lucide-image-plus-icon lucide-image-plus"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 4v16m8-8H4"
-                          />
+                          <path d="M16 5h6" />
+                          <path d="M19 2v6" />
+                          <path d="M21 11.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7.5" />
+                          <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                          <circle cx="9" cy="9" r="2" />
                         </svg>
                       </label>
                     ))}
