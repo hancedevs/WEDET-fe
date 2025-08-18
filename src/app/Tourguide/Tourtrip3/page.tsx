@@ -34,9 +34,7 @@ export default function TripPostStep3() {
     { id: 2, text: "Expert naturalist guide and local guides" },
   ]);
 
-  const [selectedOption, setSelectedOption] = useState<"save" | "schedule">(
-    "save"
-  );
+  const [selectedOption, setSelectedOption] = useState<"save" | "schedule">();
 
   const handleAdd = (setter: React.Dispatch<React.SetStateAction<Item[]>>) => {
     setter((prev) => [...prev, { id: Date.now(), text: "" }]);
@@ -134,10 +132,10 @@ export default function TripPostStep3() {
   );
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen ">
       {/* Main Content */}
-      <div className="flex justify-center py-6">
-        <div className="p-6 max-w-sm w-full bg-white rounded-lg shadow">
+      <div className="flex justify-center ">
+        <div className="p-6  w-full bg-white rounded-lg shadow">
           <div className="flex justify-between items-center mb-2">
             <h1 className="font-bold text-lg">Trip post</h1>
             <Bell className="w-5 h-5" />
@@ -202,9 +200,9 @@ export default function TripPostStep3() {
 
           {/* schedule button */}
           <div className="relative bg-white rounded-2xl shadow-md p-4 mb-15 w-full">
-            <div className="flex items-center bg-[#F3F8F6] rounded-full w-full h-9 mx-auto -mt-6 mb-3 shadow-sm">
+            <div className="flex items-center gap-2 bg-[#F3F8F6] rounded-full w-full h-9 mx-auto -mt-6 mb-3 shadow-sm">
               <button
-                className={`flex-1 h-8 rounded-full font-medium text-sm shadow  ${
+                className={`flex-1 s h-9   rounded-full font-medium text-sm   ${
                   cardTab === "oneTime"
                     ? "bg-[#28B872] text-white"
                     : "text-gray-400"
@@ -214,7 +212,7 @@ export default function TripPostStep3() {
                 One Time
               </button>
               <button
-                className={`flex-1 h-8 rounded-full font-medium text-sm transition-all ${
+                className={`flex-1 h-9 rounded-full font-medium text-sm  transition-all ${
                   cardTab === "scheduled"
                     ? "bg-[#28B872] text-white shadow"
                     : "text-gray-400"
@@ -243,7 +241,7 @@ export default function TripPostStep3() {
                         dateInputRef.current?.showPicker &&
                         dateInputRef.current.showPicker()
                       }
-                      className="absolute -top-3 p-2 bg-white rounded-full justify-end w-30 h-10 flex items-center shadow-lg justify-center z-10"
+                      className="absolute -top-3 p-2 bg-white rounded-full justify-end w-full h-10 flex items-center shadow-lg justify-center z-10"
                     >
                       <Calendar className="w-6 h-6 text-[#28B872]" />
                     </button>
@@ -252,7 +250,7 @@ export default function TripPostStep3() {
                       type="date"
                       value={selectedDate}
                       onChange={(e) => setSelectedDate(e.target.value)}
-                      className="hidden"
+                      className="absolute opacity-0 w-0 h-0"
                     />
                     <span className="mt-8 text-2xl font-bold mt-6">Wenchi</span>
                   </div>

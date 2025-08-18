@@ -185,11 +185,11 @@ export default function Step2() {
           </div>
         </div>
         <div className="mt-4">
-        <StepController
-          prevHref="/Tourguide/Tourtrip1"
-          nextHref="/Tourguide/Tourtrip3"
-        />
-      </div>
+          <StepController
+            prevHref="/Tourguide/Tourtrip1"
+            nextHref="/Tourguide/Tourtrip3"
+          />
+        </div>
       </TourtripLayout>
       <Navbar />
     </div>
