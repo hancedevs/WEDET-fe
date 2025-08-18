@@ -73,15 +73,17 @@ export const forgotPasswordSchema = z.object({
   email: emailSchema,
 });
 
-export const resetPasswordSchema = z.object({
-  token: z.string().min(1, "Token is required"),
-  password: passwordSchema,
-  confirmPassword: z.string().min(1, "Please confirm your password"),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
-// Profile update schema 
+export const resetPasswordSchema = z
+  .object({
+    token: z.string().min(1, "Token is required"),
+    password: passwordSchema,
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
+// Profile update schema
 export const profileUpdateSchema = z.object({
   firstName: nameSchema,
   lastName: nameSchema,
@@ -90,8 +92,7 @@ export const profileUpdateSchema = z.object({
   gender: genderSchema,
   avatar: z.string().url("Please enter a valid URL").optional(),
 });
- //booking steps schema
-
+//booking steps schema
 
 export const step1Schema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -117,17 +118,14 @@ export const step1Schema = z.object({
   nationality: z.string().min(1, "Nationality is required"),
 });
 
-
 export const step2Schema = z.object({
-  numberOfPeople: z
-    .string()
-    .refine(
-      (val) => {
-        const num = Number(val);
-        return !isNaN(num) && num >= 1 && num <= 10;
-      },
-      { message: "You must select at least one person" }
-    ),
+  numberOfPeople: z.string().refine(
+    (val) => {
+      const num = Number(val);
+      return !isNaN(num) && num >= 1 && num <= 10;
+    },
+    { message: "You must select at least one person" }
+  ),
   people: z.array(z.any()).optional(),
   dietaryRestrictions: z.string().optional(),
   medicalConditions: z.string().optional(),
@@ -141,9 +139,61 @@ export const step3Schema = z.object({
 });
 
 export const step4Schema = z.object({
-  agreed: z.boolean().refine(val => val === true, {
+  agreed: z.boolean().refine((val) => val === true, {
     message: "Please agree to the terms and conditions",
   }),
 });
 
+
+
+export const BussinessSignupSchema = z.object({
+  BusinessName: nameSchema,
+  registrationNumber: z
+    .string()
+    .min(5, "Registration number must be at least 5 characters long")
+    .max(20, "Registration number cannot exceed 20 characters")
+    .regex(
+      /^[A-Za-z0-9-]+$/,
+      "Only alphanumeric characters and hyphens are allowed"
+    ),
+
+  foundingDate: z
+    .date()
+    .max(new Date(), "Founding date cannot be in the future")
+    .refine(
+      (date) => date >= new Date("1900-01-01"),
+      "Founding date must be after 1900"
+    ),
+
+  aboutBusiness: z
+    .string()
+    .min(50, "Description must be at least 50 characters")
+    .max(2000, "Description cannot exceed 2000 characters"),
+
+    businessImage: z
+    .array(
+      z
+        .string()
+        .refine(
+          (v) => v.startsWith("data:") || /^https?:\/\//.test(v),
+          "Invalid image"
+        )
+    )
+    .min(2, "Add at least two photo"),
+    email: emailSchema, 
+    phoneNumber: z
+    .string()
+    .min(6, "Phone number too short")
+    .max(20, "Phone number too long")
+    .transform(str => str.replace(/[\s-]/g, "")), 
+
+  fayidaId: z
+    .string()
+    .min(8, "Fayida ID must be at least 8 characters")
+    .max(20, "Fayida ID cannot exceed 20 characters")
+    .regex(
+      /^[A-Za-z0-9]+$/, 
+      "Only letters and numbers allowed"
+    )
+});
 
