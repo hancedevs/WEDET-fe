@@ -26,6 +26,9 @@ export function LoginPage() {
   const handleNavigateToSignup = () => {
     router.push("/auth/signup");
   };
+  const handleNavigateToBussinessSignup = () => {
+    router.push("/auth/BussinesRegistration");
+  };
 
   const handleNavigateToforgotpassword = () => {
     router.push("/auth/forgotpassword");
@@ -247,6 +250,28 @@ export function LoginPage() {
                   }}
                 >
                   signup
+                </button>
+              </span>
+            </div>
+            <div className="text-center mt-6">
+              <span
+                className="text-gray-500 text-sm"
+                style={{
+                  fontFamily: "'Century Gothic', sans-serif",
+                  fontWeight: 300,
+                }}
+              >
+                Don&apos;t have an account?{" "}
+                <button
+                  type="button"
+                  onClick={handleNavigateToBussinessSignup}
+                  className="text-[#28B872] font-medium hover:underline"
+                  style={{
+                    fontFamily: "'Century Gothic', sans-serif",
+                    fontWeight: 300,
+                  }}
+                >
+                  Registartion as Bussiness
                 </button>
               </span>
             </div>
