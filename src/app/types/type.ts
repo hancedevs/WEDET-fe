@@ -162,3 +162,19 @@ export type Step4FormData = z.infer<typeof step4Schema>;
 // utility types
 export type Gender = "male" | "female";
 export type AuthType = "login" | "signup" | "forgot-password" | "otp";
+
+
+export type PostAction = "save" | "schedule";
+export type ScheduleType = "oneTime" | "scheduled";
+
+export interface StepthreeFormData {
+  price: number;
+  discount?: number;
+  total: number;
+  includes?: string[];
+  notIncludes?: string[];
+  essentialEquipment?: string[];
+  postAction: PostAction;
+  scheduleType: ScheduleType;
+  scheduleAt?: Date;
+}

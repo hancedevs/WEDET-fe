@@ -1,4 +1,5 @@
-import { z } from "zod";
+import z from "zod";
+
 export const step1Schema = z.object({
   tourName: z.string().min(2, "Tour name is required"),
   tourType: z.string().min(1, "Select a tour type"),
@@ -21,3 +22,29 @@ export const step1Schema = z.object({
 });
 
 export type Step1FormData = z.infer<typeof step1Schema>;
+
+
+
+export type ScheduleType = "oneTime" | "scheduled";
+
+export const stepthreeSchema = z.object({
+  price: z.number().min(0, "Price must be non-negative"),
+  discount: z.number().min(0).max(100).optional(),
+  total: z.number().min(0),
+  includes: z.array(z.string().min(1)).min(1),
+  notIncludes: z.array(z.string().min(1)).optional(),
+  essentialEquipment: z.array(z.string().min(1)).optional(),
+  postAction: z.enum(["save", "schedule"]),
+  scheduleType: z.enum(["oneTime", "scheduled"]).optional(),
+  scheduleAt: z.date().optional(),
+}).refine((data) => {
+  if (data.postAction === "schedule") {
+    return !!data.scheduleAt && !!data.scheduleType;
+  }
+  return true;
+}, {
+  message: "Schedule date and type are required for scheduling",
+  path: ["scheduleAt"],
+});
+
+export type StepthreeFormData = z.infer<typeof stepthreeSchema>;
