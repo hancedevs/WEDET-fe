@@ -34,8 +34,8 @@ export default function Step1Page() {
   const onPhotosChange = (arr: string[]) =>
     setValue("photos", arr, { shouldValidate: true, shouldDirty: true });
 
-  const onSubmit = (data: Step1FormData) => {
-    router.push("/Tourguide/Tourtip2");
+  const onSubmit = (_data: Step1FormData) => {
+    router.push("/Tourguide/Tourtrip2");
   };
 
   const submitOrFocus = handleSubmit(onSubmit, (errs) => {
@@ -43,47 +43,49 @@ export default function Step1Page() {
     if (first) setFocus(first);
   });
 
+  const baseField =
+    "mt-1 mb-4 w-full h-10 rounded-full bg-white border border-gray-200 shadow px-5 text-base outline-none " +
+    "placeholder:text-gray-400 " +
+    "focus:bg-[#EAF8F1] focus:border-[#9be5c2] focus:ring-2 focus:ring-[#26cc73] focus:caret-[#26cc73] " +
+    "aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-500/60";
+
+  const baseTextarea =
+    "mt-1 mb-4 w-full min-h-[7rem] rounded-2xl bg-white border border-gray-200 shadow px-5 py-3 text-base outline-none " +
+    "placeholder:text-gray-400 resize-none " +
+    "focus:bg-[#EAF8F1] focus:border-[#9be5c2] focus:ring-2 focus:ring-[#26cc73] focus:caret-[#26cc73] " +
+    "aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-500/60";
+
+  const labelCls = "block text-[15px] text-gray-700";
+
   return (
     <div className="relative">
       <TourtripLayout progress={33} title="Trip post">
-        <form
-          onSubmit={submitOrFocus}
-          className="pb-[140px] max-w-[430px] mx-auto"
-        >
-          <h3 className="text-x font-semibold mb-2">Step 1</h3>
-          <div className="text-x font-semibold mb-3">
-            Basic Tour Information
-          </div>
+        <form onSubmit={submitOrFocus} className="pb-[140px] max-w-[430px] mx-auto">
+          <h3 className="text-sm font-semibold mb-2">Step 1</h3>
+          <div className="text-xl font-semibold mb-3">Basic Tour Information</div>
 
-          <label className="block text-[15px] text-g">Tour name</label>
+          <label className={labelCls}>Tour name</label>
           <input
             {...register("tourName")}
             placeholder="Trip to Wenchi"
-            className="
-              mt-1 mb-4 w-full h-10 rounded-full bg-[#fafafa] shadow px-5 text-base outline-none
-              border-none focus:border-none focus:ring-2 focus:ring-[#26cc73]
-              placeholder:text-gray-400 caret-[#26cc73]
-              aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-500/60
-            "
+            className={baseField}
             aria-invalid={!!errors.tourName}
           />
           {errors.tourName && (
-            <p className="text-red-500 text-xs mb-2">
-              {errors.tourName.message}
-            </p>
+            <p className="text-red-500 text-xs -mt-3 mb-2">{errors.tourName.message}</p>
           )}
 
-          <label className="block text-[15px] ">Tour type</label>
+          <label className={labelCls}>Tour type</label>
           <div className="relative mt-1 mb-1">
             <select
               {...register("tourType")} 
               defaultValue=""
-              className="
-                appearance-none w-full h-10 rounded-full bg-[#fafafa] shadow px-5 pr-10 text-base outline-none mb-4
-                border-none focus:border-none focus:ring-2 focus:ring-[#26cc73]
-                placeholder:text-gray-400 caret-[#26cc73]
-                aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-500/60
-              "
+              className={
+                "appearance-none w-full h-10 rounded-full bg-white border border-gray-200 shadow px-5 pr-10 text-base outline-none mb-4 " +
+                "placeholder:text-gray-400 " +
+                "focus:bg-[#EAF8F1] focus:border-[#9be5c2] focus:ring-2 focus:ring-[#26cc73] focus:caret-[#26cc73] " +
+                "aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-500/60"
+              }
               aria-invalid={!!errors.tourType}
             >
               <option value="" disabled>
@@ -100,30 +102,21 @@ export default function Step1Page() {
             />
           </div>
           {errors.tourType && (
-            <p className="text-red-500 text-xs mb-2">
-              {errors.tourType.message}
-            </p>
+            <p className="text-red-500 text-xs -mt-3 mb-2">{errors.tourType.message}</p>
           )}
 
-          <label className="block text-[15px] ">Destination/Park</label>
+          <label className={labelCls}>Destination/Park</label>
           <input
             {...register("destination")}
             placeholder="Wenchi Lake"
-            className="
-              mt-1 mb-4 w-full h-10 rounded-full bg-[#fafafa] shadow px-5 text-base outline-none
-              border-none focus:border-none focus:ring-2 focus:ring-[#26cc73]
-              placeholder:text-gray-400 caret-[#26cc73]
-              aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-500/60
-            "
+            className={baseField}
             aria-invalid={!!errors.destination}
           />
           {errors.destination && (
-            <p className="text-red-500 text-xs mb-2">
-              {errors.destination.message}
-            </p>
+            <p className="text-red-500 text-xs -mt-3 mb-2">{errors.destination.message}</p>
           )}
 
-          <div className="text-[15px]  ">Photos</div>
+          <div className="text-[15px] text-gray-700">Photos</div>
           <div className="mt-2 mb-3">
             <PhotoPicker
               value={photos}
@@ -132,60 +125,40 @@ export default function Step1Page() {
             />
           </div>
 
-          <label className="block text-[15px] ">Starting point</label>
+          <label className={labelCls}>Starting point</label>
           <input
             {...register("startingPoint")}
             placeholder="Addis Ababa"
-            className="
-              mt-1 mb-4 w-full h-10 rounded-full bg-[#fafafa] shadow px-5 text-base outline-none
-              border-none focus:border-none focus:ring-2 focus:ring-[#26cc73]
-              placeholder:text-gray-400 caret-[#26cc73]
-              aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-500/60
-            "
+            className={baseField}
             aria-invalid={!!errors.startingPoint}
           />
           {errors.startingPoint && (
-            <p className="text-red-500 text-xs mb-2">
-              {errors.startingPoint.message}
-            </p>
+            <p className="text-red-500 text-xs -mt-3 mb-2">{errors.startingPoint.message}</p>
           )}
-          <label className="block text-[15px]  ">Overview</label>
+
+          <label className={labelCls}>Overview</label>
           <textarea
             {...register("overview")}
             placeholder="Brief description of the tour..."
-            className="
-              mt-1 mb-4 w-full h-28 rounded-2xl bg-[#fafafa] shadow px-5 py-3 text-base outline-none
-              border-none focus:border-none focus:ring-2 focus:ring-[#26cc73] resize-none
-              placeholder:text-gray-400 caret-[#26cc73]
-              aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-500/60
-            "
+            className={baseTextarea}
             aria-invalid={!!errors.overview}
           />
           {errors.overview && (
-            <p className="text-red-500 text-xs mb-2">
-              {errors.overview.message}
-            </p>
+            <p className="text-red-500 text-xs -mt-3 mb-2">{errors.overview.message}</p>
           )}
 
-          <label className="block text-[15px] ">Top highlights</label>
+          <label className={labelCls}>Top highlights</label>
           <textarea
             {...register("highlights")}
             placeholder="Sunset, boat ride, hot springs…"
-            className="
-              mt-1 mb-4 w-full h-28 rounded-2xl bg-[#fafafa] shadow px-5 py-3 text-base outline-none
-              border-none focus:border-none focus:ring-2 focus:ring-[#26cc73] resize-none
-              placeholder:text-gray-400 caret-[#26cc73]
-              aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-500/60
-            "
+            className={baseTextarea}
             aria-invalid={!!errors.highlights}
           />
           {errors.highlights && (
-            <p className="text-red-500 text-xs mb-2">
-              {errors.highlights.message}
-            </p>
+            <p className="text-red-500 text-xs -mt-3 mb-2">{errors.highlights.message}</p>
           )}
 
-          <div className="mt-23 pb-6">
+          <div className="mt-10 pb-6">
             <StepController
               showPrev={false}
               canNext={!isSubmitting}

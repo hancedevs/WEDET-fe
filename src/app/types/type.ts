@@ -162,3 +162,33 @@ export type Step4FormData = z.infer<typeof step4Schema>;
 // utility types
 export type Gender = "male" | "female";
 export type AuthType = "login" | "signup" | "forgot-password" | "otp";
+
+
+export type PostAction = "save" | "schedule";
+export type ScheduleType = "oneTime" | "scheduled";
+
+export interface StepthreeFormData {
+  price: number;
+  discount?: number;
+  total: number;
+  includes?: string[];
+  notIncludes?: string[];
+  essentialEquipment?: string[];
+  postAction: PostAction;
+  scheduleType: ScheduleType;
+  scheduleAt?: Date;
+}
+// Centralized types
+
+export interface Passenger {
+  name: string;
+  email: string;
+  phone?: string;
+  status?: "Paid" | "Pending" | "Cancelled" | string;
+  amountBr: number;
+  people: number;
+  location: string;
+  dateISO: string; 
+  time: string;  
+  note?: string;
+}

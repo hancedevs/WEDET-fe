@@ -1,295 +1,471 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import Image from "next/image";
-import { Bell, X, Plus, MapPin, Tag, Calendar } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  useForm,
+  SubmitHandler,
+  SubmitErrorHandler,
+  UseFormReturn,
+} from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Calendar } from "lucide-react";
+
 import TourtripLayout from "@/app/components/Tourguidecomponents/TourtripLayout";
 import Navbar from "@/app/components/Tourguidecomponents/TourGuideNavbar";
+import StepController from "@/app/components/Tourguidecomponents/stepcontroller";
+import TripCard from "@/app/components/ui/TripCard";
+import type { Trip } from "@/app/types/type";
+import {
+  stepthreeSchema,
+  type StepthreeFormData,
+  type ScheduleType,
+} from "@/lib/tourguideschema";
 
-interface Item {
-  id: number;
-  text: string;
-}
+/* ---------------- Reusable Input ---------------- */
+type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
+  error?: string | boolean;
+  rightAddon?: React.ReactNode;
+  variant?: "plain" | "filled";
+};
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, error, rightAddon, variant = "plain", ...props }, ref) => {
+    const base =
+      "w-full h-10 rounded-full shadow px-5 text-base text-gray-900 placeholder:text-gray-400 " +
+      "outline-none transition-colors duration-200 " +
+      "focus:bg-[#EAF8F1] focus:border-[#9be5c2] focus:ring-2 focus:ring-[#26cc73] focus:caret-[#26cc73] " +
+      "aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-500/60";
+    const tone =
+      variant === "filled"
+        ? "bg-[#fafafa] border-0"
+        : "bg-white border border-gray-200";
+    return (
+      <div className="relative">
+        <input
+          ref={ref}
+          aria-invalid={!!error}
+          className={[base, tone, className].filter(Boolean).join(" ")}
+          {...props}
+        />
+        {rightAddon && (
+          <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
+            {rightAddon}
+          </span>
+        )}
+        {typeof error === "string" && (
+          <p className="text-red-500 text-sm mt-1 px-2">{error}</p>
+        )}
+      </div>
+    );
+  }
+);
+Input.displayName = "Input";
 
-export default function TripPostStep3() {
-  const [cardTab, setCardTab] = useState<"oneTime" | "scheduled">("oneTime");
-  const [selectedDate, setSelectedDate] = useState<string>("");
-  const dateInputRef = useRef<HTMLInputElement>(null);
+type StepthreeFormReturn = UseFormReturn<StepthreeFormData>;
+function CapsuleList({
+  name,
+  form,
+  placeholder = "Add item…",
+  title,
+}: {
+  name: "includes" | "notIncludes" | "essentialEquipment";
+  form: StepthreeFormReturn;
+  placeholder?: string;
+  title: string;
+}) {
+  const {
+    watch,
+    setValue,
+    formState: { errors },
+  } = form;
 
-  const [price, setPrice] = useState<number>(3000);
-  const [discount, setDiscount] = useState<string>("15");
-  const discountNumber = discount === "" ? 0 : Number(discount);
-  const total = price - price * (discountNumber / 100);
+  const items = (watch(name) as string[]) ?? [];
+  const [isAdding, setIsAdding] = useState(false);
+  const [newItem, setNewItem] = useState("");
 
-  const [includeItems, setIncludeItems] = useState<Item[]>([
-    { id: 1, text: "Expert naturalist guide and local guides" },
-    { id: 2, text: "Expert naturalist guide and local guides" },
-  ]);
-  const [notIncludeItems, setNotIncludeItems] = useState<Item[]>([
-    { id: 1, text: "Expert naturalist guide and local guides" },
-    { id: 2, text: "Expert naturalist guide and local guides" },
-  ]);
-  const [equipmentItems, setEquipmentItems] = useState<Item[]>([
-    { id: 1, text: "Expert naturalist guide and local guides" },
-    { id: 2, text: "Expert naturalist guide and local guides" },
-  ]);
+  const errorMsg =
+    (errors[name] as unknown as { message?: string } | undefined)?.message ??
+    "";
 
-  const [selectedOption, setSelectedOption] = useState<"save" | "schedule">();
-
-  const handleAdd = (setter: React.Dispatch<React.SetStateAction<Item[]>>) => {
-    setter((prev) => [...prev, { id: Date.now(), text: "" }]);
+  const addItem = () => {
+    const v = newItem.trim();
+    if (!v) return;
+    setValue(name, [...items, v], { shouldDirty: true, shouldValidate: true });
+    setNewItem("");
+    setIsAdding(false);
   };
 
-  const handleDelete = (
-    id: number,
-    setter: React.Dispatch<React.SetStateAction<Item[]>>
-  ) => {
-    setter((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const handleEdit = (
-    id: number,
-    value: string,
-    setter: React.Dispatch<React.SetStateAction<Item[]>>
-  ) => {
-    setter((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, text: value } : item))
+  const removeItem = (i: number) => {
+    setValue(
+      name,
+      items.filter((_, idx) => idx !== i),
+      { shouldDirty: true, shouldValidate: true }
     );
   };
 
-  const renderList = (
-    title: string,
-    items: Item[],
-    setter: React.Dispatch<React.SetStateAction<Item[]>>
-  ) => (
+  return (
     <div className="mb-6">
       <h3 className="font-medium mb-2">{title}</h3>
-      {items.map((item) => (
+
+      {items.map((text, i) => (
         <div
-          key={item.id}
-          className="flex items-center justify-between bg-gray-100 rounded-full px-3 py-1 mb-2"
+          key={`${name}-${i}`}
+          className="flex items-center rounded-full bg-white shadow px-4 py-3 mb-3"
         >
-          <div className="flex items-center flex-1">
-            <button
-              onClick={() => handleDelete(item.id, setter)}
-              className="mr-2 text-gray-500 hover:text-red-500"
-            >
-              <X className="w-4 h-4" />
-            </button>
-            <input
-              type="text"
-              value={item.text}
-              placeholder="Type here..."
-              onChange={(e) => handleEdit(item.id, e.target.value, setter)}
-              className="bg-transparent outline-none flex-1 text-sm placeholder-gray-400"
-            />
-          </div>
+          <button
+            type="button"
+            onClick={() => removeItem(i)}
+            className="mr-3 text-black"
+            aria-label="Remove"
+          >
+            ×
+          </button>
+          <span className="text-base">{text}</span>
         </div>
       ))}
-      <button
-        onClick={() => handleAdd(setter)}
-        className="flex items-center text-gray-700 border border-gray-200 rounded-full px-4 py-1 hover:bg-gray-200"
-      >
-        <Plus className="w-4 h-4 mr-1" /> Add more
-      </button>
-    </div>
-  );
 
-  const renderCustomToggle = () => (
-    <div className="flex flex-col gap-4 my-6">
-      {[
-        { value: "save", label: "Save Trip" },
-        { value: "schedule", label: "Schedule Post" },
-      ].map((opt) => (
-        <label
-          key={opt.value}
-          className="flex items-center cursor-pointer select-none"
-        >
-          <span
-            className={
-              `relative flex items-center justify-center w-6 h-6 mr-3 rounded-full border-2 transition-colors duration-150 ` +
-              (selectedOption === opt.value
-                ? "border-[#28B872]"
-                : "border-[#28B872]")
-            }
-          >
-            {selectedOption === opt.value ? (
-              <span className="block w-10 h-5 rounded-full bg-[#28B872] border-4 border-white"></span>
-            ) : null}
-          </span>
-          <span className="font-bold text-black text-lg">{opt.label}</span>
-          <input
-            type="radio"
-            name="trip-toggle"
-            value={opt.value}
-            checked={selectedOption === opt.value}
-            onChange={() => setSelectedOption(opt.value as "save" | "schedule")}
-            className="hidden"
+      {isAdding ? (
+        <div className="flex items-center">
+          <Input
+            value={newItem}
+            onChange={(e) => setNewItem(e.target.value)}
+            placeholder={placeholder}
+            variant="filled"
           />
-        </label>
-      ))}
+          <button
+            type="button"
+            onClick={addItem}
+            className="ml-2 text-[#26cc73] font-medium"
+          >
+            Add
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setIsAdding(false);
+              setNewItem("");
+            }}
+            className="ml-2 text-gray-500"
+          >
+            Cancel
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setIsAdding(true)}
+          className="flex items-center text-black rounded-full bg-white shadow px-5 py-2"
+        >
+          <span className="mr-2">+</span> Add more
+        </button>
+      )}
+
+      {errorMsg && <p className="text-red-500 text-sm mt-1 px-2">{errorMsg}</p>}
     </div>
   );
+}
+
+const fmtDateOnly = (iso?: string) => {
+  if (!iso) return "";
+  const d = new Date(`${iso}T00:00:00`);
+  if (Number.isNaN(d.getTime())) return "";
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "2-digit",
+  }).format(d);
+};
+const todayISO = () => {
+  const d = new Date();
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+};
+
+export default function Step3Page() {
+  const router = useRouter();
+
+  const form = useForm<StepthreeFormData>({
+    resolver: zodResolver(stepthreeSchema),
+    mode: "onChange",
+    reValidateMode: "onChange",
+    shouldFocusError: true,
+    defaultValues: {
+      includes: ["Expert naturalist guide and local guides"],
+      scheduleType: "oneTime",
+      discount: 0,
+    },
+  });
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { isSubmitting, errors },
+  } = form;
+
+  const price = watch("price");
+  const discount = watch("discount");
+  const postAction = watch("postAction");
+  const scheduleType = watch("scheduleType");
+  const isScheduling = postAction === "schedule";
+
+  const total = useMemo(() => {
+    const p = Number(price) || 0;
+    const d = Number(discount) || 0;
+    return Math.max(0, Math.round(p * (1 - d / 100)));
+  }, [price, discount]);
+
+  useEffect(() => {
+    setValue("total", total, { shouldDirty: true, shouldValidate: true });
+  }, [total, setValue]);
+
+  const [dateISO, setDateISO] = useState<string>("");
+  useEffect(() => {
+    if (isScheduling && dateISO) {
+      setValue("scheduleAt", new Date(`${dateISO}T00:00:00`), {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    } else {
+      setValue("scheduleAt", undefined, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
+  }, [isScheduling, dateISO, setValue]);
+
+  const chooseTab = (tab: ScheduleType) => {
+    setValue("scheduleType", tab, { shouldDirty: true, shouldValidate: true });
+  };
+
+  const onSubmit: SubmitHandler<StepthreeFormData> = async (data) => {
+    await new Promise((r) => setTimeout(r, 150));
+    console.log("Form submitted:", data, { dateISO });
+    router.push("/Tourguide/MyTrips");
+  };
+
+  const onError: SubmitErrorHandler<StepthreeFormData> = (e) => {
+    console.log("Form errors:", e);
+  };
 
   return (
-    <div className="flex flex-col min-h-screen ">
-      {/* Main Content */}
-      <div className="flex justify-center ">
-        <div className="p-6  w-full bg-white rounded-lg shadow">
-          <div className="flex justify-between items-center mb-2">
-            <h1 className="font-bold text-lg">Trip post</h1>
-            <Bell className="w-5 h-5" />
-          </div>
+    <div className="relative">
+      <TourtripLayout progress={100} title="Trip post">
+        <form
+          onSubmit={handleSubmit(onSubmit, onError)}
+          className="pb-[140px] max-w-[430px] mx-auto"
+        >
+          <p className="text-sm mb-2">Step 3</p>
+          <div className="text-xl font-semibold mb-3">Pricing Information</div>
 
-          <div className="w-full h-1 rounded-full mb-4">
-            <div
-              className="h-1 rounded-full w-full"
-              style={{ backgroundColor: "#28B872" }}
-            ></div>
-          </div>
-
-          <p className="text-sm mb-4">Step 3</p>
-          <h2 className="mb-2">Pricing Information</h2>
-          <label className="block text-sm mb-2">Price</label>
-          <input
+          <label className="block text-[15px]">Price</label>
+          <Input
             type="number"
-            value={price}
-            onChange={(e) => setPrice(Number(e.target.value))}
-            className="w-full border border-gray-200 rounded-full px-4 py-2 text-center text-gray-500 shadow-lg"
+            inputMode="decimal"
+            placeholder="3000"
+            {...register("price", { valueAsNumber: true })}
+            error={errors.price?.message}
           />
 
-          <div className="flex flex-row items-end gap-x-8 mt-5">
-            <div>
-              <label className="block text-md mb-1">If Discount</label>
-              <div className="relative">
-                <input
-                  type="number"
-                  value={discount}
-                  min={0}
-                  max={100}
-                  onChange={(e) => setDiscount(e.target.value)}
-                  className="w-25 border border-gray-200 rounded-full py-2 pr-4 text-center text-gray-500 shadow-lg"
-                />
-                <span className="absolute right-8 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-2">
+            <label htmlFor="discount" className="text-[15px]">
+              If Discount
+            </label>
+            <label htmlFor="total" className="text-[15px]">
+              Total
+            </label>
+
+            <Input
+              id="discount"
+              type="number"
+              inputMode="numeric"
+              placeholder="15"
+              {...register("discount", { valueAsNumber: true })}
+              variant="filled"
+              error={errors.discount?.message}
+              rightAddon={
+                <span className="inline-flex items-center justify-center w-8">
                   %
                 </span>
-              </div>
-            </div>
-            <div>
-              <label className="block text-md mb-1">Total</label>
+              }
+              className="w-full"
+            />
+
+            <Input
+              id="total"
+              type="number"
+              readOnly
+              placeholder="2700"
+              {...register("total", { valueAsNumber: true })}
+              variant="filled"
+              error={errors.total?.message}
+              rightAddon={
+                <span className="inline-flex items-center justify-center w-8 opacity-0">
+                  %
+                </span>
+              }
+              className="w-full"
+            />
+          </div>
+
+          <CapsuleList
+            name="includes"
+            form={form}
+            title="Include"
+            placeholder="Expert guide, entry fees…"
+          />
+          <CapsuleList
+            name="notIncludes"
+            form={form}
+            title="Not Include"
+            placeholder="Flights, tips…"
+          />
+          <CapsuleList
+            name="essentialEquipment"
+            form={form}
+            title="Essential Equipment"
+            placeholder="Hiking boots, jacket…"
+          />
+
+          <fieldset
+            className="mt-4 space-y-3"
+            role="radiogroup"
+            aria-label="Post action"
+          >
+            <legend className="sr-only">Post action</legend>
+
+            <label className="flex items-center cursor-pointer select-none">
               <input
-                type="number"
-                value={total}
-                readOnly
-                className="w-25 border border-gray-200 rounded-full px-3 py-2 text-center text-gray-500 shadow-lg"
+                type="radio"
+                value="save"
+                {...register("postAction")}
+                className="peer sr-only"
               />
-            </div>
-          </div>
+              <span
+                className="relative mr-3 w-5 h-5 rounded-full border-2 border-[#26cc73]
+                  after:content-[''] after:absolute after:inset-0.5 after:rounded-full
+                  after:bg-[#26cc73] after:scale-0 after:transition-transform after:duration-150
+                  peer-checked:after:scale-100"
+              />
+              <span className="font-medium text-gray-700 peer-checked:text-black">
+                Save Trip
+              </span>
+            </label>
 
-          <div className="mt-8">
-            {renderList("Include", includeItems, setIncludeItems)}
-            {renderList("Not Include", notIncludeItems, setNotIncludeItems)}
-            {renderList(
-              "Essential Equipment",
-              equipmentItems,
-              setEquipmentItems
+            <label className="flex items-center cursor-pointer select-none">
+              <input
+                type="radio"
+                value="schedule"
+                {...register("postAction")}
+                className="peer sr-only"
+              />
+              <span
+                className="relative mr-3 w-5 h-5 rounded-full border-2 border-[#26cc73]
+                  after:content-[''] after:absolute after:inset-0.5 after:rounded-full
+                  after:bg-[#26cc73] after:scale-0 after:transition-transform after:duration-150
+                  peer-checked:after:scale-100"
+              />
+              <span className="font-medium text-gray-700 peer-checked:text-black">
+                Schedule Post
+              </span>
+            </label>
+
+            {errors.postAction && (
+              <p className="text-red-500 text-sm mt-1 px-2">
+                {errors.postAction.message as string}
+              </p>
             )}
-          </div>
+          </fieldset>
 
-          {renderCustomToggle()}
+          {isScheduling && (
+            <div className="relative bg-white rounded-[42px] p-4 mt-9 mb-6 ring-1 ring-[#DBF5E8] shadow-[0_10px_26px_rgba(0,0,0,0.08)]">
+              {/* Tabs */}
+              <div className="flex items-center bg-[#F2F9F5] rounded-[40px] w-full h-10 mb-7 p-1 shadow-sm ring-1 ring-[#D9F0E7]">
+                <button
+                  type="button"
+                  onClick={() => chooseTab("oneTime")}
+                  className={`flex-1 h-8 rounded-full font-medium text-sm ${
+                    scheduleType === "oneTime"
+                      ? "bg-[#28B872] text-white shadow"
+                      : "text-gray-500"
+                  }`}
+                >
+                  One Time
+                </button>
+                <button
+                  type="button"
+                  onClick={() => chooseTab("scheduled")}
+                  className={`flex-1 h-8 rounded-full font-medium text-sm ${
+                    scheduleType === "scheduled"
+                      ? "bg-[#28B872] text-white shadow"
+                      : "text-gray-500"
+                  }`}
+                >
+                  Scheduled
+                </button>
+              </div>
 
-          {/* schedule button */}
-          <div className="relative bg-white rounded-2xl shadow-md p-4 mb-15 w-full">
-            <div className="flex items-center gap-2 bg-[#F3F8F6] rounded-full w-full h-9 mx-auto -mt-6 mb-3 shadow-sm">
-              <button
-                className={`flex-1 s h-9   rounded-full font-medium text-sm   ${
-                  cardTab === "oneTime"
-                    ? "bg-[#28B872] text-white"
-                    : "text-gray-400"
-                }`}
-                onClick={() => setCardTab("oneTime")}
-              >
-                One Time
-              </button>
-              <button
-                className={`flex-1 h-9 rounded-full font-medium text-sm  transition-all ${
-                  cardTab === "scheduled"
-                    ? "bg-[#28B872] text-white shadow"
-                    : "text-gray-400"
-                }`}
-                onClick={() => setCardTab("scheduled")}
-              >
-                Scheduled
-              </button>
-            </div>
-            {/* wenchi card */}
-            <div className="relative bg-white rounded-2xl w-full shadow p-3 pt-3">
-              <div className="flex flex-row gap-4 w-full items-center">
-                <Image
-                  src="/tipsimage.png"
-                  alt="Wenchi"
-                  width={120}
-                  height={120}
-                  className="w-35 h-55 object-cover rounded-4xl"
-                  priority
+              {/* Card + date chip */}
+              <div className="relative rounded-4xl">
+                <TripCard
+                  trip={
+                    {
+                      id: "wenchi-demo",
+                      title: "Wenchi",
+                      location: "Wenchi, Oromia",
+                      priceBr: Number(watch("total") || 0),
+                      durationDays: 2,
+                      imageUrl: "/tipsimage.png",
+                    } as Trip
+                  }
                 />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start gap-90 relative">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        dateInputRef.current?.showPicker &&
-                        dateInputRef.current.showPicker()
-                      }
-                      className="absolute -top-3 p-2 bg-white rounded-full justify-end w-full h-10 flex items-center shadow-lg justify-center z-10"
-                    >
-                      <Calendar className="w-6 h-6 text-[#28B872]" />
-                    </button>
+
+                <div className="absolute -top-5 right-4">
+                  <div
+                    className={`flex items-center bg-white rounded-full shadow-[0_8px_18px_rgba(0,0,0,0.12)] ring-1 ring-[#E7F7F0] h-10 ${
+                      dateISO
+                        ? "w-[160px] pl-4 pr-3 justify-start"
+                        : "w-[64px] justify-center px-3"
+                    }`}
+                  >
+                    {dateISO && (
+                      <span className="text-sm text-gray-500 truncate mr-2">
+                        {fmtDateOnly(dateISO)}
+                      </span>
+                    )}
+                    <Calendar className="w-5 h-5 text-[#28B872]" />
                     <input
-                      ref={dateInputRef}
                       type="date"
-                      value={selectedDate}
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                      className="absolute opacity-0 w-0 h-0"
+                      min={todayISO()}
+                      value={dateISO}
+                      onChange={(e) => setDateISO(e.target.value)}
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                      aria-label="Pick schedule date"
                     />
-                    <span className="mt-8 text-2xl font-bold mt-6">Wenchi</span>
-                  </div>
-                  <div className="flex flex-row flex-wrap gap-x-6 gap-y-2 items-center mt-2">
-                    <div className="flex items-center text-gray-700 text-base">
-                      <MapPin
-                        className="w-7 h-7 mr-1"
-                        style={{ color: "#28B872" }}
-                      />
-                      Wenchi, Oromia
-                    </div>
-                    <div className="flex items-center text-gray-700 text-base">
-                      <Tag
-                        className="w-5 h-5 mr-1"
-                        style={{ color: "#28B872" }}
-                      />
-                      2,000 Br
-                    </div>
-                    <div className="flex items-center text-gray-700 text-base">
-                      <Calendar
-                        className="w-5 h-5 mr-1"
-                        style={{ color: "#28B872" }}
-                      />
-                      2 day{"'"}s trip
-                    </div>
-                  </div>
-                  <div className="flex justify-end mt-3">
-                    <div className="bg-[#28B872] rounded-full h-6 w-20 flex items-center justify-center text-white font-medium text-sm">
-                      Save
-                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* <TourtripLayout /> */}
+              {errors.scheduleAt && (
+                <p className="text-red-500 text-sm mt-2 px-2">
+                  {errors.scheduleAt.message as string}
+                </p>
+              )}
+            </div>
+          )}
+
+          <div className="mt-39 pb-6">
+            <StepController
+              showPrev
+              canNext={!isSubmitting}
+              submitMode
+              prevHref="/Tourguide/Tourtip2"
+              className="max-w-[430px] mx-auto"
+            />
+          </div>
+        </form>
+      </TourtripLayout>
+
       <Navbar active="explore" />
     </div>
   );
