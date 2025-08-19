@@ -178,3 +178,17 @@ export interface StepthreeFormData {
   scheduleType: ScheduleType;
   scheduleAt?: Date;
 }
+// Centralized types
+
+export interface Passenger {
+  name: string;
+  email: string;
+  phone?: string;
+  status?: "Paid" | "Pending" | "Cancelled" | string;
+  amountBr: number;
+  people: number;
+  location: string;
+  dateISO: string; 
+  time: string;  
+  note?: string;
+}

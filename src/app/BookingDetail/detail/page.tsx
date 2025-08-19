@@ -1,11 +1,15 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Detailfilter from "@/app/components/ui/Detailfilter";
 import Navbar from "@/app/components/Tourguidecomponents/TourGuideNavbar";
 
+import PassengerCard from "@/app/components/ui/PassengerCard";
+import type { Passenger } from "@/app/types/type";
+
+/* ----------------------------- TripCard ----------------------------- */
 interface TripCardProps {
   date: string;
   duration: string;
@@ -32,12 +36,13 @@ const TripCard: React.FC<TripCardProps> = ({
   onPassengerListClick,
 }) => {
   return (
-    <div className="mx-4 my-2  p-6 border border-green-400 rounded-4xl bg-green-50">
-      <div className="flex justify-between font-semibold text-sm text-black-600 mb-2">
+    <div className="mx-4 my-2 p-6 border border-green-400 rounded-3xl bg-green-50">
+      <div className="flex justify-between font-semibold text-sm text-gray-600 mb-2">
         <span>{date}</span>
         <span>Duration: {duration}</span>
       </div>
-      <div className="">
+
+      <div>
         <div className="flex justify-between items-start">
           <div className="font-semibold">
             <h2 className="text-4xl">{title}</h2>
@@ -62,6 +67,7 @@ const TripCard: React.FC<TripCardProps> = ({
           </div>
         </div>
       </div>
+
       <div className="flex justify-between">
         <button
           onClick={onPassengerListClick}
@@ -80,11 +86,56 @@ const TripCard: React.FC<TripCardProps> = ({
   );
 };
 
+/* ----------------------- Same-page Passenger View ----------------------- */
+function PassengerListView({
+  title,
+  passengers,
+  onBack,
+}: {
+  title: string;
+  passengers: Passenger[];
+  onBack: () => void;
+}) {
+  return (
+    <div className="min-h-[60vh] flex flex-col">
+      {/* Header */}
+      <div className="flex items-center space-x-3 p-4">
+        <button
+          onClick={onBack}
+          className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200"
+        >
+          <ArrowLeft className="text-green-600" size={26} />
+        </button>
+        <div>
+          <h1 className="text-lg font-bold">{title} – Passengers</h1>
+          <p className="text-sm font-bold text-gray-500">
+            {passengers.length} total
+          </p>
+        </div>
+      </div>
+
+      {/* List */}
+      <div className="flex-1 px-4 pb-6">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {passengers.map((p, i) => (
+            <PassengerCard key={i} p={p} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* -------------------------------- Page -------------------------------- */
+type Trip = TripCardProps & { slug: string };
+
 export default function TourPage() {
   const router = useRouter();
 
-  const trips = [
+  // 1) Your trips (added slug to identify active trip)
+  const trips: Trip[] = [
     {
+      slug: "wenchi",
       date: "01/10/2025",
       duration: "2 days",
       title: "Wenchi",
@@ -97,45 +148,105 @@ export default function TourPage() {
     },
   ];
 
+  // 2) Passengers per trip (replace with real data fetch)
+  const passengersByTrip: Record<string, Passenger[]> = {
+    wenchi: [
+      {
+        name: "Abel Tadesse",
+        email: "abel@example.com",
+        phone: "+251912345678",
+        status: "Paid",
+        amountBr: 5400,
+        people: 2,
+        location: "Addis Ababa, Mexico",
+        dateISO: "2025-10-01",
+        time: "08:30 AM",
+        note: "Vegetarian meal.",
+      },
+      {
+        name: "Sara M.",
+        email: "sara@example.com",
+        phone: "+251911112222",
+        status: "Pending",
+        amountBr: 2700,
+        people: 1,
+        location: "Bole",
+        dateISO: "2025-10-01",
+        time: "08:30 AM",
+      },
+      {
+        name: "Yonatan K.",
+        email: "yonatan@example.com",
+        phone: "+251900001234",
+        status: "Paid",
+        amountBr: 2700,
+        people: 1,
+        location: "Gerji",
+        dateISO: "2025-10-01",
+        time: "08:30 AM",
+        note: "Allergic to peanuts.",
+      },
+    ],
+  };
+
+  // 3) Simple view toggle state
+  const [view, setView] = useState<"details" | "passengers">("details");
+  const [activeTrip, setActiveTrip] = useState<Trip | null>(null);
+
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      {/* Header */}
-      <div className="flex items-center space-x-3 p-4">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200"
-        >
-          <ArrowLeft className="text-green-600" size={30} />
-        </button>
-        <div>
-          <h1 className="text-lg font-bold">Wenchi Trip</h1>
-          <p className="text-sm font-bold text-gray-500">Details</p>
-        </div>
-      </div>
+      {view === "details" ? (
+        <>
+          {/* Header */}
+          <div className="flex items-center space-x-3 p-4">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200"
+            >
+              <ArrowLeft className="text-green-600" size={30} />
+            </button>
+            <div>
+              <h1 className="text-lg font-bold">Wenchi Trip</h1>
+              <p className="text-sm font-bold text-gray-500">Details</p>
+            </div>
+          </div>
 
-      {/* Render Trip Cards */}
-      {trips.map((trip, index) => (
-        <TripCard
-          key={index}
-          {...trip}
-          onPassengerListClick={() => alert(`Passenger List for ${trip.title}`)}
+          {/* Trip cards */}
+          {trips.map((trip) => (
+            <TripCard
+              key={trip.slug}
+              {...trip}
+              onPassengerListClick={() => {
+                setActiveTrip(trip);
+                setView("passengers"); // 👉 swap to PassengerList in the SAME page
+              }}
+            />
+          ))}
+
+          {/* Main Content */}
+          <div className="flex-1">
+            <Detailfilter />
+          </div>
+
+          {/* Edit Button */}
+          <div className="px-4 mt-3 mb-10 flex items-center justify-center">
+            <button
+              onClick={() => alert("Edit clicked")}
+              className="w-20 gap-2 px-4 py-2 rounded-full bg-[#28B872] hover:bg-green-600 text-white font-semibold transition-colors"
+            >
+              Edit
+            </button>
+          </div>
+        </>
+      ) : (
+        // Passenger list view (same page)
+        <PassengerListView
+          title={activeTrip?.title ?? "Trip"}
+          passengers={passengersByTrip[activeTrip?.slug ?? "wenchi"] ?? []}
+          onBack={() => setView("details")}
         />
-      ))}
+      )}
 
-      {/* Main Content */}
-      <div className="flex-1">
-        <Detailfilter />
-      </div>
-
-      {/* Edit Button */}
-      <div className="px-4 mt-3 mb-30 flex items-center justify-center">
-        <button
-          onClick={() => alert("Edit clicked")}
-          className="w-20  gap-2 px-4 py-2 rounded-full bg-[#28B872] hover:bg-green-600 text-white font-semibold transition-colors"
-        >
-          Edit
-        </button>
-      </div>
       <Navbar active="explore" />
     </div>
   );
