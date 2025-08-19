@@ -2,14 +2,8 @@
 import Navbar from "@/app/components/Tourguidecomponents/TourGuideNavbar";
 import React from "react";
 import Image from "next/image";
-import {
-  Plus,
-  Ticket,
-  RotateCcw,
-  StepForward,
-  DollarSign,
-  Circle,
-} from "lucide-react";
+import { Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // Reusable Card Component
 interface TripCardProps {
@@ -21,6 +15,7 @@ interface TripCardProps {
   day: number;
   total: string;
   bgcolor?: string;
+  path: string;
 }
 
 const TripCard: React.FC<TripCardProps> = ({
@@ -31,40 +26,49 @@ const TripCard: React.FC<TripCardProps> = ({
   date,
   day,
   total,
-  bgcolor,
+  bgcolor = "#28B872",
 }) => {
-  const badgeTextColor = bgcolor === "#FFEA00" ? "text-black" : "text-white";
-
-  // Shadow color based on bgcolor
-  const shadowColor = bgcolor ? `${bgcolor}30` : "#00000033"; //
+  const router = useRouter();
 
   return (
     <div
-      className="relative rounded-2xl p-4 flex justify-between items-center w-full mb-8"
+      onClick={() => router.push("../BookingDetail/detail")}
+      className="relative bg-white rounded-2xl p-4 flex justify-between items-center w-full mb-8 cursor-pointer transition hover:scale-[1.02] hover:shadow-lg"
       style={{
-        boxShadow: `0 4px 15px ${shadowColor}`,
-        backgroundColor: "white",
+        boxShadow: `0 4px 12px ${bgcolor}80`, // 80 = opacity for softer shadow
       }}
     >
       <div className="flex-1 mr-4">
         <span
-          className={`absolute -top-4 right-6 text-xs px-3 py-1 rounded-full font-medium ${badgeTextColor}`}
-          style={{ backgroundColor: bgcolor }}
+          className="absolute -top-4 right-6 text-xs px-3 py-1 rounded-full font-medium"
+          style={{
+            backgroundColor: bgcolor,
+            color:
+              bgcolor === "#28B872" || bgcolor === "#FF2D2D"
+                ? "white"
+                : "black",
+          }}
         >
           {date}
         </span>
 
         <div>
-          <p className="text-sm text-gray-500">Duration: {duration}</p>
-          <h2 className="text-xl font-bold">{title}</h2>
-          <p className="text-gray-600">{price} per person</p>
-          <p className="text-gray-500">Capacity: {capacity}</p>
+          <p className="text-sm text-[#B0C8C8]">Duration: {duration}</p>
+          <h2 className="text-4xl font-semibold">{title}</h2>
+          <p className="text-sm text-[#B0C8C8]">{price} per person</p>
+          <p className="text-sm text-[#B0C8C8]">Capacity: {capacity}</p>
         </div>
       </div>
       <div className="flex flex-col items-center mr-4">
         <span className="text-5xl font-bold">{day}</span>
         <span className="text-sm font-semibold text-black-500">{total}</span>
-        <button className="mt-2 px-4 py-1 rounded-full bg-[#28B872] text-white text-sm font-medium hover:bg-green-600 transition">
+        <button
+          onClick={(e) => {
+            e.stopPropagation(); //  Prevent parent click
+            alert("Edit button clicked");
+          }}
+          className="mt-2 px-4 py-1 rounded-full bg-[#28B872] text-white text-sm font-medium hover:bg-green-600 transition"
+        >
           Edit
         </button>
       </div>
@@ -75,48 +79,64 @@ const TripCard: React.FC<TripCardProps> = ({
 export default function Dashboard() {
   return (
     <div className="min-h-screen w-full">
-      <div className="w-full px-4 pb-20">
-        {/* Header */}
-        <div className="flex items-center mb-10 mt-4 pr-3">
-          <div className="relative w-20 h-20">
+      <div className="w-full px-4 py pb-20">
+        <div className="flex items-center mb-6 mt-4 pr-2">
+          <div className="relative w-12 h-12">
             <Image
               src="/man image.jpg"
               alt="User"
               fill
-              className="rounded-full object-cover border-4 border-green-500"
+              className="rounded-full object-cover border-2 border-green-500"
             />
           </div>
-          <div className="ml-3">
-            <p className="text-sm text-gray-500">Good morning, user</p>
-            <h1 className="text-lg font-bold">Discover and go</h1>
+          <div className="ml-2">
+            <p className="text-xs">Good morning, user</p>
+            <h1 className="text-lg font-semibold">Discover and go</h1>
           </div>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-4 mb-6 w-full">
-          <div className="bg-white rounded-3xl shadow-[0_2px_4px_rgba(74,222,128,0.3)] p-4 flex items-center w-full">
-            <Ticket className="text-green-500 w-8 h-8 mr-3" />
+          <div className="bg-white rounded-2xl shadow-[0_4px_6px_rgba(74,222,128,0.3)] p-4 flex items-center w-full">
+            <Image
+              src="/Tickets.png"
+              alt="Ticket"
+              width={40}
+              height={40}
+              className="w-10 h-10 mr-3"
+            />
             <div>
-              <p className="text-sm text-[#96A9AA]">Total Tickets</p>
+              <p className="text-xs text-[#96A9AA]">Total Tickets</p>
               <h2 className="text-2xl font-bold">280</h2>
             </div>
           </div>
-
-          <div className="bg-white rounded-3xl shadow-[0_2px_4px_rgba(74,222,128,0.3)] p-4 flex items-center w-full">
-            <div className="relative w-8 h-8 mr-3">
-              <RotateCcw className="text-green-500 w-10 h-10" />
-              <DollarSign className="absolute top-1/2 left-1/2 transform -translate-x-1/4 -translate-y-1/3 text-green-500 w-5 h-5" />
+          <div className="bg-white rounded-2xl shadow-[0_4px_6px_rgba(74,222,128,0.3)] p-4 flex items-center w-full">
+            <div className="flex-shrink-0 mr-3">
+              <Image
+                src="/refund.png"
+                alt="Refund"
+                width={48}
+                height={48}
+                className="object-contain w-10 h-10"
+              />
             </div>
-            <div>
-              <p className="text-sm text-[#96A9AA]">Refund Request</p>
-              <h2 className="text-xl font-bold">31</h2>
+            <div className="min-w-0">
+              <p className="text-xs text-[#96A9AA] whitespace-nowrap truncate">
+                Refund Request
+              </p>
+              <h2 className="text-2xl font-bold">31</h2>
             </div>
           </div>
-
-          <div className="bg-white rounded-3xl shadow-[0_2px_4px_rgba(74,222,128,0.3)] p-4 flex items-center w-full">
-            <StepForward className="text-green-500 w-8 h-8 mr-3" />
+          <div className="bg-white rounded-2xl shadow-[0_4px_6px_rgba(74,222,128,0.3)] p-4 flex items-center w-full">
+            <Image
+              src="/Next (1).png"
+              alt="Ticket"
+              width={40}
+              height={40}
+              className="w-10 h-10 mr-3"
+            />
             <div>
-              <p className="text-sm text-[#96A9AA]">Upcoming Trip</p>
+              <p className="text-xs text-[#96A9AA]">Upcoming Trip</p>
               <h2 className="text-2xl font-semibold">Wenchi</h2>
               <span className="text-xs block -mt-1">
                 <span className="text-red-500">01</span>
@@ -124,14 +144,19 @@ export default function Dashboard() {
               </span>
             </div>
           </div>
-
-          <div className="bg-[#F3FCFB] rounded-3xl shadow-[0_2px_4px_rgba(74,222,128,0.3)] p-4 flex items-center w-full">
-            <Circle strokeWidth={3.5} className="w-8 h-8 text-green-500 mr-3" />
+          <div className="bg-[#F3FCFB] rounded-2xl shadow-[0_4px_6px_rgba(74,222,128,0.3)] p-4 flex items-center w-full">
+            <Image
+              src="/trip origin.png"
+              alt="Ticket"
+              width={40}
+              height={40}
+              className="w-10 h-10 mr-3"
+            />
             <div>
-              <p className="text-sm text-[#96A9AA]">Total Trips</p>
+              <p className="text-xs text-[#96A9AA]">Total Trips</p>
               <div className="flex items-baseline space-x-2">
                 <h2 className="text-2xl font-bold">31</h2>
-                <p className="text-sm font-semibold">Last Month</p>
+                <p className="text-xs font-semibold">Last Month</p>
               </div>
             </div>
           </div>
@@ -155,6 +180,7 @@ export default function Dashboard() {
           day={24}
           total="19,000Br"
           bgcolor="#FFEA00"
+          path="/trips/wenchi"
         />
         <TripCard
           title="Suba"
@@ -165,9 +191,10 @@ export default function Dashboard() {
           day={2}
           total="19,000Br"
           bgcolor="#28B872"
+          path="/trips/suba"
         />
         <TripCard
-          title="Wenchi"
+          title="Entoto"
           duration="2 days"
           price="$ 3,200"
           capacity={28}
@@ -175,6 +202,7 @@ export default function Dashboard() {
           day={26}
           total="19,000Br"
           bgcolor="#FF2D2D"
+          path="/trips/entoto"
         />
       </div>
 
