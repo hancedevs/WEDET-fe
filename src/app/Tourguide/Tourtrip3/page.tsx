@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
@@ -7,7 +8,7 @@ import {
   SubmitHandler,
   SubmitErrorHandler,
   UseFormReturn,
-} from "react-hook-form";
+} from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Calendar } from "lucide-react";
 
@@ -21,8 +22,6 @@ import {
   type StepthreeFormData,
   type ScheduleType,
 } from "@/lib/tourguideschema";
-
-/* ---------------- Reusable Input ---------------- */
 type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   error?: string | boolean;
   rightAddon?: React.ReactNode;
@@ -191,7 +190,6 @@ export default function Step3Page() {
     defaultValues: {
       includes: ["Expert naturalist guide and local guides"],
       scheduleType: "oneTime",
-      discount: 0,
     },
   });
 
@@ -280,7 +278,9 @@ export default function Step3Page() {
               type="number"
               inputMode="numeric"
               placeholder="15"
-              {...register("discount", { valueAsNumber: true })}
+              {...register("discount", {
+                setValueAs: (v) => (v === "" || v === undefined ? "" : Number(v)),
+              })}
               variant="filled"
               error={errors.discount?.message}
               rightAddon={
@@ -334,12 +334,29 @@ export default function Step3Page() {
           >
             <legend className="sr-only">Post action</legend>
 
+            
             <label className="flex items-center cursor-pointer select-none">
               <input
                 type="radio"
                 value="save"
-                {...register("postAction")}
                 className="peer sr-only"
+                checked={postAction === "save"}
+                onChange={() =>
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  setValue("postAction", "save" as any, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  })
+                }
+                onClick={() => {
+                  if (postAction === "save") {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    setValue("postAction", "" as any, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                  }
+                }}
               />
               <span
                 className="relative mr-3 w-5 h-5 rounded-full border-2 border-[#26cc73]
@@ -356,8 +373,24 @@ export default function Step3Page() {
               <input
                 type="radio"
                 value="schedule"
-                {...register("postAction")}
                 className="peer sr-only"
+                checked={postAction === "schedule"}
+                onChange={() =>
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  setValue("postAction", "schedule" as any, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  })
+                }
+                onClick={() => {
+                  if (postAction === "schedule") {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    setValue("postAction", "" as any, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                  }
+                }}
               />
               <span
                 className="relative mr-3 w-5 h-5 rounded-full border-2 border-[#26cc73]
