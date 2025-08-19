@@ -33,7 +33,7 @@ const TripCard: React.FC<TripCardProps> = ({
 
   return (
     <div
-      className="relative rounded-4xl border-2 p-4 flex justify-between items-center w-full mb-8 cursor-pointer transition"
+      className="relative rounded-4xl border-2 p-4 flex justify-between items-center w-full mb-8 cursor-pointer transition hover:scale-[1.02] hover:shadow-lg"
       style={{
         borderColor,
         boxShadow: `0 4px 12px ${borderColor}55`, // shadow based on border color
@@ -55,7 +55,7 @@ const TripCard: React.FC<TripCardProps> = ({
           {date}
         </span>
         <p className="text-xs text-[#B0C8C8]">Duration: {duration}</p>
-        <h2 className="text-4xl font-semibold">{title}</h2>
+        <h2 className="text-4xl font-bold">{title}</h2>
         <p className="text-xs text-[#B0C8C8]">{price} per person</p>
         <p className="text-xs text-[#B0C8C8]">Capacity: {capacity}</p>
       </div>
