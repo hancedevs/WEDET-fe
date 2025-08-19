@@ -37,8 +37,6 @@ export const Step2TripSchema = z.object({
 });
 
 export type Step1FormData = z.infer<typeof step1Schema>;
-<<<<<<< HEAD
-
 
 
 export type ScheduleType = "oneTime" | "scheduled";
@@ -64,6 +62,6 @@ export const stepthreeSchema = z.object({
 });
 
 export type StepthreeFormData = z.infer<typeof stepthreeSchema>;
-=======
+
 export type Step2FormData = z.infer<typeof Step2TripSchema>;
->>>>>>> c1b0c78131a5d86a98427883264a7c7c41e2c658
+

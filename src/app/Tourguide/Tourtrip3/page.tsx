@@ -87,19 +87,12 @@ function CapsuleList({
     (errors[name] as unknown as { message?: string } | undefined)?.message ??
     "";
 
-<<<<<<< HEAD
   const addItem = () => {
     const v = newItem.trim();
     if (!v) return;
     setValue(name, [...items, v], { shouldDirty: true, shouldValidate: true });
     setNewItem("");
     setIsAdding(false);
-=======
-  const [selectedOption, setSelectedOption] = useState<"save" | "schedule">();
-
-  const handleAdd = (setter: React.Dispatch<React.SetStateAction<Item[]>>) => {
-    setter((prev) => [...prev, { id: Date.now(), text: "" }]);
->>>>>>> c1b0c78131a5d86a98427883264a7c7c41e2c658
   };
 
   const removeItem = (i: number) => {
@@ -256,7 +249,6 @@ export default function Step3Page() {
   };
 
   return (
-<<<<<<< HEAD
     <div className="relative">
       <TourtripLayout progress={100} title="Trip post">
         <form
@@ -265,16 +257,6 @@ export default function Step3Page() {
         >
           <p className="text-sm mb-2">Step 3</p>
           <div className="text-xl font-semibold mb-3">Pricing Information</div>
-=======
-    <div className="flex flex-col min-h-screen ">
-      {/* Main Content */}
-      <div className="flex justify-center ">
-        <div className="p-6  w-full bg-white rounded-lg shadow">
-          <div className="flex justify-between items-center mb-2">
-            <h1 className="font-bold text-lg">Trip post</h1>
-            <Bell className="w-5 h-5" />
-          </div>
->>>>>>> c1b0c78131a5d86a98427883264a7c7c41e2c658
 
           <label className="block text-[15px]">Price</label>
           <Input
@@ -423,7 +405,6 @@ export default function Step3Page() {
                 </button>
               </div>
 
-<<<<<<< HEAD
               {/* Card + date chip */}
               <div className="relative rounded-4xl">
                 <TripCard
@@ -453,68 +434,13 @@ export default function Step3Page() {
                       </span>
                     )}
                     <Calendar className="w-5 h-5 text-[#28B872]" />
-=======
-          {/* schedule button */}
-          <div className="relative bg-white rounded-2xl shadow-md p-4 mb-15 w-full">
-            <div className="flex items-center gap-2 bg-[#F3F8F6] rounded-full w-full h-9 mx-auto -mt-6 mb-3 shadow-sm">
-              <button
-                className={`flex-1 s h-9   rounded-full font-medium text-sm   ${
-                  cardTab === "oneTime"
-                    ? "bg-[#28B872] text-white"
-                    : "text-gray-400"
-                }`}
-                onClick={() => setCardTab("oneTime")}
-              >
-                One Time
-              </button>
-              <button
-                className={`flex-1 h-9 rounded-full font-medium text-sm  transition-all ${
-                  cardTab === "scheduled"
-                    ? "bg-[#28B872] text-white shadow"
-                    : "text-gray-400"
-                }`}
-                onClick={() => setCardTab("scheduled")}
-              >
-                Scheduled
-              </button>
-            </div>
-            {/* wenchi card */}
-            <div className="relative bg-white rounded-2xl w-full shadow p-3 pt-3">
-              <div className="flex flex-row gap-4 w-full items-center">
-                <Image
-                  src="/tipsimage.png"
-                  alt="Wenchi"
-                  width={120}
-                  height={120}
-                  className="w-35 h-55 object-cover rounded-4xl"
-                  priority
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start gap-90 relative">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        dateInputRef.current?.showPicker &&
-                        dateInputRef.current.showPicker()
-                      }
-                      className="absolute -top-3 p-2 bg-white rounded-full justify-end w-full h-10 flex items-center shadow-lg justify-center z-10"
-                    >
-                      <Calendar className="w-6 h-6 text-[#28B872]" />
-                    </button>
->>>>>>> c1b0c78131a5d86a98427883264a7c7c41e2c658
                     <input
                       type="date"
-<<<<<<< HEAD
                       min={todayISO()}
                       value={dateISO}
                       onChange={(e) => setDateISO(e.target.value)}
                       className="absolute inset-0 opacity-0 cursor-pointer"
                       aria-label="Pick schedule date"
-=======
-                      value={selectedDate}
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                      className="absolute opacity-0 w-0 h-0"
->>>>>>> c1b0c78131a5d86a98427883264a7c7c41e2c658
                     />
                   </div>
                 </div>
