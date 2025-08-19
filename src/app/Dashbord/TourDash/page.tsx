@@ -33,7 +33,7 @@ const TripCard: React.FC<TripCardProps> = ({
   return (
     <div
       onClick={() => router.push("../BookingDetail/detail")}
-      className="relative bg-white rounded-2xl p-4 flex justify-between items-center w-full mb-8 cursor-pointer transition hover:scale-[1.02] hover:shadow-lg"
+      className="relative bg-white rounded-4xl p-4 flex justify-between items-center w-full mb-8 cursor-pointer transition hover:scale-[1.02] hover:shadow-lg"
       style={{
         boxShadow: `0 4px 12px ${bgcolor}80`, // 80 = opacity for softer shadow
       }}
@@ -53,10 +53,10 @@ const TripCard: React.FC<TripCardProps> = ({
         </span>
 
         <div>
-          <p className="text-sm text-[#B0C8C8]">Duration: {duration}</p>
+          <p className="text-xs text-[#B0C8C8]">Duration: {duration}</p>
           <h2 className="text-4xl font-semibold">{title}</h2>
-          <p className="text-sm text-[#B0C8C8]">{price} per person</p>
-          <p className="text-sm text-[#B0C8C8]">Capacity: {capacity}</p>
+          <p className="text-xs text-[#B0C8C8]">{price} per person</p>
+          <p className="text-xs text-[#B0C8C8]">Capacity: {capacity}</p>
         </div>
       </div>
       <div className="flex flex-col items-center mr-4">
@@ -67,7 +67,7 @@ const TripCard: React.FC<TripCardProps> = ({
             e.stopPropagation(); //  Prevent parent click
             alert("Edit button clicked");
           }}
-          className="mt-2 px-4 py-1 rounded-full bg-[#28B872] text-white text-sm font-medium hover:bg-green-600 transition"
+          className="mt-2 px-8 py-1 rounded-full bg-[#28B872] text-white text-sm font-medium hover:bg-green-600 transition"
         >
           Edit
         </button>
@@ -75,7 +75,7 @@ const TripCard: React.FC<TripCardProps> = ({
     </div>
   );
 };
-
+// dashboard cards
 export default function Dashboard() {
   return (
     <div className="min-h-screen w-full">
@@ -97,7 +97,7 @@ export default function Dashboard() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-4 mb-6 w-full">
-          <div className="bg-white rounded-2xl shadow-[0_4px_6px_rgba(74,222,128,0.3)] p-4 flex items-center w-full">
+          <div className="bg-white rounded-4xl shadow-[0_4px_6px_rgba(74,222,128,0.3)] p-4 flex items-center w-full">
             <Image
               src="/Tickets.png"
               alt="Ticket"
@@ -110,7 +110,7 @@ export default function Dashboard() {
               <h2 className="text-2xl font-bold">280</h2>
             </div>
           </div>
-          <div className="bg-white rounded-2xl shadow-[0_4px_6px_rgba(74,222,128,0.3)] p-4 flex items-center w-full">
+          <div className="bg-white rounded-4xl shadow-[0_4px_6px_rgba(74,222,128,0.3)] p-4 flex items-center w-full">
             <div className="flex-shrink-0 mr-3">
               <Image
                 src="/refund.png"
@@ -127,7 +127,7 @@ export default function Dashboard() {
               <h2 className="text-2xl font-bold">31</h2>
             </div>
           </div>
-          <div className="bg-white rounded-2xl shadow-[0_4px_6px_rgba(74,222,128,0.3)] p-4 flex items-center w-full">
+          <div className="bg-white rounded-4xl shadow-[0_4px_6px_rgba(74,222,128,0.3)] p-4 flex items-center w-full">
             <Image
               src="/Next (1).png"
               alt="Ticket"
@@ -144,7 +144,7 @@ export default function Dashboard() {
               </span>
             </div>
           </div>
-          <div className="bg-[#F3FCFB] rounded-2xl shadow-[0_4px_6px_rgba(74,222,128,0.3)] p-4 flex items-center w-full">
+          <div className="bg-[#F3FCFB] rounded-4xl shadow-[0_4px_6px_rgba(74,222,128,0.3)] p-4 flex items-center w-full">
             <Image
               src="/trip origin.png"
               alt="Ticket"
@@ -152,11 +152,13 @@ export default function Dashboard() {
               height={40}
               className="w-10 h-10 mr-3"
             />
-            <div>
+            <div className="flex-1 min-w-0">
               <p className="text-xs text-[#96A9AA]">Total Trips</p>
               <div className="flex items-baseline space-x-2">
                 <h2 className="text-2xl font-bold">31</h2>
-                <p className="text-xs font-semibold">Last Month</p>
+                <p className="text-xs font-semibold whitespace-nowrap overflow-hidden text-ellipsis">
+                  Last Month
+                </p>
               </div>
             </div>
           </div>

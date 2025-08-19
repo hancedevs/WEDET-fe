@@ -54,10 +54,10 @@ const TripCard: React.FC<TripCardProps> = ({
         >
           {date}
         </span>
-        <p className="text-sm text-[#B0C8C8]">Duration: {duration}</p>
+        <p className="text-xs text-[#B0C8C8]">Duration: {duration}</p>
         <h2 className="text-4xl font-semibold">{title}</h2>
-        <p className="text-sm text-[#B0C8C8]">{price} per person</p>
-        <p className="text-sm text-[#B0C8C8]">Capacity: {capacity}</p>
+        <p className="text-xs text-[#B0C8C8]">{price} per person</p>
+        <p className="text-xs text-[#B0C8C8]">Capacity: {capacity}</p>
       </div>
 
       {/* Right Section */}
@@ -65,7 +65,7 @@ const TripCard: React.FC<TripCardProps> = ({
         <span className="text-4xl font-bold">{day}</span>
         <span className="text-sm font-semibold text-black">{total}</span>
         <button
-          className="mt-2 px-4 py-1 rounded-full bg-[#28B872] text-white text-sm font-medium hover:bg-green-600 transition"
+          className="mt-2 px-8 py-1 rounded-full bg-[#28B872] text-white text-sm font-medium hover:bg-green-600 transition"
           onClick={(e) => {
             e.stopPropagation(); // prevent card click
             alert("Edit button clicked!");
