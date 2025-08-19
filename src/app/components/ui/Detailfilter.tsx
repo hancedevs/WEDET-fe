@@ -48,54 +48,54 @@ const TabbedDetail = () => {
             </div>
           </div>
         );
-        case "Itinerary":
-          return (
-            <div className="p-6 font-semibold space-y-4">
-              {[1, 2, 3, 4].map((_, index) => (
-                <div key={index} className="flex gap-x-2 items-start">
-                  <div className="flex relative flex-col items-center h-[100px]">
-                    {/* Dotted vertical connector */}
-                    {index < 3 && (
-                      <div
-                        className="absolute top-0 border-l-2 border-dotted border-[#28B872]"
-                        style={{
-                          height: "calc(100% - -4rem)",
-                        }}
-                      />
-                    )}
-  
-                    {/* Green circle */}
-                    <div className="w-4 h-4 bg-[#28B872] rounded-full relative z-10">
-                      <span className="absolute top-1/2 left-1/2 h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-white border border-white transform -translate-x-1/2 -translate-y-1/2"></span>
-                    </div>
-                  </div>
-  
-                  {/* Time & Date */}
-                  <div className="grid mr-3">
-                    <p className="font-semibold leading-tight mb-0">8:30</p>
-                    <p className="text-black leading-tight whitespace-nowrap m">
-                      Jun 04/25
-                    </p>
-                  </div>
-  
-                  {/* Card content */}
-                  <div className="bg-white shadow p-6 rounded-[30px] w-full">
-                    <ul className="space-y-3 list-disc pl-3 text-gray-600">
-                      <li className="text-[#28B872]">
-                        <span className="text-gray-700">Swimming</span>
-                      </li>
-                      <li className="text-[#28B872]">
-                        <span className="text-gray-700">Riding</span>
-                      </li>
-                      <li className="text-[#28B872]">
-                        <span className="text-gray-700">Fishing</span>
-                      </li>
-                    </ul>
+      case "Itinerary":
+        return (
+          <div className="p-6 font-semibold space-y-4">
+            {[1, 2, 3, 4].map((_, index) => (
+              <div key={index} className="flex gap-x-2 items-start">
+                <div className="flex relative flex-col items-center h-[100px]">
+                  {/* Dotted vertical connector */}
+                  {index < 3 && (
+                    <div
+                      className="absolute top-0 border-l-2 border-dotted border-[#28B872]"
+                      style={{
+                        height: "calc(100% - -4rem)",
+                      }}
+                    />
+                  )}
+
+                  {/* Green circle */}
+                  <div className="w-4 h-4 bg-[#28B872] rounded-full relative z-10">
+                    <span className="absolute top-1/2 left-1/2 h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-white border border-white transform -translate-x-1/2 -translate-y-1/2"></span>
                   </div>
                 </div>
-              ))}
-            </div>
-          );
+
+                {/* Time & Date */}
+                <div className="grid mr-3">
+                  <p className="font-semibold leading-tight mb-0">8:30</p>
+                  <p className="text-black leading-tight whitespace-nowrap m">
+                    Jun 04/25
+                  </p>
+                </div>
+
+                {/* Card content */}
+                <div className="bg-white shadow p-6 rounded-[30px] w-full">
+                  <ul className="space-y-3 list-disc pl-3 text-gray-600">
+                    <li className="text-[#28B872]">
+                      <span className="text-gray-700">Swimming</span>
+                    </li>
+                    <li className="text-[#28B872]">
+                      <span className="text-gray-700">Riding</span>
+                    </li>
+                    <li className="text-[#28B872]">
+                      <span className="text-gray-700">Fishing</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </div>
+        );
 
       case "Included":
         return (
@@ -158,12 +158,12 @@ const TabbedDetail = () => {
 
   return (
     <div className="max-w-3xl mx-auto mt-6 sm:mt-10 px-2 sm:px-0">
-      <div className="flex gap-2 sm:gap-4 mb-4 sm:mb-6 border p-1 rounded-[35px] border-[#E9F4F4] bg-[#E9F4F4] overflow-x-auto">
+      <div className="flex w-full p-1 rounded-full bg-[#E9F4F4]">
         {TABS.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-3 py-1 sm:px-4 sm:py-2 rounded-3xl font-medium text-sm sm:text-base whitespace-nowrap ${
+            className={`flex-1 px-3 py-1 sm:px-4 sm:py-2 rounded-3xl font-medium text-sm sm:text-base whitespace-nowrap ${
               activeTab === tab
                 ? "bg-[#28B872] text-white"
                 : "text-gray-600 hover:text-green-600"

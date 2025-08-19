@@ -21,7 +21,23 @@ export const step1Schema = z.object({
   highlights: z.string().min(2, "Add at least one highlight"),
 });
 
+export const Step2TripSchema = z.object({
+  groupNumber: z
+    .string()
+    .min(1, "Group number is required")
+    .regex(/^[1-9][0-9]*$/, "Group number must be a positive number"),
+  activities: z
+    .array(
+      z.object({
+        activity: z.string().min(1, "Activity is required"),
+        time: z.string().min(1, "Time is required"),
+      })
+    )
+    .min(1, "At least one activity is required"),
+});
+
 export type Step1FormData = z.infer<typeof step1Schema>;
+<<<<<<< HEAD
 
 
 
@@ -48,3 +64,6 @@ export const stepthreeSchema = z.object({
 });
 
 export type StepthreeFormData = z.infer<typeof stepthreeSchema>;
+=======
+export type Step2FormData = z.infer<typeof Step2TripSchema>;
+>>>>>>> c1b0c78131a5d86a98427883264a7c7c41e2c658
