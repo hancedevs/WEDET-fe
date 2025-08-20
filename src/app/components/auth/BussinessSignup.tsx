@@ -6,10 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { BussinessSignupSchema } from "@/lib/validation";
 import { z } from "zod";
-
+import { useRouter } from "next/navigation";
 export default function Signupform() {
-  const [dateType, setDateType] = useState<"text" | "date">("text");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const router = useRouter();
 
   const [formData, setFormData] = useState({
     BusinessName: "",
@@ -22,10 +22,13 @@ export default function Signupform() {
     businessImage: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name } = e.target;
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
+      [name]: value,
     }));
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -34,18 +37,7 @@ export default function Signupform() {
 
   const validateForm = () => {
     try {
-      const validationData = {
-        BusinessName: formData.BusinessName,
-        registrationNumber: formData.registrationNumber,
-        foundingDate: formData.foundingDate,
-        aboutBusiness: formData.aboutBusiness,
-        email: formData.email,
-        phoneNumber: formData.phoneNumber,
-        fayidaId: formData.fayidaId,
-        businessImage: formData.businessImage,
-      };
-
-      BussinessSignupSchema.parse(validationData);
+      BussinessSignupSchema.parse(formData);
       setErrors({});
       return true;
     } catch (error) {
@@ -65,11 +57,15 @@ export default function Signupform() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!validateForm()) {
+      console.log(" Validation failed");
       return;
     }
 
-    console.log("Form submitted:", formData);
+    console.log("Validation passed", formData);
+    router.push("/auth/otp");
+
     setFormData({
       BusinessName: "",
       registrationNumber: "",
@@ -81,11 +77,12 @@ export default function Signupform() {
       businessImage: "",
     });
   };
+
   return (
     <div>
       <Logo />
       <div className="absolute top-30 w-full bg-white flex flex-col rounded-t-3xl justify-center py-6 sm:px-6 lg:px-8">
-        <div className="max-w-sm ">
+        <div className="max-w-sm">
           <h2 className="text-xl px-10 mt-3 font-semibold text-black">
             Business Profile
           </h2>
@@ -95,7 +92,7 @@ export default function Signupform() {
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="grid gap-y-8 gap-x-4">
                 <div className="flex flex-col gap-1">
-                  <label htmlFor="">Business name</label>
+                  <label>Business name</label>
                   <Input
                     name="BusinessName"
                     value={formData.BusinessName}
@@ -110,9 +107,9 @@ export default function Signupform() {
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label htmlFor="">Registration Number</label>
+                  <label>Registration Number</label>
                   <Input
-                    name="Registration number"
+                    name="registrationNumber"
                     value={formData.registrationNumber}
                     onChange={handleChange}
                     className="rounded-3xl p-6 border-none shadow focus:ring-2 focus:ring-green-300"
@@ -125,27 +122,24 @@ export default function Signupform() {
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label htmlFor="">Founding date</label>
+                  <label>Founding date</label>
                   <Input
-                    name="foundingdate"
-                    type={dateType}
+                    type="date"
                     value={formData.foundingDate}
-                    onFocus={() => setDateType("date")}
-                    onBlur={() =>
-                      formData.foundingDate === "" && setDateType("text")
+                    onChange={(e) =>
+                      setFormData({ ...formData, foundingDate: e.target.value })
                     }
-                    onChange={handleChange}
                     className="rounded-3xl p-6 border-none shadow focus:ring-2 focus:ring-green-300"
                   />
-                  {errors.registrationNumber && (
+                  {errors.foundingDate && (
                     <p className="text-red-500 text-xs mt-1 px-2">
-                      {errors.registrationNumber}
+                      {errors.foundingDate}
                     </p>
                   )}
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label htmlFor="">About Your business</label>
+                  <label>About Your business</label>
                   <textarea
                     name="aboutBusiness"
                     value={formData.aboutBusiness}
@@ -162,7 +156,7 @@ export default function Signupform() {
                 <h2 className="font-bold">Account owner</h2>
 
                 <div className="flex flex-col gap-1">
-                  <label htmlFor="">Email Address</label>
+                  <label>Email Address</label>
                   <Input
                     name="email"
                     value={formData.email}
@@ -175,10 +169,11 @@ export default function Signupform() {
                     </p>
                   )}
                 </div>
+
                 <div className="flex flex-col gap-1">
-                  <label htmlFor="">Phone number</label>
+                  <label>Phone number</label>
                   <Input
-                    name="phonenumber"
+                    name="phoneNumber"
                     value={formData.phoneNumber}
                     onChange={handleChange}
                     className="rounded-3xl p-6 border-none shadow focus:ring-2 focus:ring-green-300"
@@ -189,10 +184,11 @@ export default function Signupform() {
                     </p>
                   )}
                 </div>
+
                 <div className="flex flex-col gap-1">
-                  <label htmlFor="">Fayda ID number</label>
+                  <label>Fayda ID number</label>
                   <Input
-                    name="faydaIdnumber"
+                    name="fayidaId"
                     value={formData.fayidaId}
                     onChange={handleChange}
                     className="rounded-3xl p-6 border-none shadow focus:ring-2 focus:ring-green-300"
@@ -203,6 +199,7 @@ export default function Signupform() {
                     </p>
                   )}
                 </div>
+
                 <div className="flex flex-col gap-1">
                   <label className="mb-3 font-medium">
                     Upload business license
@@ -251,6 +248,7 @@ export default function Signupform() {
                   </div>
                 </div>
               </div>
+
               <div>
                 <Button
                   type="submit"

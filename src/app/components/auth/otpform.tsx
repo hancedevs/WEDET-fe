@@ -45,7 +45,7 @@ export function OTPForm() {
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500))
-      router.push("/pages/home")
+      router.push("/auth/login")
     } catch {
       setError("Invalid OTP. Please try again.")
     } finally {

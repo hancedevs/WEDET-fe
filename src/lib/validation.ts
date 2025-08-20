@@ -145,55 +145,26 @@ export const step4Schema = z.object({
 });
 
 
-
 export const BussinessSignupSchema = z.object({
-  BusinessName: nameSchema,
-  registrationNumber: z
-    .string()
-    .min(5, "Registration number must be at least 5 characters long")
-    .max(20, "Registration number cannot exceed 20 characters")
-    .regex(
-      /^[A-Za-z0-9-]+$/,
-      "Only alphanumeric characters and hyphens are allowed"
-    ),
-
+  BusinessName: z.string().min(1, "Business name is required"),
+  registrationNumber: z.string().min(1, "Registration number is required"),
   foundingDate: z
-    .date()
-    .max(new Date(), "Founding date cannot be in the future")
-    .refine(
-      (date) => date >= new Date("1900-01-01"),
-      "Founding date must be after 1900"
-    ),
-
-  aboutBusiness: z
     .string()
-    .min(50, "Description must be at least 50 characters")
-    .max(2000, "Description cannot exceed 2000 characters"),
-
-    businessImage: z
-    .array(
-      z
-        .string()
-        .refine(
-          (v) => v.startsWith("data:") || /^https?:\/\//.test(v),
-          "Invalid image"
-        )
-    )
-    .min(2, "Add at least two photo"),
-    email: emailSchema, 
-    phoneNumber: z
-    .string()
-    .min(6, "Phone number too short")
-    .max(20, "Phone number too long")
-    .transform(str => str.replace(/[\s-]/g, "")), 
-
-  fayidaId: z
-    .string()
-    .min(8, "Fayida ID must be at least 8 characters")
-    .max(20, "Fayida ID cannot exceed 20 characters")
-    .regex(
-      /^[A-Za-z0-9]+$/, 
-      "Only letters and numbers allowed"
-    )
+    .refine((val) => {
+      const date = new Date(val);
+      return (
+        !isNaN(date.getTime()) &&
+        date <= new Date() &&
+        date >= new Date("1900-01-01")
+      );
+    }, {
+      message: "Founding date must be between 1900 and today",
+    }),
+  aboutBusiness: z.string().min(1, "About business is required"),
+  email: z.string().email("Invalid email"),
+  phoneNumber: z.string().min(10, "Phone number is too short"),
+  fayidaId: z.string().min(1, "Fayida ID is required"),
+  businessImage: z.string().optional(),
 });
+
 
