@@ -22,7 +22,6 @@ interface TripCardProps {
   totalPrice: string;
   onPassengerListClick?: () => void;
 }
-
 const TripCard: React.FC<TripCardProps> = ({
   date,
   duration,
@@ -35,6 +34,7 @@ const TripCard: React.FC<TripCardProps> = ({
   totalPrice,
   onPassengerListClick,
 }) => {
+  const router = useRouter();
   return (
     <div className="mx-4 my-2 p-6 border border-green-400 rounded-3xl bg-green-50">
       <div className="flex justify-between font-semibold text-sm text-gray-600 mb-2">
@@ -76,7 +76,7 @@ const TripCard: React.FC<TripCardProps> = ({
           Passenger List
         </button>
         <button
-          onClick={() => alert("Generate ticket is clicked")}
+          onClick={() => router.push("/ticket")}
           className="mt-4 px-4 py-2 rounded-full border border-[#28B872] text-[#28B872] text-sm font-semibold"
         >
           Generate Ticket
