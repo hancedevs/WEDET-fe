@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { House, MapPin, Heart, User } from "lucide-react";
+import { House, MapPin, User } from "lucide-react";
 
 export default function NavBar() {
   const [active, setActive] = useState("explore");
