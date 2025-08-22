@@ -37,7 +37,7 @@ export const dateOfBirthSchema = z
     const dob = new Date(val);
     const now = new Date();
     const age = now.getFullYear() - dob.getFullYear();
-    return age >= 13;
+    return age >= 1;
   }, "You must be at least 13 years old");
 
 export const genderSchema = z.enum(["male", "female"]).refine((val) => val, {
