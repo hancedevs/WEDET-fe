@@ -239,7 +239,7 @@ export default function Step3Page() {
   const onSubmit: SubmitHandler<StepthreeFormData> = async (data) => {
     await new Promise((r) => setTimeout(r, 150));
     console.log("Form submitted:", data, { dateISO });
-    router.push("/Tourguide/MyTrips");
+    router.push("/Dashbord/TourDash");
   };
 
   const onError: SubmitErrorHandler<StepthreeFormData> = (e) => {
