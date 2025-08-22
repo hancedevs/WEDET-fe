@@ -9,7 +9,7 @@ interface Props {
 
 export default function StepControls({ step, onNext, onPrev, disableNext }: Props) {
   return (
-    <div className="flex items-center justify-between px-6 py-3 select-none">
+    <div className="flex items-center justify-between px-6 py-3 mb-18 select-none">
       {/* Previous */}
       {step === 1 ? (
         <div /> 
