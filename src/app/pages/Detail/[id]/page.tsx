@@ -69,13 +69,17 @@ export default function TourPage() {
       <div className="relative z-20">
         <div className="bg-white relative mt-[-1.5rem] left-1/2 transform -translate-x-1/2 w-full max-w-4xl border rounded-t-[35px] p-4 sm:p-5">
           <div className="mb-4 mt-3">
-            <h1 className="text-xl sm:text-2xl font-bold">Wenchi Park, Oromia</h1>
+            <h1 className="text-xl sm:text-2xl font-bold">
+              Wenchi Park, Oromia
+            </h1>
             <div className="flex flex-wrap items-center mt-1 gap-2">
               <div className="flex items-center">
                 <Star size={16} className="text-yellow-500 fill-yellow-500" />
                 <span className="ml-1 text-sm font-medium">4.7</span>
               </div>
-              <span className="text-[#959494] font-semibold text-sm">(158 reviews)</span>
+              <span className="text-[#959494] font-semibold text-sm">
+                (158 reviews)
+              </span>
               <span className="bg-green-100 font-semibold text-[#0A703E] border-1 border-[#00FF83] text-xs px-2 py-1 rounded-full">
                 Moderate
               </span>
@@ -88,9 +92,15 @@ export default function TourPage() {
               <div className="bg-[#F00505] rounded-[35px] text-white px-2 py-1 font-bold text-xs sm:text-sm">
                 Save 15%
               </div>
-              <div className="text-green-600 font-bold text-lg sm:text-xl">2,700 Br</div>
-              <div className="text-[#A6A6A6] text-xs sm:text-sm line-through mr-2 sm:mr-6">3,000 Br</div>
-              <div className="text-[#A6A6A6] text-[10px] sm:text-xs mr-1 sm:mr-4">per person</div>
+              <div className="text-green-600 font-bold text-lg sm:text-xl">
+                2,700 Br
+              </div>
+              <div className="text-[#A6A6A6] text-xs sm:text-sm line-through mr-2 sm:mr-6">
+                3,000 Br
+              </div>
+              <div className="text-[#A6A6A6] text-[10px] sm:text-xs mr-1 sm:mr-4">
+                per person
+              </div>
             </div>
           </div>
           <div className="mb-6">
@@ -131,14 +141,23 @@ export default function TourPage() {
                 </Avatar>
                 <div className="flex-1 sm:flex-none">
                   <div className="flex gap-2 items-center">
-                    <h3 className="font-bold text-sm sm:text-base">Abebe Balcha</h3>
-                    <BadgeCheck strokeWidth={1.25} className="text-green-700 w-4 h-4 sm:w-5 sm:h-5" />
+                    <h3 className="font-bold text-sm sm:text-base">
+                      Abebe Balcha
+                    </h3>
+                    <BadgeCheck
+                      strokeWidth={1.25}
+                      className="text-green-700 w-4 h-4 sm:w-5 sm:h-5"
+                    />
                   </div>
-                  <p className="text-gray-500 text-xs sm:text-sm">18 years experience</p>
+                  <p className="text-gray-500 text-xs sm:text-sm">
+                    18 years experience
+                  </p>
                 </div>
               </div>
               <div className="flex flex-row sm:flex-col items-start sm:items-center mt-2 sm:mt-0 w-full sm:w-auto justify-between sm:justify-normal">
-                <span className="text-[#959494] font-semibold text-xs sm:text-sm">Your Expert Guide</span>
+                <span className="text-[#959494] font-semibold text-xs sm:text-sm">
+                  Your Expert Guide
+                </span>
                 <div className="flex items-center mb-0 sm:mb-3 mr-0 sm:mr-3">
                   <Star size={16} className="text-yellow-500" />
                   <span className="ml-1 text-sm font-medium">4.7</span>
