@@ -3,21 +3,37 @@
 import { useState } from "react";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
+
 import { supabase } from "@/lib/supabaseClient";
 import { signupSchema } from "@/lib/validation";
+
 import Logo from "../ui/Logo";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "../ui/sonner";
+
+type Gender = "male" | "female" | "";
+
+interface FormState {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  gender: Gender;
+  email: string;
+  password: string;
+  agreeToTerms: boolean;
+}
+
 export default function Signupform() {
   const router = useRouter();
+
   const [dateType, setDateType] = useState<"text" | "date">("text");
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [showPassword, setShowPassword] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormState>({
     firstName: "",
     lastName: "",
     dateOfBirth: "",
@@ -37,11 +53,11 @@ export default function Signupform() {
     try {
       signupSchema.parse({
         firstName: formData.firstName,
-        lastName:  formData.lastName,
-        email:     formData.email,
-        password:  formData.password,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
         dateOfBirth: formData.dateOfBirth || undefined,
-        gender: (formData.gender as "male" | "female") || undefined,
+        gender: (formData.gender as Exclude<Gender, "">) || undefined,
         agreeToTerms: formData.agreeToTerms,
       });
       setErrors({});
@@ -74,39 +90,26 @@ export default function Signupform() {
     try {
       const { firstName, lastName, dateOfBirth, gender, email, password } = formData;
 
-      const { data, error } = await supabase.auth.signUp({
+      const { data: signUpData, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { firstName, lastName, dateOfBirth, gender },
+          data: { firstName, lastName, dateOfBirth, gender, role: "normal_user" }, // 👈 tag role
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
+
       if (error) {
         toast.error(error.message, { id: tid });
         setErrors((p) => ({ ...p, root: error.message }));
         return;
       }
 
-      const authUser = data.user;
-      if (!authUser) {
-        toast.info("Check your email to confirm your account.", { id: tid });
-        return;
-      }
+      // Always force the login screen next:
+      if (signUpData.session) await supabase.auth.signOut();
 
-      await supabase
-        .from("profile")
-        .upsert(
-          {
-            user_id: authUser.id,
-            full_name: `${firstName} ${lastName}`.trim(),
-            gender: gender || null,
-          },
-          { onConflict: "user_id" }
-        );
-
-      toast.success("Account created! 🎉", { id: tid });
-      router.push("/pages/home");
+      toast.success("Account created! You can now log in.", { id: tid });
+      router.replace("/auth/login");
 
       setFormData({
         firstName: "",
@@ -117,10 +120,10 @@ export default function Signupform() {
         password: "",
         agreeToTerms: false,
       });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      toast.error(err?.message ?? "Something went wrong", { id: tid });
-      setErrors((p) => ({ ...p, root: err?.message ?? "Something went wrong" }));
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      toast.error(message, { id: tid });
+      setErrors((p) => ({ ...p, root: message }));
     } finally {
       setIsSubmitting(false);
     }
@@ -133,6 +136,7 @@ export default function Signupform() {
         <div className="max-w-sm mx-auto">
           <h2 className="text-xl px-10 mt-3 font-bold text-[#959494]">Create your account</h2>
         </div>
+
         <div className="mt-4 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="px-10 sm:rounded-lg sm:px-10">
             <form className="space-y-4" onSubmit={handleSubmit}>
@@ -146,6 +150,7 @@ export default function Signupform() {
                   onChange={handleChange}
                   className="rounded-3xl p-6 border-none shadow placeholder:text-gray-300 focus:ring-2 focus:ring-green-300"
                   placeholder="First Name"
+                  disabled={isSubmitting}
                 />
                 {errors.firstName && <p className="text-red-500 text-xs mt-1 px-2">{errors.firstName}</p>}
               </div>
@@ -158,6 +163,7 @@ export default function Signupform() {
                   onChange={handleChange}
                   className="rounded-3xl p-6 border-none shadow placeholder:text-gray-300 focus:ring-2 focus:ring-green-300"
                   placeholder="Last Name"
+                  disabled={isSubmitting}
                 />
                 {errors.lastName && <p className="text-red-500 text-xs mt-1 px-2">{errors.lastName}</p>}
               </div>
@@ -173,6 +179,7 @@ export default function Signupform() {
                   onChange={handleChange}
                   className="rounded-3xl p-6 border-none shadow placeholder:text-gray-300 focus:ring-2 focus:ring-green-300"
                   placeholder="Date of birth"
+                  disabled={isSubmitting}
                 />
                 {errors.dateOfBirth && <p className="text-red-500 text-xs mt-1 px-2">{errors.dateOfBirth}</p>}
               </div>
@@ -191,8 +198,11 @@ export default function Signupform() {
                         className="h-4 w-4 accent-green-600"
                         checked={formData.gender === g}
                         onChange={handleChange}
+                        disabled={isSubmitting}
                       />
-                      <label htmlFor={g} className="ml-2 block text-sm text-green-500 capitalize">{g}</label>
+                      <label htmlFor={g} className="ml-2 block text-sm text-green-500 capitalize">
+                        {g}
+                      </label>
                     </div>
                   ))}
                 </div>
@@ -207,6 +217,7 @@ export default function Signupform() {
                   onChange={handleChange}
                   className="rounded-3xl p-6 border-none shadow placeholder:text-gray-300 focus:ring-2 focus:ring-green-300"
                   placeholder="Email"
+                  disabled={isSubmitting}
                 />
                 {errors.email && <p className="text-red-500 text-xs mt-1 px-2">{errors.email}</p>}
               </div>
@@ -220,11 +231,13 @@ export default function Signupform() {
                   onChange={handleChange}
                   className="rounded-3xl p-6 border-none shadow placeholder:text-gray-300 focus:ring-2 focus:ring-green-300 pr-10"
                   placeholder="New Password"
+                  disabled={isSubmitting}
                 />
                 <button
                   type="button"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => setShowPassword((s) => !s)}
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -240,6 +253,7 @@ export default function Signupform() {
                   checked={formData.agreeToTerms}
                   onChange={handleChange}
                   className="h-4 w-4 accent-green-600"
+                  disabled={isSubmitting}
                 />
                 <label htmlFor="agreeToTerms" className="text-sm font-medium mt-4 text-[#959494] ml-2">
                   By selecting Create account I agree to wedet&apos;s terms of service and privacy policy.
