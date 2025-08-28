@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
+
 type CardContent = {
   title: string;
   description: string;
@@ -9,11 +10,12 @@ type CardContent = {
   image: string;
   image1: string;
 };
+
 const cards: CardContent[] = [
   {
     title: "X/ weder",
     description:
-      "cfgeasuvhref f iebyskhv o uhvbk sk cfgeasuvhref f iebyskhv ouhvbk sk",
+      "description description description description description description description description ",
     buttonText: "Book now!",
     footer: "KURIFTU RESORTS",
     image: "/image1.jpg",
@@ -37,8 +39,10 @@ const cards: CardContent[] = [
     image1: "/boredim.png",
   },
 ];
+
 export default function ResortPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
+
   return (
     <div className="relative max-w-4xl mt-5 mx-auto">
       <div className="relative border border-green-500 mb-8 h-66 w-full overflow-visible rounded-[35px]">
@@ -50,30 +54,46 @@ export default function ResortPage() {
             }`}
           >
             <div className="flex items-center">
-              <Image
-                src="/Header.jpg"
-                alt="logo"
-                width={200}
-                height={100}
-                className="p-8"
-              />
-              <h2 className="text-green-700 font-bold">{card.footer}</h2>
+              <div className="flex justify-between w-full p-4">
+                <div className="flex-1 flex justify-start">
+                  <Image
+                    src="/wedet-logo.png"
+                    alt="logo"
+                    width={200}
+                    height={100}
+                    className="max-h-14 w-auto object-contain"
+                  />
+                </div>
+
+                <div className="flex-1 flex justify-end">
+                  <Image
+                    src="/kuriftu logo.png"
+                    alt="logo"
+                    width={200}
+                    height={100}
+                    className="max-h-14 w-auto object-contain"
+                  />
+                </div>
+              </div>
             </div>
+
             <div>
-              <p className="px-6 w-[250px]">{card.description}</p>
+              <p className="px-6">{card.description}</p>
             </div>
+
             <div className="flex justify-between">
               <button className="border text-white bg-[#28B872] m-8 px-5 py-2 rounded-[35px]">
                 {card.buttonText}
               </button>
             </div>
+
             <div className="absolute bottom-[-30px] right-[-14px] z-10">
               <Image
                 key={index}
                 src={card.image1}
-                alt="logo"
+                alt="decoration"
                 width={200}
-                height={10}
+                height={100}
                 quality={80}
                 className="w-[150px] sm:w-[150px] md:w-[200px] h-auto"
                 style={{
@@ -86,7 +106,7 @@ export default function ResortPage() {
         ))}
       </div>
 
-      <div className=" mt-2 mb-8 mx-auto w-fit transform -translate-x-1/2 flex gap-2">
+      <div className="mt-2 mb-8 mx-auto w-fit flex gap-2">
         {cards.map((_, index) => (
           <button
             key={index}
