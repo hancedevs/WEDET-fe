@@ -158,21 +158,24 @@ const TabbedDetail = () => {
 
   return (
     <div className="max-w-3xl mx-auto mt-6 sm:mt-10 px-2 sm:px-0">
-      <div className="flex w-full p-1 rounded-full bg-[#E9F4F4]">
+      <div className="flex w-full p-1 rounded-full bg-[#E9F4F4] justify-between">
         {TABS.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`flex-1 px-3 py-1 sm:px-4 sm:py-2 rounded-3xl font-medium text-sm sm:text-base whitespace-nowrap ${
-              activeTab === tab
-                ? "bg-[#28B872] text-white"
-                : "text-gray-600 hover:text-green-600"
-            }`}
+            className={`px-2 py-1 sm:px-3 sm:py-2 md:px-4 md:py-2 rounded-3xl font-medium 
+        text-xs sm:text-sm md:text-base
+        ${
+          activeTab === tab
+            ? "bg-[#28B872] text-white"
+            : "text-gray-600 hover:text-green-600"
+        }`}
           >
             {tab}
           </button>
         ))}
       </div>
+
       <div className="bg-white px-2 sm:px-0">{renderContent()}</div>
     </div>
   );

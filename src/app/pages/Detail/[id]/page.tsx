@@ -8,6 +8,7 @@ import TravelCard from "../../../components/ui/travelcard";
 import Detailfilter from "@/app/components/ui/Detailfilter";
 import { useRouter } from "next/navigation";
 import NavBar from "@/app/components/ui/navBar";
+
 const Images = ["/image1.jpg", "/image2.jpg", "/tipsimage.png"];
 
 export default function TourPage() {
@@ -16,6 +17,7 @@ export default function TourPage() {
   const handeclick = () => {
     router.push("/pages/home");
   };
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % Images.length);
@@ -25,7 +27,8 @@ export default function TourPage() {
 
   return (
     <div className="w-full mx-auto bg-white">
-      <div className="relative h-[280px] sm:h-[350px] md:h-[400px] w-full overflow-hidden">
+      {/* Full width slideshow */}
+      <div className="relative h-[280px] sm:h-[350px] md:h-[400px] w-full overflow-hidden max-w-full">
         {Images.map((img, index) => (
           <Image
             key={index}
@@ -66,8 +69,10 @@ export default function TourPage() {
           ))}
         </div>
       </div>
+
+      {/* Full width top card */}
       <div className="relative z-20">
-        <div className="bg-white relative mt-[-1.5rem] left-1/2 transform -translate-x-1/2 w-full max-w-4xl border rounded-t-[35px] p-4 sm:p-5">
+        <div className="bg-white relative mt-[-1.5rem] w-full max-w-full border rounded-t-[35px] p-4 sm:p-5">
           <div className="mb-4 mt-3">
             <h1 className="text-xl sm:text-2xl font-bold">
               Wenchi Park, Oromia
@@ -95,43 +100,47 @@ export default function TourPage() {
               <div className="text-green-600 font-bold text-lg sm:text-xl">
                 2,700 Br
               </div>
-              <div className="text-[#A6A6A6] text-xs sm:text-sm line-through mr-2 sm:mr-6">
+              <div className="text-[#A6A6A6] font-bold text-md sm:text-sm line-through mr-2 sm:mr-6">
                 3,000 Br
               </div>
-              <div className="text-[#A6A6A6] text-[10px] sm:text-xs mr-1 sm:mr-4">
+              <div className="text-[#A6A6A6] font-bold text-[12px] sm:text-xs mr-1 sm:mr-4">
                 per person
               </div>
             </div>
           </div>
           <div className="mb-6">
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap font-bold gap-1 px-1 sm:px-13">
               {["Wildlife", "Jungle", "Culture", "Wildlife"].map((tag, i) => (
                 <span
                   key={i}
-                  className="border border-[#E9F4F4] text-black font-semibold rounded-[35px] px-4 py-1 text-xs sm:text-sm"
+                  className="flex-1 text-center border border-[#E9F4F4] text-black font-semibold rounded-[35px] px-3 sm:px-3 py-1 text-xs sm:text-sm"
                 >
                   {tag}
                 </span>
               ))}
             </div>
           </div>
+
+          {/* Rest of the content remains unchanged */}
           <div className="mb-6 border border-[#E9F4F4] pl-8 sm:px-10 py-3 sm:py-5 rounded-[35px] flex justify-between sm:gap-0">
             <div className="min-w-[80px]">
-              <div className="text-xs text-[#959494]">Duration</div>
-              <div className="font-medium text-[#28B872]">2 Days</div>
+              <div className="font-bold text-xs text-[#959494]">Duration</div>
+              <div className="font-bold text-[#28B872]">2 Days</div>
             </div>
             <div className="min-w-[80px]">
-              <div className="text-xs text-[#959494]">Group Size</div>
-              <div className="font-medium text-[#28B872]">Max 10</div>
+              <div className="text-xs font-bold text-[#959494]">Group Size</div>
+              <div className="font-bold text-[#28B872]">Max 10</div>
             </div>
             <div className="min-w-[80px]">
-              <div className="text-xs text-[#959494]">Min Age</div>
-              <div className="font-medium text-[#28B872]">14+</div>
+              <div className="text-xs font-bold text-[#959494]">Min Age</div>
+              <div className="font-bold text-[#28B872]">14+</div>
             </div>
           </div>
+
           <div className="shadow-xl bg-white flex flex-col rounded-[35px] p-3 sm:p-4">
-            <div className="flex flex-col sm:flex-row sm:gap-2 sm:justify-between items-start sm:items-center mb-4">
-              <div className="flex items-center gap-2 w-full sm:w-auto">
+            {/* Top section */}
+            <div className="flex flex-row justify-between items-center mb-4 flex-wrap sm:flex-nowrap">
+              <div className="flex items-center gap-2 min-w-0">
                 <Avatar className="h-12 w-12 sm:h-15 sm:w-15 border-2 border-green-500">
                   <AvatarImage
                     src="https://github.com/shadcn.png"
@@ -139,48 +148,54 @@ export default function TourPage() {
                   />
                   <AvatarFallback>US</AvatarFallback>
                 </Avatar>
-                <div className="flex-1 sm:flex-none">
+                <div className="min-w-0">
                   <div className="flex gap-2 items-center">
-                    <h3 className="font-bold text-sm sm:text-base">
+                    <h3 className="font-bold text-sm sm:text-base truncate">
                       Abebe Balcha
                     </h3>
                     <BadgeCheck
-                      strokeWidth={1.25}
+                      strokeWidth={3}
                       className="text-green-700 w-4 h-4 sm:w-5 sm:h-5"
                     />
                   </div>
-                  <p className="text-gray-500 text-xs sm:text-sm">
+                  <p className="text-gray-500 text-xs sm:text-sm truncate">
                     18 years experience
                   </p>
                 </div>
               </div>
-              <div className="flex flex-row sm:flex-col items-start sm:items-center mt-2 sm:mt-0 w-full sm:w-auto justify-between sm:justify-normal">
-                <span className="text-[#959494] font-semibold text-xs sm:text-sm">
+
+              <div className="flex flex-col items-end gap-1 min-w-[120px]">
+                <span className="text-[#959494] font-semibold text-xs sm:text-sm truncate">
                   Your Expert Guide
                 </span>
-                <div className="flex items-center mb-0 sm:mb-3 mr-0 sm:mr-3">
+                <div className="flex items-center justify-end">
                   <Star size={16} className="text-yellow-500" />
                   <span className="ml-1 text-sm font-medium">4.7</span>
                 </div>
               </div>
             </div>
-            <p className="text-[#959494] font-bold text-xs sm:text-sm px-2 sm:px-16 mb-4">
-              Carlos is a naturalist guide born in the Amazon basin. His
-              encyclopedic knowledge of rainforest ecology combined with his
-              ability to spot even the most elusive wildlife, makes him one of
-              Perus most respected jungle guides.
-            </p>
-            <div className="flex flex-wrap gap-1 px-1  sm:px-13">
+
+            <div className="ml-12">
+              <p className="text-[#959494] text-justify font-bold text-xs sm:text-sm px-2 sm:px-16 mb-4 max-w-[400]">
+                Carlos is a naturalist guide born in the Amazon basin. His
+                encyclopedic knowledge of rainforest ecology combined with his
+                ability to spot even the most elusive wildlife, makes him one of
+                Perus most respected jungle guides.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-1 px-1 sm:px-13">
               {["Wildlife", "Jungle", "Culture", "Wildlife"].map((tag, i) => (
                 <span
                   key={i}
-                  className="border border-[#E9F4F4] text-black font-semibold rounded-[35px] px-3 sm:px-3 py-1 text-xs sm:text-sm"
+                  className="flex-1 text-center border border-[#E9F4F4] text-black font-semibold rounded-[35px] px-3 sm:px-3 py-1 text-xs sm:text-sm"
                 >
                   {tag}
                 </span>
               ))}
             </div>
           </div>
+
           <div className="w-full max-w-full overflow-hidden">
             <Detailfilter />
           </div>
