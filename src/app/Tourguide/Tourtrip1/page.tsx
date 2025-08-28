@@ -9,6 +9,7 @@ import PhotoPicker from "@/app/components/Tourguidecomponents/photopicker";
 import { step1Schema, type Step1FormData } from "@/lib/tourguideschema";
 import { ChevronDown } from "lucide-react";
 import StepController from "@/app/components/Tourguidecomponents/stepcontroller";
+import { saveDraft } from "@/lib/tripDraftLocal";
 
 export default function Step1Page() {
   const router = useRouter();
@@ -25,16 +26,15 @@ export default function Step1Page() {
     mode: "onSubmit",
     reValidateMode: "onChange",
     shouldFocusError: true,
-    defaultValues: {
-      photos: [],
-    },
+    defaultValues: { photos: [] },
   });
 
   const photos = watch("photos");
   const onPhotosChange = (arr: string[]) =>
     setValue("photos", arr, { shouldValidate: true, shouldDirty: true });
 
-  const onSubmit = (_data: Step1FormData) => {
+  const onSubmit = async (data: Step1FormData) => {
+    saveDraft("step1", data);
     router.push("/Tourguide/Tourtrip2");
   };
 
@@ -78,7 +78,7 @@ export default function Step1Page() {
           <label className={labelCls}>Tour type</label>
           <div className="relative mt-1 mb-1">
             <select
-              {...register("tourType")} 
+              {...register("tourType")}
               defaultValue=""
               className={
                 "appearance-none w-full h-10 rounded-full bg-white border border-gray-200 shadow px-5 pr-10 text-base outline-none mb-4 " +

@@ -64,7 +64,7 @@ const TripCard: React.FC<TripCardProps> = ({
         <span className="text-sm font-semibold text-black-500">{total}</span>
         <button
           onClick={(e) => {
-            e.stopPropagation(); //  Prevent parent click
+            e.stopPropagation(); // Prevent parent click
             alert("Edit button clicked");
           }}
           className="mt-2 px-8 py-1 rounded-full bg-[#28B872] text-white text-sm font-medium hover:bg-green-600 transition"
@@ -77,6 +77,12 @@ const TripCard: React.FC<TripCardProps> = ({
 };
 // dashboard cards
 export default function Dashboard() {
+  const router = useRouter();
+
+  const handleAddTrip = () => {
+    router.push('/Tourguide/Tourtrip1');
+  };
+
   return (
     <div className="min-h-screen w-full">
       <div className="w-full px-4 py pb-20">
@@ -167,7 +173,10 @@ export default function Dashboard() {
         {/* Trips Section */}
         <div className="flex justify-between items-center mb-6 w-full">
           <h2 className="text-lg font-bold">Trips</h2>
-          <button className="flex items-center gap-1 text-green-600 font-medium hover:underline">
+          <button 
+            className="flex items-center gap-1 text-green-600 font-medium hover:underline"
+            onClick={handleAddTrip}
+          >
             <Plus className="w-4 h-4" /> Add Trip
           </button>
         </div>

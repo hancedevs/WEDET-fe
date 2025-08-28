@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
@@ -8,7 +7,7 @@ import {
   SubmitHandler,
   SubmitErrorHandler,
   UseFormReturn,
-} from "react-hook-form"
+} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Calendar } from "lucide-react";
 
@@ -22,6 +21,10 @@ import {
   type StepthreeFormData,
   type ScheduleType,
 } from "@/lib/tourguideschema";
+
+import { saveDraft } from "@/lib/tripDraftLocal";
+import { postTripToSupabase } from "@/lib/tripPoster";
+
 type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   error?: string | boolean;
   rightAddon?: React.ReactNode;
@@ -35,9 +38,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       "focus:bg-[#EAF8F1] focus:border-[#9be5c2] focus:ring-2 focus:ring-[#26cc73] focus:caret-[#26cc73] " +
       "aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-500/60";
     const tone =
-      variant === "filled"
-        ? "bg-[#fafafa] border-0"
-        : "bg-white border border-gray-200";
+      variant === "filled" ? "bg-[#fafafa] border-0" : "bg-white border border-gray-200";
     return (
       <div className="relative">
         <input
@@ -83,8 +84,7 @@ function CapsuleList({
   const [newItem, setNewItem] = useState("");
 
   const errorMsg =
-    (errors[name] as unknown as { message?: string } | undefined)?.message ??
-    "";
+    (errors[name] as unknown as { message?: string } | undefined)?.message ?? "";
 
   const addItem = () => {
     const v = newItem.trim();
@@ -107,16 +107,8 @@ function CapsuleList({
       <h3 className="font-medium mb-2">{title}</h3>
 
       {items.map((text, i) => (
-        <div
-          key={`${name}-${i}`}
-          className="flex items-center rounded-full bg-white shadow px-4 py-3 mb-3"
-        >
-          <button
-            type="button"
-            onClick={() => removeItem(i)}
-            className="mr-3 text-black"
-            aria-label="Remove"
-          >
+        <div key={`${name}-${i}`} className="flex items-center rounded-full bg-white shadow px-4 py-3 mb-3">
+          <button type="button" onClick={() => removeItem(i)} className="mr-3 text-black" aria-label="Remove">
             ×
           </button>
           <span className="text-base">{text}</span>
@@ -131,21 +123,10 @@ function CapsuleList({
             placeholder={placeholder}
             variant="filled"
           />
-          <button
-            type="button"
-            onClick={addItem}
-            className="ml-2 text-[#26cc73] font-medium"
-          >
+          <button type="button" onClick={addItem} className="ml-2 text-[#26cc73] font-medium">
             Add
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              setIsAdding(false);
-              setNewItem("");
-            }}
-            className="ml-2 text-gray-500"
-          >
+          <button type="button" onClick={() => { setIsAdding(false); setNewItem(""); }} className="ml-2 text-gray-500">
             Cancel
           </button>
         </div>
@@ -168,10 +149,7 @@ const fmtDateOnly = (iso?: string) => {
   if (!iso) return "";
   const d = new Date(`${iso}T00:00:00`);
   if (Number.isNaN(d.getTime())) return "";
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "2-digit",
-  }).format(d);
+  return new Intl.DateTimeFormat("en-US", { month: "short", day: "2-digit" }).format(d);
 };
 const todayISO = () => {
   const d = new Date();
@@ -236,9 +214,20 @@ export default function Step3Page() {
     setValue("scheduleType", tab, { shouldDirty: true, shouldValidate: true });
   };
 
+  // Submit: save step3, then insert into public.tours
   const onSubmit: SubmitHandler<StepthreeFormData> = async (data) => {
-    await new Promise((r) => setTimeout(r, 150));
-    console.log("Form submitted:", data, { dateISO });
+    saveDraft("step3", data);
+
+    const status = data.postAction === "schedule" ? "scheduled" : "posted";
+    const sched = status === "scheduled" ? (data.scheduleAt ?? null) : null;
+
+    try {
+      await postTripToSupabase({ status, scheduleAt: sched, dateISO });
+    } catch (e) {
+      console.error(e);
+      return;
+    }
+
     router.push("/Dashbord/TourDash");
   };
 
@@ -249,10 +238,7 @@ export default function Step3Page() {
   return (
     <div className="relative">
       <TourtripLayout progress={100} title="Trip post">
-        <form
-          onSubmit={handleSubmit(onSubmit, onError)}
-          className="pb-[140px] max-w-[430px] mx-auto"
-        >
+        <form onSubmit={handleSubmit(onSubmit, onError)} className="pb-[140px] max-w-[430px] mx-auto">
           <p className="text-sm mb-2">Step 3</p>
           <div className="text-xl font-semibold mb-3">Pricing Information</div>
 
@@ -266,12 +252,8 @@ export default function Step3Page() {
           />
 
           <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-2">
-            <label htmlFor="discount" className="text-[15px]">
-              If Discount
-            </label>
-            <label htmlFor="total" className="text-[15px]">
-              Total
-            </label>
+            <label htmlFor="discount" className="text-[15px]">If Discount</label>
+            <label htmlFor="total" className="text-[15px]">Total</label>
 
             <Input
               id="discount"
@@ -283,11 +265,7 @@ export default function Step3Page() {
               })}
               variant="filled"
               error={errors.discount?.message}
-              rightAddon={
-                <span className="inline-flex items-center justify-center w-8">
-                  %
-                </span>
-              }
+              rightAddon={<span className="inline-flex items-center justify-center w-8">%</span>}
               className="w-full"
             />
 
@@ -299,42 +277,18 @@ export default function Step3Page() {
               {...register("total", { valueAsNumber: true })}
               variant="filled"
               error={errors.total?.message}
-              rightAddon={
-                <span className="inline-flex items-center justify-center w-8 opacity-0">
-                  %
-                </span>
-              }
+              rightAddon={<span className="inline-flex items-center justify-center w-8 opacity-0">%</span>}
               className="w-full"
             />
           </div>
 
-          <CapsuleList
-            name="includes"
-            form={form}
-            title="Include"
-            placeholder="Expert guide, entry fees…"
-          />
-          <CapsuleList
-            name="notIncludes"
-            form={form}
-            title="Not Include"
-            placeholder="Flights, tips…"
-          />
-          <CapsuleList
-            name="essentialEquipment"
-            form={form}
-            title="Essential Equipment"
-            placeholder="Hiking boots, jacket…"
-          />
+          <CapsuleList name="includes" form={form} title="Include" placeholder="Expert guide, entry fees…" />
+          <CapsuleList name="notIncludes" form={form} title="Not Include" placeholder="Flights, tips…" />
+          <CapsuleList name="essentialEquipment" form={form} title="Essential Equipment" placeholder="Hiking boots, jacket…" />
 
-          <fieldset
-            className="mt-4 space-y-3"
-            role="radiogroup"
-            aria-label="Post action"
-          >
+          <fieldset className="mt-4 space-y-3" role="radiogroup" aria-label="Post action">
             <legend className="sr-only">Post action</legend>
 
-            
             <label className="flex items-center cursor-pointer select-none">
               <input
                 type="radio"
@@ -342,31 +296,19 @@ export default function Step3Page() {
                 className="peer sr-only"
                 checked={postAction === "save"}
                 onChange={() =>
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  setValue("postAction", "save" as any, {
-                    shouldDirty: true,
-                    shouldValidate: true,
-                  })
+                  setValue("postAction", "save" as any, { shouldDirty: true, shouldValidate: true })
                 }
                 onClick={() => {
                   if (postAction === "save") {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    setValue("postAction", "" as any, {
-                      shouldDirty: true,
-                      shouldValidate: true,
-                    });
+                    setValue("postAction", "" as any, { shouldDirty: true, shouldValidate: true });
                   }
                 }}
               />
-              <span
-                className="relative mr-3 w-5 h-5 rounded-full border-2 border-[#26cc73]
+              <span className="relative mr-3 w-5 h-5 rounded-full border-2 border-[#26cc73]
                   after:content-[''] after:absolute after:inset-0.5 after:rounded-full
                   after:bg-[#26cc73] after:scale-0 after:transition-transform after:duration-150
-                  peer-checked:after:scale-100"
-              />
-              <span className="font-medium text-gray-700 peer-checked:text-black">
-                Save Trip
-              </span>
+                  peer-checked:after:scale-100" />
+              <span className="font-medium text-gray-700 peer-checked:text-black">Save Trip</span>
             </label>
 
             <label className="flex items-center cursor-pointer select-none">
@@ -376,51 +318,34 @@ export default function Step3Page() {
                 className="peer sr-only"
                 checked={postAction === "schedule"}
                 onChange={() =>
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  setValue("postAction", "schedule" as any, {
-                    shouldDirty: true,
-                    shouldValidate: true,
-                  })
+                  setValue("postAction", "schedule" as any, { shouldDirty: true, shouldValidate: true })
                 }
                 onClick={() => {
                   if (postAction === "schedule") {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    setValue("postAction", "" as any, {
-                      shouldDirty: true,
-                      shouldValidate: true,
-                    });
+                    setValue("postAction", "" as any, { shouldDirty: true, shouldValidate: true });
                   }
                 }}
               />
-              <span
-                className="relative mr-3 w-5 h-5 rounded-full border-2 border-[#26cc73]
+              <span className="relative mr-3 w-5 h-5 rounded-full border-2 border-[#26cc73]
                   after:content-[''] after:absolute after:inset-0.5 after:rounded-full
                   after:bg-[#26cc73] after:scale-0 after:transition-transform after:duration-150
-                  peer-checked:after:scale-100"
-              />
-              <span className="font-medium text-gray-700 peer-checked:text-black">
-                Schedule Post
-              </span>
+                  peer-checked:after:scale-100" />
+              <span className="font-medium text-gray-700 peer-checked:text-black">Schedule Post</span>
             </label>
 
             {errors.postAction && (
-              <p className="text-red-500 text-sm mt-1 px-2">
-                {errors.postAction.message as string}
-              </p>
+              <p className="text-red-500 text-sm mt-1 px-2">{errors.postAction.message as string}</p>
             )}
           </fieldset>
 
           {isScheduling && (
             <div className="relative bg-white rounded-[42px] p-4 mt-9 mb-6 ring-1 ring-[#DBF5E8] shadow-[0_10px_26px_rgba(0,0,0,0.08)]">
-              {/* Tabs */}
               <div className="flex items-center bg-[#F2F9F5] rounded-[40px] w-full h-10 mb-7 p-1 shadow-sm ring-1 ring-[#D9F0E7]">
                 <button
                   type="button"
                   onClick={() => chooseTab("oneTime")}
                   className={`flex-1 h-8 rounded-full font-medium text-sm ${
-                    scheduleType === "oneTime"
-                      ? "bg-[#28B872] text-white shadow"
-                      : "text-gray-500"
+                    scheduleType === "oneTime" ? "bg-[#28B872] text-white shadow" : "text-gray-500"
                   }`}
                 >
                   One Time
@@ -429,16 +354,13 @@ export default function Step3Page() {
                   type="button"
                   onClick={() => chooseTab("scheduled")}
                   className={`flex-1 h-8 rounded-full font-medium text-sm ${
-                    scheduleType === "scheduled"
-                      ? "bg-[#28B872] text-white shadow"
-                      : "text-gray-500"
+                    scheduleType === "scheduled" ? "bg-[#28B872] text-white shadow" : "text-gray-500"
                   }`}
                 >
                   Scheduled
                 </button>
               </div>
 
-              {/* Card + date chip */}
               <div className="relative rounded-4xl">
                 <TripCard
                   trip={
@@ -456,16 +378,10 @@ export default function Step3Page() {
                 <div className="absolute -top-5 right-4">
                   <div
                     className={`flex items-center bg-white rounded-full shadow-[0_8px_18px_rgba(0,0,0,0.12)] ring-1 ring-[#E7F7F0] h-10 ${
-                      dateISO
-                        ? "w-[160px] pl-4 pr-3 justify-start"
-                        : "w-[64px] justify-center px-3"
+                      dateISO ? "w-[160px] pl-4 pr-3 justify-start" : "w-[64px] justify-center px-3"
                     }`}
                   >
-                    {dateISO && (
-                      <span className="text-sm text-gray-500 truncate mr-2">
-                        {fmtDateOnly(dateISO)}
-                      </span>
-                    )}
+                    {dateISO && <span className="text-sm text-gray-500 truncate mr-2">{fmtDateOnly(dateISO)}</span>}
                     <Calendar className="w-5 h-5 text-[#28B872]" />
                     <input
                       type="date"
@@ -480,9 +396,7 @@ export default function Step3Page() {
               </div>
 
               {errors.scheduleAt && (
-                <p className="text-red-500 text-sm mt-2 px-2">
-                  {errors.scheduleAt.message as string}
-                </p>
+                <p className="text-red-500 text-sm mt-2 px-2">{errors.scheduleAt.message as string}</p>
               )}
             </div>
           )}
@@ -492,7 +406,7 @@ export default function Step3Page() {
               showPrev
               canNext={!isSubmitting}
               submitMode
-              prevHref="/Tourguide/Tourtip2"
+              prevHref="/Tourguide/Tourtip2"  // keep as your original route
               className="max-w-[430px] mx-auto"
             />
           </div>
