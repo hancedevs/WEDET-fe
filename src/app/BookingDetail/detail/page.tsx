@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Detailfilter from "@/app/components/ui/Detailfilter";
 import Navbar from "@/app/components/Tourguidecomponents/TourGuideNavbar";
-
 import PassengerCard from "@/app/components/ui/PassengerCard";
 import type { Passenger } from "@/app/types/type";
+import { supabase } from "@/lib/supabaseClient";
 
 /* ----------------------------- TripCard ----------------------------- */
 interface TripCardProps {
@@ -22,6 +22,7 @@ interface TripCardProps {
   totalPrice: string;
   onPassengerListClick?: () => void;
 }
+
 const TripCard: React.FC<TripCardProps> = ({
   date,
   duration,
@@ -127,28 +128,36 @@ function PassengerListView({
 }
 
 /* -------------------------------- Page -------------------------------- */
-type Trip = TripCardProps & { slug: string };
+interface Tour {
+  id: number;
+  price: number;
+  discount: number;
+  total: number;
+  tourName: string;
+  start_date: string;
+  end_date: string;
+  group_number: number;
+  selectedDay: string;
+  destination: string;
+  overview: string;
+  highlights: string;
+  activities: string; // JSON string of activities
+}
 
 export default function TourPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tourId = searchParams.get("id");
+
+  const [tour, setTour] = useState<Tour | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // 1) Your trips (added slug to identify active trip)
-  const trips: Trip[] = [
-    {
-      slug: "wenchi",
-      date: "01/10/2025",
-      duration: "2 days",
-      title: "Wenchi",
-      pricePerPerson: "2,700",
-      capacity: 26,
-      seatLeft: 16,
-      seatsBooked: 20,
-      seatsPending: 3,
-      totalPrice: "27,000Br",
-    },
-  ];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [trips, setTrips] = useState<any[]>([]);
 
-  // 2) Passengers per trip (replace with real data fetch)
+  // 2) Passengers per trip (using mock data as requested)
   const passengersByTrip: Record<string, Passenger[]> = {
     wenchi: [
       {
@@ -191,7 +200,116 @@ export default function TourPage() {
 
   // 3) Simple view toggle state
   const [view, setView] = useState<"details" | "passengers">("details");
-  const [activeTrip, setActiveTrip] = useState<Trip | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [activeTrip, setActiveTrip] = useState<any | null>(null);
+
+  // Fetch tour data from Supabase
+  useEffect(() => {
+    const fetchTour = async () => {
+      if (!tourId) return;
+
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('tours')
+          .select('*')
+          .eq('id', tourId)
+          .single();
+
+        if (error) {
+          throw error;
+        }
+
+        if (data) {
+          setTour(data);
+          
+          // Convert the tour data to the trips format
+          const duration = getDaysBetweenDates(data.start_date, data.end_date);
+          const formattedDate = data.selectedDay 
+            ? formatDate(data.selectedDay) 
+            : formatDate(data.start_date);
+            
+          const tripData = {
+            slug: data.id.toString(),
+            date: formattedDate,
+            duration: `${duration} days`,
+            title: data.tourName || "Unnamed Tour",
+            pricePerPerson: `$${data.price || 0}`,
+            capacity: data.group_number || 0,
+            seatLeft: calculateSeatLeft(data.group_number || 0, 10), // Mock booked seats
+            seatsBooked: 10, // Mock data
+            seatsPending: 3, // Mock data
+            totalPrice: `${data.total || 0} Br`,
+          };
+          
+          setTrips([tripData]);
+          setActiveTrip(tripData);
+        }
+      } catch (error) {
+        console.error('Error fetching tour:', error);
+        setError('Failed to load tour data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTour();
+  }, [tourId]);
+
+  // Helper function to calculate days between dates
+  const getDaysBetweenDates = (startDate: string, endDate: string): number => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+  };
+
+  // Helper function to format date
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+  };
+
+  // Helper function to calculate seats left
+  const calculateSeatLeft = (capacity: number, booked: number): number => {
+    return Math.max(0, capacity - booked);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col min-h-screen bg-white justify-center items-center">
+        <p>Loading tour data...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col min-h-screen bg-white justify-center items-center">
+        <p className="text-red-500">{error}</p>
+        <button 
+          onClick={() => router.back()}
+          className="mt-4 px-4 py-2 rounded-full bg-[#28B872] text-white"
+        >
+          Go Back
+        </button>
+      </div>
+    );
+  }
+
+  if (!tour) {
+    return (
+      <div className="flex flex-col min-h-screen bg-white justify-center items-center">
+        <p>Tour not found</p>
+        <button 
+          onClick={() => router.back()}
+          className="mt-4 px-4 py-2 rounded-full bg-[#28B872] text-white"
+        >
+          Go Back
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -206,7 +324,7 @@ export default function TourPage() {
               <ArrowLeft className="text-green-600" size={30} />
             </button>
             <div>
-              <h1 className="text-lg font-bold">Wenchi Trip</h1>
+              <h1 className="text-lg font-bold">{tour.tourName || "Tour Details"}</h1>
               <p className="text-sm font-bold text-gray-500">Details</p>
             </div>
           </div>
@@ -218,14 +336,16 @@ export default function TourPage() {
               {...trip}
               onPassengerListClick={() => {
                 setActiveTrip(trip);
-                setView("passengers"); // 👉 swap to PassengerList in the SAME page
+                setView("passengers");
               }}
             />
           ))}
 
           {/* Main Content */}
           <div className="flex-1">
-            <Detailfilter />
+            <Detailfilter 
+              tourData={tour} // Pass the tour data to Detailfilter component
+            />
           </div>
 
           {/* Edit Button */}
@@ -242,7 +362,7 @@ export default function TourPage() {
         // Passenger list view (same page)
         <PassengerListView
           title={activeTrip?.title ?? "Trip"}
-          passengers={passengersByTrip[activeTrip?.slug ?? "wenchi"] ?? []}
+          passengers={passengersByTrip["wenchi"]} // Using mock passenger data
           onBack={() => setView("details")}
         />
       )}

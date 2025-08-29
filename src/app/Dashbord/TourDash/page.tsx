@@ -1,11 +1,23 @@
 "use client";
 import Navbar from "@/app/components/Tourguidecomponents/TourGuideNavbar";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
 
-// Reusable Card Component
+interface Tour {
+  id: number;
+  price: number;
+  discount: number;
+  total: number;
+  "tourName": string;
+  start_date: string;
+  end_date: string;
+  group_number: number;
+  "selectedDay": string;
+}
+
 interface TripCardProps {
   title: string;
   duration: string;
@@ -27,15 +39,16 @@ const TripCard: React.FC<TripCardProps> = ({
   day,
   total,
   bgcolor = "#28B872",
+  path
 }) => {
   const router = useRouter();
 
   return (
     <div
-      onClick={() => router.push("../BookingDetail/detail")}
+      onClick={() => router.push(path)}
       className="relative bg-white rounded-4xl p-4 flex justify-between items-center w-full mb-8 cursor-pointer transition hover:scale-[1.02] hover:shadow-lg"
       style={{
-        boxShadow: `0 4px 12px ${bgcolor}80`, // 80 = opacity for softer shadow
+        boxShadow: `0 4px 12px ${bgcolor}80`, 
       }}
     >
       <div className="flex-1 mr-4">
@@ -64,7 +77,7 @@ const TripCard: React.FC<TripCardProps> = ({
         <span className="text-sm font-semibold text-black-500">{total}</span>
         <button
           onClick={(e) => {
-            e.stopPropagation(); // Prevent parent click
+            e.stopPropagation(); 
             alert("Edit button clicked");
           }}
           className="mt-2 px-8 py-1 rounded-full bg-[#28B872] text-white text-sm font-medium hover:bg-green-600 transition"
@@ -75,13 +88,80 @@ const TripCard: React.FC<TripCardProps> = ({
     </div>
   );
 };
-// dashboard cards
+
+// Helper function to calculate days between dates
+const getDaysBetweenDates = (startDate: string, endDate: string): number => {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const diffTime = Math.abs(end.getTime() - start.getTime());
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end days
+};
+
+// Helper function to format date
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+};
+
+// Helper function to get random color for cards
+const getRandomColor = (): string => {
+  const colors = ["#28B872", "#FF2D2D", "#FFEA00"];
+  return colors[Math.floor(Math.random() * colors.length)];
+};
+
+
 export default function Dashboard() {
   const router = useRouter();
+  const [tours, setTours] = useState<Tour[]>([]);
+  const [loading, setLoading] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [user, setUser] = useState<any>(null);
+  useEffect(() => {
+    fetchTours();
+    fetchUser();
+  }, []);
+  
+  const fetchUser = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUser(user);
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    }
+  };
+
+  const fetchTours = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('tours')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+
+      setTours(data || []);
+    } catch (error) {
+      console.error('Error fetching tours:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAddTrip = () => {
     router.push('/Tourguide/Tourtrip1');
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen w-full flex justify-center items-center">
+        <p>Loading tours...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full">
@@ -96,7 +176,7 @@ export default function Dashboard() {
             />
           </div>
           <div className="ml-2">
-            <p className="text-xs">Good morning, user</p>
+          <p className="text-xs">Good morning, {user?.user_metadata?.name || 'user'}</p>
             <h1 className="text-lg font-semibold">Discover and go</h1>
           </div>
         </div>
@@ -143,10 +223,21 @@ export default function Dashboard() {
             />
             <div>
               <p className="text-xs text-[#96A9AA]">Upcoming Trip</p>
-              <h2 className="text-2xl font-semibold">Wenchi</h2>
+              <h2 className="text-2xl font-semibold">
+                {tours.length > 0 ? tours[0].tourName : "No trips"}
+              </h2>
               <span className="text-xs block -mt-1">
-                <span className="text-red-500">01</span>
-                <span className="text-green-500">/01/2025</span>
+                {tours.length > 0 && (
+                  <>
+                    <span className="text-red-500">
+                      {formatDate(tours[0].start_date).split('/')[1]}
+                    </span>
+                    <span className="text-green-500">
+                      /{formatDate(tours[0].start_date).split('/')[0]}/
+                      {formatDate(tours[0].start_date).split('/')[2]}
+                    </span>
+                  </>
+                )}
               </span>
             </div>
           </div>
@@ -161,7 +252,7 @@ export default function Dashboard() {
             <div className="flex-1 min-w-0">
               <p className="text-xs text-[#96A9AA]">Total Trips</p>
               <div className="flex items-baseline space-x-2">
-                <h2 className="text-2xl font-bold">31</h2>
+                <h2 className="text-2xl font-bold">{tours.length}</h2>
                 <p className="text-xs font-semibold whitespace-nowrap overflow-hidden text-ellipsis">
                   Last Month
                 </p>
@@ -182,39 +273,31 @@ export default function Dashboard() {
         </div>
 
         {/* Trip List */}
-        <TripCard
-          title="Wenchi"
-          duration="2 days"
-          price="$ 3,200"
-          capacity={28}
-          date="9/12/2025"
-          day={24}
-          total="19,000Br"
-          bgcolor="#FFEA00"
-          path="/trips/wenchi"
-        />
-        <TripCard
-          title="Suba"
-          duration="2 days"
-          price="$ 2,800"
-          capacity={20}
-          date="9/12/2025"
-          day={2}
-          total="19,000Br"
-          bgcolor="#28B872"
-          path="/trips/suba"
-        />
-        <TripCard
-          title="Entoto"
-          duration="2 days"
-          price="$ 3,200"
-          capacity={28}
-          date="9/12/2025"
-          day={26}
-          total="19,000Br"
-          bgcolor="#FF2D2D"
-          path="/trips/entoto"
-        />
+        {tours.length === 0 ? (
+          <p className="text-center py-8">No trips available. Add your first trip!</p>
+        ) : (
+          tours.map((tour) => {
+            const duration = getDaysBetweenDates(tour.start_date, tour.end_date);
+            const formattedDate = tour.selectedDay 
+              ? formatDate(tour.selectedDay) 
+              : formatDate(tour.start_date);
+            
+            return (
+              <TripCard
+                key={tour.id}
+                title={tour.tourName || "Unnamed Tour"}
+                duration={`${duration} days`}
+                price={`$${tour.price || 0}`}
+                capacity={tour.group_number || 0}
+                date={formattedDate}
+                day={duration}
+                total={`${tour.total || 0} Br`}
+                bgcolor={getRandomColor()}
+                path={`../BookingDetail/detail?id=${tour.id}`}
+              />
+            );
+          })
+        )}
       </div>
 
       <Navbar />

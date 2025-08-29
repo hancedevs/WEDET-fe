@@ -64,11 +64,18 @@ export async function postTripToSupabase(opts: {
   const s1 = (draft.step1 ?? {}) as Record<string, any>;
   const s2 = (draft.step2 ?? {}) as {
     days?: number[];
-    activities?: { activity: string; time: string }[];
+    dayData?: Record<string, {
+      meals: {
+        breakfast: boolean;
+        lunch: boolean;
+        dinner: boolean;
+      };
+      activities: { activity: string; time: string }[];
+    }>;
     selectedDay?: string;
     startDate?: string; // "YYYY-MM-DD"
     endDate?: string;   // "YYYY-MM-DD"
-    groupNumber?: string | number; // NEW
+    groupNumber?: string | number;
   };
   const s3 = (draft.step3 ?? {}) as Record<string, any>;
 
@@ -91,6 +98,23 @@ export async function postTripToSupabase(opts: {
     const n = Number(raw);
     return Number.isFinite(n) && n > 0 ? Math.floor(n) : 1;
   })();
+
+  // Process dayData into a format suitable for database storage
+  const processDayData = (dayData: Record<string, any> | undefined) => {
+    if (!dayData) return null;
+    
+    const processed: Record<string, any> = {};
+    
+    Object.entries(dayData).forEach(([dayKey, dayInfo]) => {
+      const dayNum = dayKey.replace('day', '');
+      processed[`day${dayNum}`] = {
+        meals: dayInfo.meals || {},
+        activities: dayInfo.activities || []
+      };
+    });
+    
+    return processed;
+  };
 
   // Build row. Include BOTH camelCase and snake_case for fields that may differ.
   const row: Record<string, any> = {
@@ -115,8 +139,8 @@ export async function postTripToSupabase(opts: {
     overview: s1.overview ?? null,
     highlights: s1.highlights ?? null,
 
-    // Step 2 plan (text columns get JSON strings if present)
-    activities: s2?.activities ? JSON.stringify(s2.activities) : null,
+    // Step 2 plan - store dayData as JSON
+    activities: s2?.dayData ? JSON.stringify(processDayData(s2.dayData)) : null,
     days: s2?.days ? JSON.stringify(s2.days) : null,
 
     // Dates (send both naming styles)
@@ -125,9 +149,9 @@ export async function postTripToSupabase(opts: {
     start_date: startYMD,
     end_date: endYMD,
 
-    // ✅ Group number (send both naming styles)
-
+    // Group number (send both naming styles)
     group_number: groupNum,
+    groupNumber: groupNum,
   };
 
   if (DRY_RUN) {
