@@ -20,6 +20,21 @@ export const step1Schema = z.object({
   overview: z.string().min(10, "Overview must be at least 10 characters"),
   highlights: z.string().min(2, "Add at least one highlight"),
 });
+export const BusinessSignupSchema = z.object({
+  BusinessName: z.string().min(2, "Business name is required"),
+  registrationNumber: z.string().min(3, "Registration number is required"),
+  foundingDate: z
+    .string()
+    .optional()
+    .refine((v) => !v || /^\d{4}-\d{2}-\d{2}$/.test(v), "Use YYYY-MM-DD"),
+  aboutBusiness: z.string().max(1000, "Max 1000 characters").optional(),
+  email: z.string().email("Invalid email"),
+  phoneNumber: z.string().min(7, "Too short").max(20, "Too long").optional(),
+  fayidaId: z.string().min(4, "Too short").max(32, "Too long").optional(),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+export type BusinessSignupInput = z.infer<typeof BusinessSignupSchema>;
 
 export const Step2TripSchema = z.object({
   groupNumber: z

@@ -1,9 +1,11 @@
 "use client";
+
 import { supabase } from "@/lib/supabaseClient";
 
-// If your storage bucket has a different name, change this:
+// Storage bucket
 const STORAGE_BUCKET = "tours";
 
+/* ---------- DB rows ---------- */
 type TourRow = {
   id: number;
   tourName?: string | null;
@@ -13,82 +15,96 @@ type TourRow = {
   price?: number | null;
   discount?: number | null;
   total?: number | null;
-  start_date?: string | null; // YYYY-MM-DD
-  end_date?: string | null; // YYYY-MM-DD
+  start_date?: string | null;
+  end_date?: string | null;
+  created_at?: string | null;
+
+  // creator (business user)
+  business_user_id?: string | null;
 };
 
+type BizProfileRow = {
+  user_id: string;
+  business_name: string | null;
+  about: string | null;           // primary
+  about_business?: string | null; // alias/legacy if present
+};
+
+/* ---------- View model ---------- */
 export type TravelCardVM = {
   id: number;
   imageUrl: string;
   placeName: string;
   location: string;
-  tripDuration: string; // "2 day's trip"
-  price: string; // e.g. "2,700"
-  oldPrice?: string; // e.g. "3,000"
+  tripDuration: string;    // "2 day's trip"
+  price: string;           // "2,700"
+  oldPrice?: string;       // "3,000"
   discountPercent?: number;
-  rating: number; // placeholder (not in table)
-  reviews: number; // placeholder (not in table)
-  agencyName: string; // placeholder (not in table)
+  rating: number;
+  reviews: number;
+  agencyName: string;      // from business_profiles.business_name
+  agencyAbout?: string;    // from business_profiles.about (fallback about_business)
 };
 
 const isFullUrl = (s?: string) => !!s && /^https?:\/\//i.test(s);
 const isDataUrl = (s?: string) => !!s && /^data:/i.test(s);
 
-/** Return a signed URL for a storage key. Works for private or public buckets. */
 async function toImageUrlFromStorageKey(path: string): Promise<string> {
-  if (isFullUrl(path)) return path;
+  if (!path) return "/tipsimage.png";
+  if (isFullUrl(path) || isDataUrl(path)) return path;
 
-  // Remove bucket prefix if the path already includes it
   const key = path.replace(new RegExp(`^${STORAGE_BUCKET}/`), "");
-
-  // Try signed URL first (works for private buckets)
   const { data, error } = await supabase.storage
     .from(STORAGE_BUCKET)
-    .createSignedUrl(key, 60 * 60 * 6); // 6 hours
+    .createSignedUrl(key, 60 * 60 * 6); // 6h
 
   if (!error && data?.signedUrl) return data.signedUrl;
 
-  // Fallback to public URL (works if bucket is public)
   const pub = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(key);
-  return pub.data.publicUrl;
+  return pub.data.publicUrl || "/tipsimage.png";
 }
 
 function fmtMoney(n?: number | null): string {
-  const v = Number.isFinite(n as number) ? (n as number) : 0;
-  return v.toLocaleString("en-US");
+  if (typeof n !== "number" || !Number.isFinite(n)) return "0";
+  return n.toLocaleString("en-US");
 }
 
 function diffDaysInclusive(a?: string | null, b?: string | null): number {
-  if (!a || !b) return 2;
+  if (!a || !b) return 1;
   const da = new Date(a);
   const db = new Date(b);
-  if (Number.isNaN(da.getTime()) || Number.isNaN(db.getTime())) return 2;
+  if (Number.isNaN(da.getTime()) || Number.isNaN(db.getTime())) return 1;
   const ms = db.getTime() - da.getTime();
-  return Math.max(1, Math.round(ms / (24 * 3600 * 1000)) + 1);
+  return Math.max(1, Math.round(ms / 86_400_000) + 1);
 }
 
-/** Map DB row -> the props your TravelCard needs */
-async function mapRowToCardVM(row: TourRow): Promise<TravelCardVM> {
-  const placeName = row.tourName ?? "Untitled Trip";
-  const location = row.destination ?? "—";
+function pickAbout(b?: BizProfileRow | null) {
+  return b?.about ?? b?.about_business ?? undefined;
+}
+
+function agencyNameOf(b?: BizProfileRow | null) {
+  return (b?.business_name?.trim() || "") || "Local Guide";
+}
+
+/** Map DB -> VM */
+async function mapRowToCardVM(row: TourRow, biz?: BizProfileRow | null): Promise<TravelCardVM> {
+  const placeName = row.tourName?.trim() || "Untitled Trip";
+  const location = row.destination?.trim() || "—";
 
   const days = diffDaysInclusive(row.start_date ?? null, row.end_date ?? null);
   const tripDuration = `${days} day's trip`;
 
   const discount = typeof row.discount === "number" ? row.discount : undefined;
-  const priceNow = typeof row.total === "number" ? row.total : row.price ?? 0;
+  const priceNow =
+    typeof row.total === "number" ? row.total :
+    typeof row.price === "number" ? row.price : 0;
   const oldPrice =
-    discount && discount > 0 && row.price ? fmtMoney(row.price) : undefined;
+    discount && discount > 0 && typeof row.price === "number"
+      ? fmtMoney(row.price)
+      : undefined;
 
-  // Image: prefer first photo; support http(s), data:, or storage key
-  const first = row.photos?.[0];
-  let imageUrl = "/tipsimage.png";
-  if (first) {
-    imageUrl =
-      isFullUrl(first) || isDataUrl(first)
-        ? first
-        : await toImageUrlFromStorageKey(first);
-  }
+  const first = Array.isArray(row.photos) ? row.photos[0] : undefined;
+  const imageUrl = first ? await toImageUrlFromStorageKey(first) : "/tipsimage.png";
 
   return {
     id: row.id,
@@ -99,28 +115,100 @@ async function mapRowToCardVM(row: TourRow): Promise<TravelCardVM> {
     price: fmtMoney(priceNow),
     oldPrice,
     discountPercent: discount,
-    rating: 4.6, // placeholder until you add real columns
-    reviews: 200, // placeholder
-    agencyName: "Local Guide",
+    rating: 4.6,
+    reviews: 200,
+    agencyName: agencyNameOf(biz),
+    agencyAbout: pickAbout(biz),
   };
 }
 
-/** Fetch only columns that actually exist in your schema */
-export async function fetchToursForHome(limit = 10): Promise<TravelCardVM[]> {
+/* ---------- Preferred: single-query LEFT join (needs FK) ---------- */
+async function fetchWithJoin(limit = 10): Promise<TravelCardVM[]> {
   const { data, error } = await supabase
     .from("tours")
-    // only existing columns per your schema
-    .select(
-      "id,tourName,tourType,destination,photos,price,discount,total,start_date,end_date"
-    )
-    .order("created_at", { ascending: false })
+    .select(`
+      id,tourName,tourType,destination,photos,price,discount,total,start_date,end_date,created_at,
+      business_user_id,
+      business_profiles(
+        user_id,business_name,about,about_business
+      )
+    `) // LEFT join; tours still show when profile missing
+    .order("created_at", { ascending: false, nullsFirst: false })
     .limit(limit);
 
-  if (error) {
-    console.error("fetchToursForHome error:", error);
+  if (error) throw error;
+
+  const rows = (data ?? []) as unknown as Array<TourRow & { business_profiles?: BizProfileRow | null }>;
+  return Promise.all(
+    rows.map((r) => mapRowToCardVM(r, r.business_profiles ?? null))
+  );
+}
+
+/* ---------- Fallback: 2 queries (no FK needed) ---------- */
+async function fetchWithBatch(limit = 10): Promise<TravelCardVM[]> {
+  const { data, error } = await supabase
+    .from("tours")
+    .select(
+      "id,tourName,tourType,destination,photos,price,discount,total,start_date,end_date,created_at,business_user_id"
+    )
+    .order("created_at", { ascending: false, nullsFirst: false })
+    .limit(limit);
+
+  if (error) throw error;
+
+  const rows = (data ?? []) as TourRow[];
+  if (rows.length === 0) {
+    console.warn("fetchToursForHome: empty result (table empty or RLS denied).");
     return [];
   }
 
-  const rows = (data ?? []) as TourRow[];
-  return Promise.all(rows.map(mapRowToCardVM));
+  const userIds = Array.from(
+    new Set(rows.map((r) => r.business_user_id).filter(Boolean))
+  ) as string[];
+
+  let bizMap = new Map<string, BizProfileRow>();
+  if (userIds.length) {
+    const { data: biz, error: bErr } = await supabase
+      .from("business_profiles")
+      .select("user_id,business_name,about,about_business")
+      .in("user_id", userIds);
+
+    if (bErr) {
+      console.warn("fetchToursForHome: business lookup failed:", bErr.message);
+    } else if (biz?.length) {
+      bizMap = new Map(biz.map((b) => [b.user_id, b] as const));
+    }
+  }
+
+  return Promise.all(
+    rows.map((r) =>
+      mapRowToCardVM(
+        r,
+        r.business_user_id ? bizMap.get(r.business_user_id) ?? null : null
+      )
+    )
+  );
+}
+
+/** Public API used by your store */
+export async function fetchToursForHome(limit = 10): Promise<TravelCardVM[]> {
+  try {
+    return await fetchWithJoin(limit);
+  } catch (e) {
+    const err = e as { message?: string };
+    console.warn("fetchToursForHome: join path failed, falling back. Reason:", err?.message ?? e);
+    try {
+      return await fetchWithBatch(limit);
+    } catch (e2) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ee = e2 as any;
+      console.error("fetchToursForHome error (batch):", {
+        code: ee?.code,
+        message: ee?.message,
+        details: ee?.details,
+        hint: ee?.hint,
+      });
+      return [];
+    }
+  }
 }

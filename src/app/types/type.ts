@@ -72,7 +72,7 @@ export interface TravelCardProps {
   placeName: string;
   location: string;
   tripDuration: string;
-  price: string | number;
+  price?: number | string;
   oldPrice?: string | number;
   discountPercent?: number;
   rating: number;

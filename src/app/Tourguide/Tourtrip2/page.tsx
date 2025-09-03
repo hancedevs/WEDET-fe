@@ -19,6 +19,21 @@ const toYMD = (d: Date) =>
     d.getDate()
   ).padStart(2, "0")}`;
 
+// Define types for our data structure
+interface Activity {
+  activity: string;
+  time: string;
+}
+
+interface DayData {
+  meals: {
+    breakfast: boolean;
+    lunch: boolean;
+    dinner: boolean;
+  };
+  activities: Activity[];
+}
+
 export default function Step2() {
   const router = useRouter();
 
@@ -30,31 +45,102 @@ export default function Step2() {
   const startDate = useMemo(() => (startISO ? new Date(startISO) : undefined), [startISO]);
   const endDate = useMemo(() => (endISO ? new Date(endISO) : undefined), [endISO]);
 
-  const [days, setDays] = useState([1, 2, 3]);
+  const [days, setDays] = useState([1]);
   const [selectedDay, setSelectedDay] = useState("day1");
-  const [groupNumber, setGroupNumber] = useState<string>(""); // NEW: capture group number
+  const [groupNumber, setGroupNumber] = useState<string>("");
 
-  const [activities, setActivities] = useState([
-    { activity: "", time: "" },
-    { activity: "", time: "" },
-  ]);
+  // Initialize dayData with default values for each day
+  const [dayData, setDayData] = useState<Record<string, DayData>>({
+    day1: {
+      meals: {
+        breakfast: false,
+        lunch: false,
+        dinner: false
+      },
+      activities: [
+        { activity: "", time: "" },
+        { activity: "", time: "" },
+      ]
+    }
+  });
+
+  // Update dayData when days change
+  useEffect(() => {
+    const newDayData = {...dayData};
+    days.forEach(day => {
+      const dayKey = `day${day}`;
+      if (!newDayData[dayKey]) {
+        newDayData[dayKey] = {
+          meals: {
+            breakfast: false,
+            lunch: false,
+            dinner: false
+          },
+          activities: [
+            { activity: "", time: "" },
+            { activity: "", time: "" },
+          ]
+        };
+      }
+    });
+    setDayData(newDayData);
+  }, [days]);
 
   const handleActivityChange = (
+    day: string,
     index: number,
     field: "activity" | "time",
     value: string
   ) => {
-    const updated = [...activities];
-    updated[index] = { ...updated[index], [field]: value };
-    setActivities(updated);
+    setDayData(prev => {
+      const updated = {...prev};
+      updated[day].activities[index] = {
+        ...updated[day].activities[index],
+        [field]: value
+      };
+      return updated;
+    });
   };
 
-  const addActivity = () => setActivities((prev) => [...prev, { activity: "", time: "" }]);
+  const handleMealChange = (day: string, meal: "breakfast" | "lunch" | "dinner", checked: boolean) => {
+    setDayData(prev => {
+      const updated = {...prev};
+      updated[day].meals[meal] = checked;
+      return updated;
+    });
+  };
+
+  const addActivity = (day: string) => {
+    setDayData(prev => {
+      const updated = {...prev};
+      updated[day].activities.push({ activity: "", time: "" });
+      return updated;
+    });
+  };
 
   const addDay = () => {
     const newDay = days.length + 1;
+    const newDayKey = `day${newDay}`;
+    
     setDays((prev) => [...prev, newDay]);
-    setSelectedDay(`day${newDay}`);
+    
+    // Initialize the new day with default data
+    setDayData(prev => ({
+      ...prev,
+      [newDayKey]: {
+        meals: {
+          breakfast: false,
+          lunch: false,
+          dinner: false
+        },
+        activities: [
+          { activity: "", time: "" },
+          { activity: "", time: "" },
+        ]
+      }
+    }));
+    
+    setSelectedDay(newDayKey);
   };
 
   // ensure end >= start
@@ -68,26 +154,34 @@ export default function Step2() {
   useEffect(() => {
     saveDraft("step2", {
       days,
-      activities,
+      dayData,
       selectedDay,
       startDate: startISO || undefined,
       endDate: endISO || undefined,
-      groupNumber: groupNumber || undefined, // NEW: persist group number
+      groupNumber: groupNumber || undefined,
     });
-  }, [days, activities, selectedDay, startISO, endISO, groupNumber]);
+  }, [days, dayData, selectedDay, startISO, endISO, groupNumber]);
 
   // form submit -> navigate (keeps UI as-is)
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     saveDraft("step2", {
       days,
-      activities,
+      dayData,
       selectedDay,
       startDate: startISO || undefined,
       endDate: endISO || undefined,
       groupNumber: groupNumber || undefined,
     });
     router.push("/Tourguide/Tourtrip3");
+  };
+
+  // Calculate the date for each day
+  const getDayDate = (dayIndex: number) => {
+    if (!startISO) return "—";
+    const date = new Date(startISO);
+    date.setDate(date.getDate() + dayIndex - 1);
+    return format(date, "dd/MM/yyyy");
   };
 
   return (
@@ -140,8 +234,8 @@ export default function Step2() {
             <Label className="block text-black font-medium mb-2">Group Number</Label>
             <Input
               type="number"
-              value={groupNumber} // NEW: controlled
-              onChange={(e) => setGroupNumber(e.target.value)} // NEW
+              value={groupNumber}
+              onChange={(e) => setGroupNumber(e.target.value)}
               className="p-2 rounded-[35px] shadow border-none mb-4"
             />
 
@@ -154,7 +248,7 @@ export default function Step2() {
                   className="bg-[#E9F4F4] px-1 rounded-[35px] inline-flex"
                 >
                   <TabsList className="gap-9 whitespace-nowrap px-2">
-                    {days.map((day) => (
+                    {days.map((day, index) => (
                       <TabsTrigger key={`day${day}`} value={`day${day}`} className="px-4 py-2">
                         Day {day}
                       </TabsTrigger>
@@ -173,18 +267,23 @@ export default function Step2() {
             </div>
 
             <p className="text-sm mb-2">
-              {startISO ? format(new Date(startISO), "dd/MM/yyyy") : "—"}
+              {getDayDate(parseInt(selectedDay.replace("day", "")))}
             </p>
-            <p className="mb-2">Meal Insulation</p>
+            <p className="mb-2">Meal Inclusion</p>
 
             <div className="p-3 rounded-2xl shadow border-gray-300 mb-4">
               {[
-                { label: "Breakfast", time: "7:00 Am" },
-                { label: "Launch", time: "12:30 Am" },
-                { label: "Dinner", time: "8:00 Pm" },
+                { label: "Breakfast", key: "breakfast", time: "7:00 Am" },
+                { label: "Lunch", key: "lunch", time: "12:30 Pm" },
+                { label: "Dinner", key: "dinner", time: "8:00 Pm" },
               ].map((meal, idx) => (
                 <div key={idx} className="flex items-center px-4 justify-between mb-2">
-                  <Checkbox defaultChecked />
+                  <Checkbox 
+                    checked={dayData[selectedDay]?.meals[meal.key as "breakfast" | "lunch" | "dinner"] || false}
+                    onCheckedChange={(checked) => 
+                      handleMealChange(selectedDay, meal.key as "breakfast" | "lunch" | "dinner", checked as boolean)
+                    }
+                  />
                   <span>{meal.label}</span>
                   <span className="text-sm">{meal.time}</span>
                 </div>
@@ -200,14 +299,14 @@ export default function Step2() {
                   className="absolute"
                   style={{
                     width: "2px",
-                    height: `${activities.length * 70}px`,
+                    height: `${(dayData[selectedDay]?.activities.length || 0) * 70}px`,
                     backgroundImage:
                       "linear-gradient(to bottom, #10B981 50%, transparent 50%)",
                     backgroundSize: "2px 12px",
                     backgroundRepeat: "repeat-y",
                   }}
                 />
-                {activities.map((_, idx) => (
+                {(dayData[selectedDay]?.activities || []).map((_, idx) => (
                   <div
                     key={idx}
                     className="relative z-10 w-6 h-6 bg-[#28B872] rounded-full border-2 border-[#28B872] mb-10 last:mb-0 flex items-center justify-center"
@@ -217,18 +316,18 @@ export default function Step2() {
                 ))}
               </div>
               <div className="flex flex-col gap-6">
-                {activities.map((act, idx) => (
+                {(dayData[selectedDay]?.activities || []).map((act, idx) => (
                   <div key={idx} className="flex items-center gap-3">
                     <Input
                       placeholder="Trip activity"
                       value={act.activity}
-                      onChange={(e) => handleActivityChange(idx, "activity", e.target.value)}
+                      onChange={(e) => handleActivityChange(selectedDay, idx, "activity", e.target.value)}
                       className="px-2 rounded-[35px] shadow border border-gray-300 placeholder:text-center"
                     />
                     <Input
                       type="time"
                       value={act.time}
-                      onChange={(e) => handleActivityChange(idx, "time", e.target.value)}
+                      onChange={(e) => handleActivityChange(selectedDay, idx, "time", e.target.value)}
                       className="rounded-[35px] border-none text-[#28B872]"
                     />
                   </div>
@@ -238,7 +337,7 @@ export default function Step2() {
 
             <div className="flex justify-center">
               <Button
-                onClick={addActivity}
+                onClick={() => addActivity(selectedDay)}
                 type="button"
                 className="w-fit mt-5 bg-[#28B872] hover:bg-green-600 rounded-[35px]"
               >

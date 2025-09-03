@@ -10,7 +10,7 @@ import { TripSummaryData } from "@/app/types/type";
 interface Props {
   step: number;
   children: ReactNode;
-  trip: TripSummaryData;
+  trip : TripSummaryData;
   onNext?: () => void;
   onPrev?: () => void;
   disableNext?: boolean;

@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Detailfilter from "@/app/components/ui/Detailfilter";
 import Navbar from "@/app/components/Tourguidecomponents/TourGuideNavbar";
-
 import PassengerCard from "@/app/components/ui/PassengerCard";
 import type { Passenger } from "@/app/types/type";
+import { supabase } from "@/lib/supabaseClient";
+import { Input } from "@/components/ui/input";
 
 /* ----------------------------- TripCard ----------------------------- */
 interface TripCardProps {
@@ -22,6 +23,7 @@ interface TripCardProps {
   totalPrice: string;
   onPassengerListClick?: () => void;
 }
+
 const TripCard: React.FC<TripCardProps> = ({
   date,
   duration,
@@ -96,6 +98,24 @@ function PassengerListView({
   passengers: Passenger[];
   onBack: () => void;
 }) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"All" | "Paid" | "Pending">(
+    "All"
+  );
+
+  // Filtered passengers
+  const filteredPassengers = passengers.filter((p) => {
+    const matchesSearch =
+      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (p.location?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
+
+    const matchesStatus =
+      statusFilter === "All" ? true : p.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
   return (
     <div className="min-h-[60vh] flex flex-col">
       {/* Header */}
@@ -109,46 +129,85 @@ function PassengerListView({
         <div>
           <h1 className="text-lg font-bold">{title} – Passengers</h1>
           <p className="text-sm font-bold text-gray-500">
-            {passengers.length} total
+            {filteredPassengers.length} shown / {passengers.length} total
           </p>
         </div>
       </div>
 
+      {/* Search + Filter Bar */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between px-4 mb-4 gap-3">
+        {/* Search box */}
+        <Input
+          type="text"
+          placeholder="Search by name, email, phone, location..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="rounded-3xl p-6 border-none shadow placeholder:text-gray-300 focus:ring-2 focus:ring-green-300"
+        />
+
+        {/* Status filter */}
+        <select
+          value={statusFilter}
+          onChange={(e) =>
+            setStatusFilter(e.target.value as "All" | "Paid" | "Pending")
+          }
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400"
+        >
+          <option value="All">All Status</option>
+          <option value="Paid">Paid</option>
+          <option value="Pending">Pending</option>
+        </select>
+      </div>
+
       {/* List */}
-      <div className="flex-1 px-4 pb-6">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {passengers.map((p, i) => (
-            <PassengerCard key={i} p={p} />
-          ))}
-        </div>
+      <div className="flex-1 px-4 mb-20 pb-6">
+        {filteredPassengers.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {filteredPassengers.map((p, i) => (
+              <PassengerCard key={i} p={p} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-500 mt-10">
+            No passengers found matching your search or filters.
+          </p>
+        )}
       </div>
     </div>
   );
 }
 
 /* -------------------------------- Page -------------------------------- */
-type Trip = TripCardProps & { slug: string };
+interface Tour {
+  id: number;
+  price: number;
+  discount: number;
+  total: number;
+  tourName: string;
+  start_date: string;
+  end_date: string;
+  group_number: number;
+  selectedDay: string;
+  destination: string;
+  overview: string;
+  highlights: string;
+  activities: string;
+}
 
 export default function TourPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tourId = searchParams.get("id");
+
+  const [tour, setTour] = useState<Tour | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // 1) Your trips (added slug to identify active trip)
-  const trips: Trip[] = [
-    {
-      slug: "wenchi",
-      date: "01/10/2025",
-      duration: "2 days",
-      title: "Wenchi",
-      pricePerPerson: "2,700",
-      capacity: 26,
-      seatLeft: 16,
-      seatsBooked: 20,
-      seatsPending: 3,
-      totalPrice: "27,000Br",
-    },
-  ];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [trips, setTrips] = useState<any[]>([]);
 
-  // 2) Passengers per trip (replace with real data fetch)
+  // 2) Passengers per trip (using mock data as requested)
   const passengersByTrip: Record<string, Passenger[]> = {
     wenchi: [
       {
@@ -191,7 +250,116 @@ export default function TourPage() {
 
   // 3) Simple view toggle state
   const [view, setView] = useState<"details" | "passengers">("details");
-  const [activeTrip, setActiveTrip] = useState<Trip | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [activeTrip, setActiveTrip] = useState<any | null>(null);
+
+  // Fetch tour data from Supabase
+  useEffect(() => {
+    const fetchTour = async () => {
+      if (!tourId) return;
+
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from("tours")
+          .select("*")
+          .eq("id", tourId)
+          .single();
+
+        if (error) {
+          throw error;
+        }
+
+        if (data) {
+          setTour(data);
+
+          // Convert the tour data to the trips format
+          const duration = getDaysBetweenDates(data.start_date, data.end_date);
+          const formattedDate = data.selectedDay
+            ? formatDate(data.selectedDay)
+            : formatDate(data.start_date);
+
+          const tripData = {
+            slug: data.id.toString(),
+            date: formattedDate,
+            duration: `${duration} days`,
+            title: data.tourName || "Unnamed Tour",
+            pricePerPerson: `$${data.price || 0}`,
+            capacity: data.group_number || 0,
+            seatLeft: calculateSeatLeft(data.group_number || 0, 10), // Mock booked seats
+            seatsBooked: 10, // Mock data
+            seatsPending: 3, // Mock data
+            totalPrice: `${data.total || 0} Br`,
+          };
+
+          setTrips([tripData]);
+          setActiveTrip(tripData);
+        }
+      } catch (error) {
+        console.error("Error fetching tour:", error);
+        setError("Failed to load tour data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTour();
+  }, [tourId]);
+
+  // Helper function to calculate days between dates
+  const getDaysBetweenDates = (startDate: string, endDate: string): number => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+  };
+
+  // Helper function to format date
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+  };
+
+  // Helper function to calculate seats left
+  const calculateSeatLeft = (capacity: number, booked: number): number => {
+    return Math.max(0, capacity - booked);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col min-h-screen bg-white justify-center items-center">
+        <p>Loading tour data...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col min-h-screen bg-white justify-center items-center">
+        <p className="text-red-500">{error}</p>
+        <button
+          onClick={() => router.back()}
+          className="mt-4 px-4 py-2 rounded-full bg-[#28B872] text-white"
+        >
+          Go Back
+        </button>
+      </div>
+    );
+  }
+
+  if (!tour) {
+    return (
+      <div className="flex flex-col min-h-screen bg-white justify-center items-center">
+        <p>Tour not found</p>
+        <button
+          onClick={() => router.back()}
+          className="mt-4 px-4 py-2 rounded-full bg-[#28B872] text-white"
+        >
+          Go Back
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -206,7 +374,9 @@ export default function TourPage() {
               <ArrowLeft className="text-green-600" size={30} />
             </button>
             <div>
-              <h1 className="text-lg font-bold">Wenchi Trip</h1>
+              <h1 className="text-lg font-bold">
+                {tour.tourName || "Tour Details"}
+              </h1>
               <p className="text-sm font-bold text-gray-500">Details</p>
             </div>
           </div>
@@ -218,14 +388,14 @@ export default function TourPage() {
               {...trip}
               onPassengerListClick={() => {
                 setActiveTrip(trip);
-                setView("passengers"); // 👉 swap to PassengerList in the SAME page
+                setView("passengers");
               }}
             />
           ))}
 
           {/* Main Content */}
           <div className="flex-1">
-            <Detailfilter />
+            <Detailfilter tourData={tour} />
           </div>
 
           {/* Edit Button */}
@@ -242,7 +412,7 @@ export default function TourPage() {
         // Passenger list view (same page)
         <PassengerListView
           title={activeTrip?.title ?? "Trip"}
-          passengers={passengersByTrip[activeTrip?.slug ?? "wenchi"] ?? []}
+          passengers={passengersByTrip["wenchi"]}
           onBack={() => setView("details")}
         />
       )}

@@ -1,88 +1,122 @@
 "use client";
-import { useEffect, useState } from "react";
+
+import { useEffect } from "react";
 import NavBar from "@/app/components/ui/navBar";
 import Header from "@/app/components/ui/Header";
 import TopRecommended from "@/app/components/ui/TopRecomanded";
 import CategorySelector from "@/app/components/ui/catagory";
 import TravelCard from "@/app/components/ui/travelcard";
-import { fetchToursForHome, type TravelCardVM } from "@/lib/toursRepo";
+import { useHomeDataStore } from "@/app/stores/useHomeDataStore";
+import SkeletonTripCard from "@/app/components/ui/SkeletonTripCard";
+import SkeletonTopRecommended from "@/app/components/ui/SkeletonTopRecommended";
+import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
-function Page() {
-  const [cards, setCards] = useState<TravelCardVM[]>([]);
-  const [loading, setLoading] = useState(true);
+// Convert "2,700" -> 2700 safely
+function toNum(v: string | number | null | undefined) {
+  if (typeof v === "number") return v;
+  if (v == null) return undefined;
+  const n = Number(String(v).replace(/[^\d.-]/g, ""));
+  return Number.isFinite(n) ? n : undefined;
+}
+
+export default function Page() {
+  const { cards, loading, ensure } = useHomeDataStore();
 
   useEffect(() => {
-    let mounted = true;
-    (async () => {
-      const res = await fetchToursForHome(12);
-      if (mounted) {
-        setCards(res);
-        setLoading(false);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
+    void ensure(12);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const showInitialSkeletons = loading && cards.length === 0;
 
   return (
     <div className="pb-28">
-      <div>
-        <Header />
-      </div>
+      <Header />
 
-      <div>
-        <TopRecommended />
-      </div>
+      {/* Top Recommended */}
+      {showInitialSkeletons ? (
+        <SkeletonTopRecommended />
+      ) : (
+        <TopRecommended cards={cards} />
+      )}
 
-      <div>
-        <CategorySelector />
-      </div>
+      <CategorySelector />
 
-      <div className="flex items-center ml-5 justify-between mb-1 ">
+      <div className="flex items-center ml-5 justify-between mb-1">
         <h2
-          className="text-gray-500 text-xs "
-          style={{ fontFamily: "'Century Gothic', sans-serif", fontWeight: 500 }}
+          className="text-gray-500 text-xs"
+          style={{
+            fontFamily: "'Century Gothic', sans-serif",
+            fontWeight: 500,
+          }}
         >
           Tips for you
         </h2>
         <button
           className="text-gray-400 text-xs mr-4"
-          style={{ fontFamily: "'Century Gothic', sans-serif", fontWeight: 300 }}
+          style={{
+            fontFamily: "'Century Gothic', sans-serif",
+            fontWeight: 300,
+          }}
         >
           See all
         </button>
       </div>
 
-      {/* List — identical visuals, but from DB */}
-      {loading ? (
-        <div className="p-2 text-xs text-gray-400">Loading…</div>
+      {/* Trip list */}
+      {showInitialSkeletons ? (
+        <div className="p-2 grid grid-cols-1 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <SkeletonTripCard key={i} />
+          ))}
+        </div>
       ) : cards.length === 0 ? (
         <div className="p-2 text-xs text-gray-400">No trips yet.</div>
       ) : (
-        cards.map((c) => (
-          <div key={c.id} className="p-2 grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-6">
-            <TravelCard
-              imageUrl={c.imageUrl}
-              placeName={c.placeName}
-              location={c.location}
-              tripDuration={c.tripDuration}
-              price={c.price}
-              oldPrice={c.oldPrice}
-              discountPercent={c.discountPercent}
-              rating={c.rating}
-              reviews={c.reviews}
-              agencyName={c.agencyName}
-            />
+        <>
+          {/* subtle loading bar if refetching while showing data */}
+          {loading && (
+            <div className="px-4 pb-2">
+              <Skeleton className="h-3 w-24 rounded" />
+            </div>
+          )}
+
+          <div className="p-2 grid grid-cols-1 gap-6">
+            {cards.map((c, i) => {
+              // Optional tooltip combining agency name + about (TravelCard itself doesn’t take agencyAbout)
+              const tooltip = c.agencyAbout?.trim()
+                ? `${c.agencyName} — ${c.agencyAbout}`
+                : c.agencyName;
+
+              return (
+                <Link
+                  key={c.id}
+                  href={`/pages/Detail/${c.id}`}
+                  className="block"
+                  title={tooltip}
+                >
+                  <TravelCard
+                    imageUrl={c.imageUrl}
+                    placeName={c.placeName}
+                    location={c.location}
+                    tripDuration={c.tripDuration}
+                    price={toNum(c.price) ?? 0}
+                    oldPrice={toNum(c.oldPrice)}
+                    discountPercent={c.discountPercent}
+                    rating={c.rating}
+                    reviews={c.reviews}
+                    agencyName={c.agencyName}
+                    priority={i < 2}
+                  />
+                </Link>
+              );
+            })}
           </div>
-        ))
+        </>
       )}
 
-      <div>
-        <NavBar />
-      </div>
+      <NavBar />
     </div>
   );
 }
-
-export default Page;
