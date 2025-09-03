@@ -14,11 +14,11 @@ type HomeState = {
   clear: () => void;
 };
 
-const STALE_MS = 5 * 60_000;           // 5 minutes
+const STALE_MS = 5 * 60_000; // 5 minutes
 const KEY = "home-cards";
-const MAX_CACHE_CARDS = 24;            // cap persisted size
+const MAX_CACHE_CARDS = 24;
 
-// Persist fewer/lighter fields to stay under quota
+// Light persisted subset
 type LightCard = Pick<
   TravelCardVM,
   | "id"
@@ -32,23 +32,36 @@ type LightCard = Pick<
   | "rating"
   | "reviews"
   | "agencyName"
+  | "agencyAbout"
 >;
 
-// A storage wrapper that swallows quota errors and replaces the entry
+// Safe session storage wrapper (quota-safe)
 const safeSessionStorage: Storage = {
-  get length() { return sessionStorage.length; },
-  clear() { sessionStorage.clear(); },
-  key(i) { return sessionStorage.key(i); },
-  getItem(k) { return sessionStorage.getItem(k); },
-  removeItem(k) { sessionStorage.removeItem(k); },
-  setItem(k, v) {
+  get length() {
+    return sessionStorage.length;
+  },
+  clear() {
+    sessionStorage.clear();
+  },
+  key(i: number) {
+    return sessionStorage.key(i);
+  },
+  getItem(k: string) {
+    return sessionStorage.getItem(k);
+  },
+  removeItem(k: string) {
+    sessionStorage.removeItem(k);
+  },
+  setItem(k: string, v: string) {
     try {
       sessionStorage.setItem(k, v);
-    } catch (err: unknown) {
-      // If we hit quota, drop the old entry and try once more
-      // (Keeps the app working instead of crashing)
+    } catch {
       if (k) sessionStorage.removeItem(k);
-      try { sessionStorage.setItem(k, v); } catch { /* give up silently */ }
+      try {
+        sessionStorage.setItem(k, v);
+      } catch {
+        // swallow
+      }
     }
   },
 };
@@ -63,7 +76,11 @@ export const useHomeDataStore = create<HomeState>()(
 
       clear: () => {
         set({ cards: [], lastFetched: null });
-        try { sessionStorage.removeItem(KEY); } catch {}
+        try {
+          sessionStorage.removeItem(KEY);
+        } catch {
+          // ignore
+        }
       },
 
       ensure: async (minCount = 12) => {
@@ -95,40 +112,37 @@ export const useHomeDataStore = create<HomeState>()(
     }),
     {
       name: KEY,
-      storage: createJSONStorage(() => safeSessionStorage, {
-        // if you’re on zustand >=4.5, this keeps only the fields above
-        replacer: (_key, value) => value,
-      }),
-      // Keep the cache tiny: only the first N cards, and only light fields
+      storage: createJSONStorage(() => safeSessionStorage),
       partialize: (s) => ({
         cards: (s.cards ?? [])
           .slice(0, MAX_CACHE_CARDS)
-          .map((c) => {
-            const lc: LightCard = {
-              id: c.id,
-              imageUrl: c.imageUrl,
-              placeName: c.placeName,
-              location: c.location,
-              tripDuration: c.tripDuration,
-              price: c.price,
-              oldPrice: c.oldPrice,
-              discountPercent: c.discountPercent,
-              rating: c.rating,
-              reviews: c.reviews,
-              agencyName: c.agencyName,
-            };
-            return lc as unknown as TravelCardVM;
-          }),
+          .map<LightCard>((c) => ({
+            id: c.id,
+            imageUrl: c.imageUrl,
+            placeName: c.placeName,
+            location: c.location,
+            tripDuration: c.tripDuration,
+            price: c.price,
+            oldPrice: c.oldPrice,
+            discountPercent: c.discountPercent,
+            rating: c.rating,
+            reviews: c.reviews,
+            agencyName: c.agencyName,
+            agencyAbout: c.agencyAbout,
+          })),
         lastFetched: s.lastFetched,
       }),
-      // bump this if you previously stored heavy data; it will re-persist in light form
-      version: 2,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      migrate: (persisted: any, version) => {
-        if (version < 2 && persisted?.cards) {
-          persisted.cards = (persisted.cards as TravelCardVM[])
+      version: 3,
+      migrate: (persisted: unknown, version: number) => {
+        if (!persisted || typeof persisted !== "object") return persisted;
+        const p = persisted as {
+          cards?: TravelCardVM[];
+          lastFetched?: number | null;
+        };
+        if (version < 3 && Array.isArray(p.cards)) {
+          p.cards = p.cards
             .slice(0, MAX_CACHE_CARDS)
-            .map((c) => ({
+            .map<LightCard>((c) => ({
               id: c.id,
               imageUrl: c.imageUrl,
               placeName: c.placeName,
@@ -140,9 +154,11 @@ export const useHomeDataStore = create<HomeState>()(
               rating: c.rating,
               reviews: c.reviews,
               agencyName: c.agencyName,
-            }));
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              agencyAbout: (c as any).agencyAbout, // may be undefined on older caches
+            })) as unknown as TravelCardVM[];
         }
-        return persisted;
+        return p as unknown;
       },
     }
   )

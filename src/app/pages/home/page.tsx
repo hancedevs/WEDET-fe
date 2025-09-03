@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { JSX, useEffect } from "react";
 import NavBar from "@/app/components/ui/navBar";
 import Header from "@/app/components/ui/Header";
 import TopRecommended from "@/app/components/ui/TopRecomanded";
@@ -13,14 +13,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 
 // Convert "2,700" -> 2700 safely
-function toNum(v: string | number | null | undefined) {
-  if (typeof v === "number") return v;
-  if (v == null) return undefined;
-  const n = Number(String(v).replace(/[^\d.-]/g, ""));
-  return Number.isFinite(n) ? n : undefined;
+function toNum(v: string | number | null | undefined): number | undefined {
+  if (typeof v === "number") return Number.isFinite(v) ? v : undefined;
+  if (typeof v === "string") {
+    const n = Number(v.replace(/[^\d.-]/g, ""));
+    return Number.isFinite(n) ? n : undefined;
+  }
+  return undefined;
 }
 
-export default function Page() {
+export default function Page(): JSX.Element {
   const { cards, loading, ensure } = useHomeDataStore();
 
   useEffect(() => {
@@ -46,19 +48,13 @@ export default function Page() {
       <div className="flex items-center ml-5 justify-between mb-1">
         <h2
           className="text-gray-500 text-xs"
-          style={{
-            fontFamily: "'Century Gothic', sans-serif",
-            fontWeight: 500,
-          }}
+          style={{ fontFamily: "'Century Gothic', sans-serif", fontWeight: 500 }}
         >
           Tips for you
         </h2>
         <button
           className="text-gray-400 text-xs mr-4"
-          style={{
-            fontFamily: "'Century Gothic', sans-serif",
-            fontWeight: 300,
-          }}
+          style={{ fontFamily: "'Century Gothic', sans-serif", fontWeight: 300 }}
         >
           See all
         </button>
@@ -75,7 +71,6 @@ export default function Page() {
         <div className="p-2 text-xs text-gray-400">No trips yet.</div>
       ) : (
         <>
-          {/* subtle loading bar if refetching while showing data */}
           {loading && (
             <div className="px-4 pb-2">
               <Skeleton className="h-3 w-24 rounded" />
@@ -84,8 +79,7 @@ export default function Page() {
 
           <div className="p-2 grid grid-cols-1 gap-6">
             {cards.map((c, i) => {
-              // Optional tooltip combining agency name + about (TravelCard itself doesn’t take agencyAbout)
-              const tooltip = c.agencyAbout?.trim()
+              const tooltip = c.agencyAbout
                 ? `${c.agencyName} — ${c.agencyAbout}`
                 : c.agencyName;
 
