@@ -6,9 +6,9 @@ import { House, MapPin, User } from "lucide-react";
 import type { NavItem, NavbarProps } from "@/app/types/type";
 
 const items = [
-  { href: "/explore",  label: "Explore",  value: "explore",  Icon: House },
-  { href: "/my-trips", label: "My Trips", value: "my-trips", Icon: MapPin },
-  { href: "/profile",  label: "Profile",  value: "profile",  Icon: User },
+  { href: "/Dashbord/TourDash",  label: "Explore",  value: "dashbord",  Icon: House },
+  { href: "/Dashbord/TourDash", label: "My Trips", value: "my-trips", Icon: MapPin },
+  { href: "/pages/profile",  label: "Profile",  value: "Tour_profile",  Icon: User },
 ] as const satisfies readonly NavItem[];
 
 export default function Navbar({ active = "explore" }: NavbarProps) {

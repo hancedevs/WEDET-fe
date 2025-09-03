@@ -4,7 +4,7 @@ import * as React from "react";
 import { Camera, CheckCircle2, Settings, Star, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import NavBar from "@/app/components/ui/navBar";
+import Navbar from "@/app/components/Tourguidecomponents/TourGuideNavbar";
 const Label: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <label className="block text-[13px] font-medium text-gray-700 mb-1">
     {children}
@@ -162,7 +162,7 @@ export default function BusinessProfilePage(): React.JSX.Element {
           </div>
         </div>
         <div className="mt-10">
-          <NavBar />
+          <Navbar />
         </div>
       </main>
     </>

@@ -136,7 +136,7 @@ export type StepControllerProps = {
 };
 
 // Tourguide navbar
-export type NavValue = "explore" | "my-trips" | "profile";
+export type NavValue = "explore" | "my-trips" | "profile" | "dashbord" | "Tour_profile";
 
 export type NavItem = {
   href: string;

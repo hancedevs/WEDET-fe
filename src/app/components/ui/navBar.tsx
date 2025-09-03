@@ -15,7 +15,7 @@ export default function NavBar() {
       label: "Explore",
       key: "explore",
       icon: <House size={26} strokeWidth={1.5} />,
-      path: "/", 
+      path: "/pages/home", 
     },
     {
       label: "My Trips",
