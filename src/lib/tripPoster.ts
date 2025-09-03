@@ -20,6 +20,7 @@ function addDays(d: Date, n: number) {
   return copy;
 }
 
+/** Try inserting; if Supabase says a column doesn't exist, strip it and retry. */
 async function adaptiveInsert(row: Record<string, any>) {
   const attempt = { ...row };
 
@@ -45,7 +46,6 @@ async function adaptiveInsert(row: Record<string, any>) {
   throw new Error("Insert failed after removing unknown columns repeatedly.");
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function diffKeys(original: Record<string, any>, finalRow: Record<string, any>) {
   const removed: string[] = [];
   for (const k of Object.keys(original)) if (!(k in finalRow)) removed.push(k);
