@@ -33,12 +33,11 @@ export default function NavBar() {
 
     return (
         <div className="fixed inset-x-0 bottom-0 z-50 p-4 pb-[env(safe-area-inset-bottom)] flex justify-center">
-            {/* Main Navigation Pill Container */}
             <nav
                 className="w-full max-w-sm h-16 bg-white rounded-full shadow-2xl flex justify-around items-center px-2"
                 style={{
-                    boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)", // General pill shadow
-                    minWidth: "280px", // Ensures it looks good on various mobile screens
+                    boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+                    minWidth: "280px",
                 }}
                 aria-label="Bottom Navigation"
             >
@@ -57,9 +56,6 @@ export default function NavBar() {
                             aria-label={item.label}
                             aria-current={isActive ? "page" : undefined}
                         >
-                            {/* Active Container (Elevated Circle) 
-                          This div is responsible for the circle, elevation, and green border/shadow.
-                        */}
                             {isActive ? (
                                 <div
                                     className={`
@@ -67,23 +63,21 @@ export default function NavBar() {
                                     flex items-center justify-center transition-all duration-300
                                     ${activeColor}
                                 `}
-                                    // Custom styles for the glow/border effect seen in the image
                                     style={{
                                         borderColor: "rgba(40, 184, 114, 0.3)",
                                         boxShadow:
                                             "0 4px 10px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(40, 184, 114, 0.2)",
-                                        transform: "translateY(-20px)", // Elevate it above the bar
+                                        transform: "translateY(-20px)",
                                     }}
                                 >
                                     {item.icon}
                                 </div>
                             ) : (
-                                /* Inactive Icon */
                                 <div
                                     className={`flex flex-col items-center ${baseColor}`}
                                 >
                                     {item.icon}
-                                    {/* Inactive Label (only visible when the item is NOT active) */}
+
                                     <span
                                         className="text-xs mt-1"
                                         style={{
