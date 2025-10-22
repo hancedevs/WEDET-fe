@@ -433,6 +433,28 @@ export default function Signupform() {
                                             : "Create account"}
                                     </PrimaryButton>
                                 </div>
+
+                                <div className="text-center mt-6">
+                                    <span
+                                        className="text-gray-500 text-sm"
+                                        style={{
+                                            fontFamily:
+                                                "'Century Gothic', sans-serif",
+                                            fontWeight: 300,
+                                        }}
+                                    >
+                                        Already have an account?{" "}
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                router.push("/auth/login");
+                                            }}
+                                            className="text-[#28B872] font-medium hover:underline"
+                                        >
+                                            Login
+                                        </button>
+                                    </span>
+                                </div>
                             </form>
                         </div>
                     </div>
