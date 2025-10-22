@@ -49,20 +49,20 @@ export default function NavBar() {
                             key={item.key}
                             onClick={() => router.push(item.path)}
                             className={`
-                            flex flex-col items-center justify-center h-full p-0 m-0 transition-all duration-300 ease-in-out
-                            relative z-10 ${isActive ? "w-1/4" : "w-1/3"}
-                            focus:outline-none 
-                        `}
+                                flex flex-col items-center cursor-pointer justify-center h-full p-0 m-0 transition-all duration-300 ease-in-out
+                                relative z-10 ${isActive ? "w-1/4" : "w-1/3"}
+                                focus:outline-none 
+                            `}
                             aria-label={item.label}
                             aria-current={isActive ? "page" : undefined}
                         >
                             {isActive ? (
                                 <div
                                     className={`
-                                    w-14 h-14 rounded-full bg-white shadow-lg border-2 
-                                    flex items-center justify-center transition-all duration-300
-                                    ${activeColor}
-                                `}
+                                        w-14 h-14 rounded-full bg-white shadow-lg border-2 
+                                        flex items-center justify-center transition-all duration-300
+                                        ${baseColor} 
+                                    `}
                                     style={{
                                         borderColor: "rgba(40, 184, 114, 0.3)",
                                         boxShadow:
@@ -70,7 +70,9 @@ export default function NavBar() {
                                         transform: "translateY(-20px)",
                                     }}
                                 >
-                                    {item.icon}
+                                    <div className={activeColor}>
+                                        {item.icon}
+                                    </div>
                                 </div>
                             ) : (
                                 <div
