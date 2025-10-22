@@ -1,5 +1,5 @@
 "use client";
-import Forgotpassword from "@/app/components/auth/forgotpassword";
+import Forgotpassword from "@/components/auth/forgotpassword";
 export default function forgotpassword() {
-  return <Forgotpassword />;
+    return <Forgotpassword />;
 }

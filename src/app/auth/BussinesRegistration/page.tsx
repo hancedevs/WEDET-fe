@@ -1,12 +1,12 @@
-'use client'
-import React from 'react'
-import BussinessSignup from '@/app/components/auth/BussinessSignup'
+"use client";
+import React from "react";
+import BussinessSignup from "@/components/auth/BussinessSignup";
 function page() {
-  return (
-    <div>
-      <BussinessSignup/>
-    </div>
-  )
+    return (
+        <div>
+            <BussinessSignup />
+        </div>
+    );
 }
 
-export default page
+export default page;

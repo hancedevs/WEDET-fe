@@ -1,4 +1,4 @@
-import { Role } from "@/app/types/type";
+import { Role } from "@/types/type";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { User as SupaUser } from "@supabase/supabase-js";

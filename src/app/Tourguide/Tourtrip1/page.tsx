@@ -3,172 +3,189 @@
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import TourtripLayout from "@/app/components/Tourguidecomponents/TourtripLayout";
-import Navbar from "@/app/components/Tourguidecomponents/TourGuideNavbar";
-import PhotoPicker from "@/app/components/Tourguidecomponents/photopicker";
+import TourtripLayout from "@/components/Tourguidecomponents/TourtripLayout";
+import Navbar from "@/components/Tourguidecomponents/TourGuideNavbar";
+import PhotoPicker from "@/components/Tourguidecomponents/photopicker";
 import { step1Schema, type Step1FormData } from "@/lib/tourguideschema";
 import { ChevronDown } from "lucide-react";
-import StepController from "@/app/components/Tourguidecomponents/stepcontroller";
+import StepController from "@/components/Tourguidecomponents/stepcontroller";
 import { saveDraft } from "@/lib/tripDraftLocal";
 
 export default function Step1Page() {
-  const router = useRouter();
+    const router = useRouter();
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    setFocus,
-    watch,
-    formState: { errors, isSubmitting },
-  } = useForm<Step1FormData>({
-    resolver: zodResolver(step1Schema),
-    mode: "onSubmit",
-    reValidateMode: "onChange",
-    shouldFocusError: true,
-    defaultValues: { photos: [] },
-  });
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        setFocus,
+        watch,
+        formState: { errors, isSubmitting },
+    } = useForm<Step1FormData>({
+        resolver: zodResolver(step1Schema),
+        mode: "onSubmit",
+        reValidateMode: "onChange",
+        shouldFocusError: true,
+        defaultValues: { photos: [] },
+    });
 
-  const photos = watch("photos");
-  const onPhotosChange = (arr: string[]) =>
-    setValue("photos", arr, { shouldValidate: true, shouldDirty: true });
+    const photos = watch("photos");
+    const onPhotosChange = (arr: string[]) =>
+        setValue("photos", arr, { shouldValidate: true, shouldDirty: true });
 
-  const onSubmit = async (data: Step1FormData) => {
-    saveDraft("step1", data);
-    router.push("/Tourguide/Tourtrip2");
-  };
+    const onSubmit = async (data: Step1FormData) => {
+        saveDraft("step1", data);
+        router.push("/Tourguide/Tourtrip2");
+    };
 
-  const submitOrFocus = handleSubmit(onSubmit, (errs) => {
-    const first = Object.keys(errs)[0] as keyof Step1FormData | undefined;
-    if (first) setFocus(first);
-  });
+    const submitOrFocus = handleSubmit(onSubmit, (errs) => {
+        const first = Object.keys(errs)[0] as keyof Step1FormData | undefined;
+        if (first) setFocus(first);
+    });
 
-  const baseField =
-    "mt-1 mb-4 w-full h-10 rounded-full bg-white border border-gray-200 shadow px-5 text-base outline-none " +
-    "placeholder:text-gray-400 " +
-    "focus:bg-[#EAF8F1] focus:border-[#9be5c2] focus:ring-2 focus:ring-[#26cc73] focus:caret-[#26cc73] " +
-    "aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-500/60";
+    const baseField =
+        "mt-1 mb-4 w-full h-10 rounded-full bg-white border border-gray-200 shadow px-5 text-base outline-none " +
+        "placeholder:text-gray-400 " +
+        "focus:bg-[#EAF8F1] focus:border-[#9be5c2] focus:ring-2 focus:ring-[#26cc73] focus:caret-[#26cc73] " +
+        "aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-500/60";
 
-  const baseTextarea =
-    "mt-1 mb-4 w-full min-h-[7rem] rounded-2xl bg-white border border-gray-200 shadow px-5 py-3 text-base outline-none " +
-    "placeholder:text-gray-400 resize-none " +
-    "focus:bg-[#EAF8F1] focus:border-[#9be5c2] focus:ring-2 focus:ring-[#26cc73] focus:caret-[#26cc73] " +
-    "aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-500/60";
+    const baseTextarea =
+        "mt-1 mb-4 w-full min-h-[7rem] rounded-2xl bg-white border border-gray-200 shadow px-5 py-3 text-base outline-none " +
+        "placeholder:text-gray-400 resize-none " +
+        "focus:bg-[#EAF8F1] focus:border-[#9be5c2] focus:ring-2 focus:ring-[#26cc73] focus:caret-[#26cc73] " +
+        "aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-500/60";
 
-  const labelCls = "block text-[15px] text-gray-700";
+    const labelCls = "block text-[15px] text-gray-700";
 
-  return (
-    <div className="relative">
-      <TourtripLayout progress={33} title="Trip post">
-        <form onSubmit={submitOrFocus} className="pb-[140px] max-w-[430px] mx-auto">
-          <h3 className="text-sm font-semibold mb-2">Step 1</h3>
-          <div className="text-xl font-semibold mb-3">Basic Tour Information</div>
+    return (
+        <div className="relative">
+            <TourtripLayout progress={33} title="Trip post">
+                <form
+                    onSubmit={submitOrFocus}
+                    className="pb-[140px] max-w-[430px] mx-auto"
+                >
+                    <h3 className="text-sm font-semibold mb-2">Step 1</h3>
+                    <div className="text-xl font-semibold mb-3">
+                        Basic Tour Information
+                    </div>
 
-          <label className={labelCls}>Tour name</label>
-          <input
-            {...register("tourName")}
-            placeholder="Trip to Wenchi"
-            className={baseField}
-            aria-invalid={!!errors.tourName}
-          />
-          {errors.tourName && (
-            <p className="text-red-500 text-xs -mt-3 mb-2">{errors.tourName.message}</p>
-          )}
+                    <label className={labelCls}>Tour name</label>
+                    <input
+                        {...register("tourName")}
+                        placeholder="Trip to Wenchi"
+                        className={baseField}
+                        aria-invalid={!!errors.tourName}
+                    />
+                    {errors.tourName && (
+                        <p className="text-red-500 text-xs -mt-3 mb-2">
+                            {errors.tourName.message}
+                        </p>
+                    )}
 
-          <label className={labelCls}>Tour type</label>
-          <div className="relative mt-1 mb-1">
-            <select
-              {...register("tourType")}
-              defaultValue=""
-              className={
-                "appearance-none w-full h-10 rounded-full bg-white border border-gray-200 shadow px-5 pr-10 text-base outline-none mb-4 " +
-                "placeholder:text-gray-400 " +
-                "focus:bg-[#EAF8F1] focus:border-[#9be5c2] focus:ring-2 focus:ring-[#26cc73] focus:caret-[#26cc73] " +
-                "aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-500/60"
-              }
-              aria-invalid={!!errors.tourType}
-            >
-              <option value="" disabled>
-                Select type
-              </option>
-              <option value="safari">Safari</option>
-              <option value="hiking">Hiking</option>
-              <option value="cultural">Cultural</option>
-              <option value="adventure">Adventure</option>
-            </select>
-            <ChevronDown
-              size={16}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
-            />
-          </div>
-          {errors.tourType && (
-            <p className="text-red-500 text-xs -mt-3 mb-2">{errors.tourType.message}</p>
-          )}
+                    <label className={labelCls}>Tour type</label>
+                    <div className="relative mt-1 mb-1">
+                        <select
+                            {...register("tourType")}
+                            defaultValue=""
+                            className={
+                                "appearance-none w-full h-10 rounded-full bg-white border border-gray-200 shadow px-5 pr-10 text-base outline-none mb-4 " +
+                                "placeholder:text-gray-400 " +
+                                "focus:bg-[#EAF8F1] focus:border-[#9be5c2] focus:ring-2 focus:ring-[#26cc73] focus:caret-[#26cc73] " +
+                                "aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-500/60"
+                            }
+                            aria-invalid={!!errors.tourType}
+                        >
+                            <option value="" disabled>
+                                Select type
+                            </option>
+                            <option value="safari">Safari</option>
+                            <option value="hiking">Hiking</option>
+                            <option value="cultural">Cultural</option>
+                            <option value="adventure">Adventure</option>
+                        </select>
+                        <ChevronDown
+                            size={16}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+                        />
+                    </div>
+                    {errors.tourType && (
+                        <p className="text-red-500 text-xs -mt-3 mb-2">
+                            {errors.tourType.message}
+                        </p>
+                    )}
 
-          <label className={labelCls}>Destination/Park</label>
-          <input
-            {...register("destination")}
-            placeholder="Wenchi Lake"
-            className={baseField}
-            aria-invalid={!!errors.destination}
-          />
-          {errors.destination && (
-            <p className="text-red-500 text-xs -mt-3 mb-2">{errors.destination.message}</p>
-          )}
+                    <label className={labelCls}>Destination/Park</label>
+                    <input
+                        {...register("destination")}
+                        placeholder="Wenchi Lake"
+                        className={baseField}
+                        aria-invalid={!!errors.destination}
+                    />
+                    {errors.destination && (
+                        <p className="text-red-500 text-xs -mt-3 mb-2">
+                            {errors.destination.message}
+                        </p>
+                    )}
 
-          <div className="text-[15px] text-gray-700">Photos</div>
-          <div className="mt-2 mb-3">
-            <PhotoPicker
-              value={photos}
-              onChange={onPhotosChange}
-              error={errors.photos?.message as string | undefined}
-            />
-          </div>
+                    <div className="text-[15px] text-gray-700">Photos</div>
+                    <div className="mt-2 mb-3">
+                        <PhotoPicker
+                            value={photos}
+                            onChange={onPhotosChange}
+                            error={errors.photos?.message as string | undefined}
+                        />
+                    </div>
 
-          <label className={labelCls}>Starting point</label>
-          <input
-            {...register("startingPoint")}
-            placeholder="Addis Ababa"
-            className={baseField}
-            aria-invalid={!!errors.startingPoint}
-          />
-          {errors.startingPoint && (
-            <p className="text-red-500 text-xs -mt-3 mb-2">{errors.startingPoint.message}</p>
-          )}
+                    <label className={labelCls}>Starting point</label>
+                    <input
+                        {...register("startingPoint")}
+                        placeholder="Addis Ababa"
+                        className={baseField}
+                        aria-invalid={!!errors.startingPoint}
+                    />
+                    {errors.startingPoint && (
+                        <p className="text-red-500 text-xs -mt-3 mb-2">
+                            {errors.startingPoint.message}
+                        </p>
+                    )}
 
-          <label className={labelCls}>Overview</label>
-          <textarea
-            {...register("overview")}
-            placeholder="Brief description of the tour..."
-            className={baseTextarea}
-            aria-invalid={!!errors.overview}
-          />
-          {errors.overview && (
-            <p className="text-red-500 text-xs -mt-3 mb-2">{errors.overview.message}</p>
-          )}
+                    <label className={labelCls}>Overview</label>
+                    <textarea
+                        {...register("overview")}
+                        placeholder="Brief description of the tour..."
+                        className={baseTextarea}
+                        aria-invalid={!!errors.overview}
+                    />
+                    {errors.overview && (
+                        <p className="text-red-500 text-xs -mt-3 mb-2">
+                            {errors.overview.message}
+                        </p>
+                    )}
 
-          <label className={labelCls}>Top highlights</label>
-          <textarea
-            {...register("highlights")}
-            placeholder="Sunset, boat ride, hot springs…"
-            className={baseTextarea}
-            aria-invalid={!!errors.highlights}
-          />
-          {errors.highlights && (
-            <p className="text-red-500 text-xs -mt-3 mb-2">{errors.highlights.message}</p>
-          )}
+                    <label className={labelCls}>Top highlights</label>
+                    <textarea
+                        {...register("highlights")}
+                        placeholder="Sunset, boat ride, hot springs…"
+                        className={baseTextarea}
+                        aria-invalid={!!errors.highlights}
+                    />
+                    {errors.highlights && (
+                        <p className="text-red-500 text-xs -mt-3 mb-2">
+                            {errors.highlights.message}
+                        </p>
+                    )}
 
-          <div className="mt-10 pb-6">
-            <StepController
-              showPrev={false}
-              canNext={!isSubmitting}
-              className="max-w-[430px] mx-auto"
-            />
-          </div>
-        </form>
-      </TourtripLayout>
+                    <div className="mt-10 pb-6">
+                        <StepController
+                            showPrev={false}
+                            canNext={!isSubmitting}
+                            className="max-w-[430px] mx-auto"
+                        />
+                    </div>
+                </form>
+            </TourtripLayout>
 
-      <Navbar active="explore" />
-    </div>
-  );
+            <Navbar active="explore" />
+        </div>
+    );
 }
