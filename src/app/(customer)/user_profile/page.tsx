@@ -207,24 +207,25 @@ export default function UserProfilePage() {
 
     return (
         <div
-            className="min-h-screen bg-gray-50 pb-24"
+            className="min-h-screen bg-white pb-24"
             style={{ fontFamily: "'Century Gothic', sans-serif" }}
         >
             <div className="max-w-xl mx-auto p-4">
                 <div className="flex items-center justify-between mb-8">
-                    <button
-                        onClick={() => router.back()}
-                        className="flex items-center gap-1 text-gray-600 hover:text-[#28B872] transition"
-                    >
-                        <ArrowLeft className="w-5 h-5" />
-                    </button>
-                    <button
-                        onClick={() => console.log("Go to settings")}
-                        className="text-gray-600 hover:text-[#28B872] p-2 rounded-full transition"
-                        aria-label="Settings"
-                    >
-                        <Settings className="w-6 h-6" />
-                    </button>
+                    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur px-3 py-2 ">
+                        <div className="mx-auto mb-4 w-full max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg">
+                            <button
+                                onClick={() => router.push("/home")}
+                                aria-label="Back"
+                                className="w-9 h-9 inline-flex items-center justify-center rounded-full bg-[#ECECEC] shadow-[0_2px_6px_rgba(0,0,0,0.05)] active:scale-95 transition"
+                            >
+                                <ArrowLeft
+                                    size={20}
+                                    className="text-[#28B872]"
+                                />
+                            </button>
+                        </div>
+                    </header>
                 </div>
 
                 <div className="bg-white rounded-3xl shadow-lg p-6 mb-8 border border-gray-100">
