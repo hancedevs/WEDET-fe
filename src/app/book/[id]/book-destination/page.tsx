@@ -1,8 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowLeft, CreditCard, Landmark } from "lucide-react";
-import { useRouter } from "next/navigation";
-import NavBar from "@/components/ui/navBar";
+import { useRouter, useParams } from "next/navigation";
+
+import { supabase } from "@/lib/supabaseClient";
+import PaymentMethods from "@/components/Banks/SelectBank";
 
 function ThickCheck({ className = "" }) {
     return (
@@ -22,10 +24,84 @@ export default function BookingPage() {
     const [seats, setSeats] = useState(4);
     const maxSeats = 14;
     const seatPrice = 575;
-    const totalPrice = seats * seatPrice;
     const [bookingType, setBookingType] = useState("team");
     const [payment, setPayment] = useState("tell_birr");
+    const [previousTickets, setPreviousTickets] = useState<any[]>([]);
+    const [userId, setUserId] = useState<string | null>(null);
+    const [tripInfo, setTripInfo] = useState<any>(null);
     const router = useRouter();
+    const params = useParams();
+    const tourId = params?.id;
+
+    useEffect(() => {
+        // Fetch current user
+        supabase.auth.getUser().then(({ data }) => {
+            const user = data?.user;
+            if (user) {
+                setUserId(user.id);
+                // Fetch any previous ticket for this user (any trip)
+                supabase
+                    .from("tickets")
+                    .select("*")
+                    .eq("user_id", user.id)
+                    .then(({ data: tickets }) => {
+                        if (tickets) setPreviousTickets(tickets);
+                    });
+            }
+        });
+    }, []);
+
+    useEffect(() => {
+        // Fetch trip info from Supabase
+        if (!tourId) return;
+        supabase
+            .from("tours")
+            .select("*")
+            .eq("id", tourId)
+            .single()
+            .then(({ data }) => {
+                if (data) setTripInfo(data);
+            });
+    }, [tourId]);
+
+    // Format date range
+    function formatDateRange(start?: string | null, end?: string | null) {
+        if (!start || !end) return "";
+        const s = new Date(start),
+            e = new Date(end);
+        if (Number.isNaN(s.getTime()) || Number.isNaN(e.getTime())) return "";
+        const sameYear = s.getFullYear() === e.getFullYear();
+        const fmt = (d: Date, opts: Intl.DateTimeFormatOptions) =>
+            d.toLocaleDateString("en-US", opts);
+        return sameYear
+            ? `${fmt(s, { month: "short", day: "numeric" })}-${fmt(e, {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+              })}`
+            : `${fmt(s, {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+              })}-${fmt(e, {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+              })}`;
+    }
+    function diffDaysInclusive(a?: string | null, b?: string | null) {
+        if (!a || !b) return 0;
+        const da = new Date(a),
+            db = new Date(b);
+        if (Number.isNaN(da.getTime()) || Number.isNaN(db.getTime())) return 0;
+        const ms = db.getTime() - da.getTime();
+        return Math.max(1, Math.round(ms / 86400000) + 1);
+    }
+
+    // Use real group size and price if available
+    const groupSize = tripInfo?.group_number ?? maxSeats;
+    const pricePerSeat = tripInfo?.total ?? tripInfo?.price ?? seatPrice;
+    const totalPrice = seats * pricePerSeat;
 
     return (
         <div className="min-h-screen bg-white flex flex-col relative font-sans">
@@ -57,7 +133,8 @@ export default function BookingPage() {
                                 available
                             </span>
                             <span className="text-[1.5rem] font-bold text-[#28B872] leading-none mt-1">
-                                14 <span className="font-extrabold">Seats</span>
+                                {groupSize}{" "}
+                                <span className="font-extrabold">Seats</span>
                             </span>
                             <span className="text-xs text-[#C7C7C7] font-bold mt-1">
                                 Select Number of seats
@@ -68,12 +145,15 @@ export default function BookingPage() {
                             <button
                                 className="w-8 h-8 flex  justify-center rounded-full bg-[#28B872] text-white text-xl font-bold active:scale-95 transition border border-[#28B872]"
                                 onClick={() =>
-                                    setSeats((s) => Math.min(maxSeats, s + 1))
+                                    setSeats((s) => Math.min(groupSize, s + 1))
                                 }
                                 aria-label="Add seat"
                             >
                                 +
                             </button>
+                            <span className="ml-2 px-6 py-2 bg-[#F4F4F4] text-[#4B4B4B] text-lg font-extrabold rounded-[20px] shadow-inner flex items-center justify-center min-w-[44px]">
+                                {seats}
+                            </span>
                             {/* Minus button  */}
                             <button
                                 className="w-8 h-8 flex justify-center rounded-full bg-white text-[#28B872] text-xl font-bold active:scale-95 transition border border-[#28B872]"
@@ -85,9 +165,6 @@ export default function BookingPage() {
                                 –
                             </button>
                             {/* Count */}
-                            <span className="ml-2 px-6 py-2 bg-[#F4F4F4] text-[#4B4B4B] text-lg font-extrabold rounded-[20px] shadow-inner flex items-center justify-center min-w-[44px]">
-                                {seats}
-                            </span>
                         </div>
                     </div>
                     {/* Price row */}
@@ -169,41 +246,7 @@ export default function BookingPage() {
                     </div>
                 </div>
 
-                <span className="text-sm font-bold text-[#BEBEBE] ml-2 mt-4">
-                    Payment method
-                </span>
-
-                {/* Payment Method Card */}
-                <div className="bg-white rounded-[28px] border-2 border-[#E8E8E8] shadow-[0_2px_8px_#00000010] px-4 py-4">
-                    <div className="flex gap-2">
-                        {/* Tell Birr */}
-                        <button
-                            className={`flex items-center gap-2 border-2 w-full justify-center py-2 rounded-full text-base font-bold transition
-                ${
-                    payment === "tell_birr"
-                        ? "bg-[#28B872] text-white shadow-[0_1.5px_8px_#28B87222] border-none"
-                        : "bg-white text-[#BEBEBE] border border-[#E8E8E8]"
-                }`}
-                            onClick={() => setPayment("tell_birr")}
-                        >
-                            <CreditCard size={20} />
-                            Tell Birr
-                        </button>
-                        {/* Bank Transfer */}
-                        <button
-                            className={`flex items-center border-2 gap-2 w-full justify-center py-2 rounded-full text-base font-bold transition
-                ${
-                    payment === "bank_transfer"
-                        ? "bg-[#28B872] text-white shadow-[0_1.5px_8px_#28B87222] border-none"
-                        : "bg-white text-[#BEBEBE] border border-[#E8E8E8]"
-                }`}
-                            onClick={() => setPayment("bank_transfer")}
-                        >
-                            <Landmark size={20} />
-                            Bank Transfer
-                        </button>
-                    </div>
-                </div>
+                <PaymentMethods />
 
                 {/* Summary Card  */}
                 <div className="bg-white rounded-[26px] border-2 border-[#E8E8E8] shadow-[0_2px_8px_#00000010] px-4 py-4 flex flex-col mb-3">
@@ -228,7 +271,59 @@ export default function BookingPage() {
 
                 {/* PAY BUTTON */}
                 <div className="w-full flex justify-center mb-4">
-                    <button className="w-full max-w-[370px] bg-[#28B872] text-white text-xl font-bold py-3 rounded-full shadow-[0_2px_12px_#28B87233]">
+                    <button
+                        className="w-full max-w-[370px] bg-[#28B872] text-white text-xl font-bold py-3 rounded-full shadow-[0_2px_12px_#28B87233]"
+                        onClick={async () => {
+                            // Fetch current user
+                            const { data: userData } =
+                                await supabase.auth.getUser();
+                            const user = userData?.user;
+                            if (!user || !tripInfo) return;
+                            // Generate public_ticket_id
+                            const { count } = await supabase
+                                .from("tickets")
+                                .select("id", { count: "exact", head: true })
+                                .eq("tour_id", tourId);
+                            const nextSeq = (count ?? 0) + 1;
+                            const paddedSeq = String(nextSeq).padStart(3, "0");
+                            const public_ticket_id = `WDT-${tourId}-${paddedSeq}`;
+                            // Insert ticket
+                            // Debug: log tripInfo to ensure all fields are present
+                            console.log("tripInfo for ticket", tripInfo);
+                            const ticket = {
+                                tour_id: tourId,
+                                title: tripInfo.tourName,
+                                location: tripInfo.destination,
+                                date_range: tripInfo.start_date,
+                                duration: tripInfo.selectedDay || "",
+                                guide: "", // Add guide if available
+                                people: seats,
+                                total_price: totalPrice,
+                                created_at: new Date().toISOString(),
+                                user_id: user.id,
+                                traveler:
+                                    user.user_metadata?.full_name ||
+                                    user.email ||
+                                    "",
+                                public_ticket_id,
+                                imageurl: tripInfo.photos?.[0] || "",
+                            };
+                            const { error, data: ticketData } = await supabase
+                                .from("tickets")
+                                .insert([ticket])
+                                .select()
+                                .single();
+                            if (!error && ticketData) {
+                                router.push(
+                                    `/book/${tourId}/step5?id=${ticketData.id}`
+                                );
+                            } else {
+                                alert(
+                                    "Failed to create ticket. Please try again."
+                                );
+                            }
+                        }}
+                    >
                         pay
                     </button>
                 </div>

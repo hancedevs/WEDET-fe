@@ -317,7 +317,7 @@ const Detailfilter = ({ tourData }: DetailfilterProps) => {
                         className={`flex-1 rounded-3xl font-medium text-sm sm:text-base whitespace-nowrap transition-all duration-200
              ${
                  activeTab === tab
-                     ? "bg-[#28B872] text-white shadow-lg z-10 px-4 py-2 sm:px-5 sm:py-3"
+                     ? "bg-[#28B872] text-white shadow-lg z-10 px-5 py-3 sm:px-5 sm:py-3"
                      : "text-gray-600 hover:text-green-600 opacity-80 px-2 py-1 sm:px-3 sm:py-2"
              }
          `}

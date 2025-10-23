@@ -471,7 +471,32 @@ export default function TourPage() {
                 <div className="fixed bottom-0 w-full bg-white p-4 sm:p-6">
                     <button
                         className="w-full bg-[#28B872] hover:bg-[#28B880] text-white py-3 rounded-[35px] font-bold transition-colors text-sm sm:text-base cursor-pointer"
-                        onClick={() => router.push(`/book/${numericId}/step1`)}
+                        onClick={async () => {
+                            if (loading) return;
+
+                            const { data: userData } =
+                                await supabase.auth.getUser();
+                            const user = userData?.user;
+                            if (!user) {
+                                router.push(`/book/${numericId}/step1`);
+                                return;
+                            }
+                            const { data: tickets } = await supabase
+                                .from("tickets")
+                                .select("id")
+                                .eq("user_id", user.id)
+                                .limit(1);
+                            if (tickets && tickets.length > 0) {
+                                router.push(
+                                    `/book/${numericId}/book-destination`
+                                );
+                            } else {
+                                // router.push(`/book/${numericId}/step1`);
+                                router.push(
+                                    `/book/${numericId}/book-destination`
+                                );
+                            }
+                        }}
                         disabled={loading}
                     >
                         {loading ? "…" : "Book now!"}

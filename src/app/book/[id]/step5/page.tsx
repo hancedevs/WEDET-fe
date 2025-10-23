@@ -1,9 +1,16 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import QRCode from "react-qr-code";
-import { Users, MapPin, CalendarDays, Calendar, Clock } from "lucide-react";
+import {
+    Users,
+    MapPin,
+    CalendarDays,
+    Calendar,
+    Clock,
+    ArrowLeft,
+} from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import NavBar from "@/components/ui/navBar";
 import { supabase } from "@/lib/supabaseClient";
@@ -101,6 +108,7 @@ export default function TicketPage() {
     const [loading, setLoading] = useState(true);
     const [trip, setTrip] = useState<TripSummaryData | null>(null);
     const [tripImage, setTripImage] = useState<string>(FALLBACK_IMG);
+    const router = useRouter();
 
     // a simple “booking” slice; if you persist data from earlier steps, read from localStorage
     const [travelerName, setTravelerName] = useState<string>("Guest Traveler");
@@ -246,6 +254,15 @@ export default function TicketPage() {
     return (
         <div className="w-full min-h-screen flex flex-col items-center bg-white">
             {/* Header */}
+            <div className="w-full flex justify-start mb-2 p-2">
+                <button
+                    onClick={() => router.push("/home")}
+                    aria-label="Back"
+                    className="w-9 h-9 inline-flex items-center justify-center rounded-full bg-[#ECECEC] shadow-[0_2px_6px_rgba(0,0,0,0.05)] active:scale-95 transition"
+                >
+                    <ArrowLeft size={20} className="text-[#28B872]" />
+                </button>
+            </div>
             <div
                 className="w-full max-w-md flex flex-col items-center px-6 py-8 shadow-lg"
                 style={{ backgroundColor: "#28B872" }}

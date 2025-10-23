@@ -27,7 +27,7 @@ export default function BookingStepLayout({
     const router = useRouter();
 
     return (
-        <div className="flex flex-col h-[calc(100vh-70px)]">
+        <div className="flex flex-col h-[calc(100vh)]">
             {/* Top Header */}
             <ProgressHeader
                 step={step}
