@@ -1,18 +1,18 @@
 "use client";
 
 import * as React from "react";
-import { z } from "zod";
+import { Funnel } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
+import { z } from "zod";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 
@@ -36,64 +36,53 @@ const filterSchema = z.object({
 
 type FilterFormValues = z.infer<typeof filterSchema>;
 
-type Props = {
-    open: boolean;
-    setOpen: (open: boolean) => void;
-    setActive: (open: boolean) => void;
-};
-
-export default function FilterOptionsModal({
-    open,
-    setOpen,
-    setActive,
-}: Props) {
+export default function FilterDropdown() {
     const form = useForm<FilterFormValues>({
         resolver: zodResolver(filterSchema),
-        defaultValues: {
-            minPrice: "",
-            maxPrice: "",
-            nearestDate: false,
-        },
-        mode: "onSubmit",
+        defaultValues: { minPrice: "", maxPrice: "", nearestDate: false },
     });
+
+    const [active, setActive] = React.useState(false);
 
     const onSubmit = (data: FilterFormValues) => {
         console.log("Filters Applied:", data);
-        setOpen(false);
+        setActive(false);
     };
 
     return (
-        <Dialog
-            open={open}
-            onOpenChange={() => {
-                setOpen(false);
-                setActive(false);
-            }}
-        >
-            <DialogContent
-                className="w-11/12 max-w-md p-6 rounded-2xl bg-white border-none shadow-2xl"
-                style={{ fontFamily: "'Century Gothic', sans-serif" }}
+        <DropdownMenu onOpenChange={(open) => setActive(open)}>
+            <DropdownMenuTrigger asChild>
+                <div
+                    className={`relative flex items-center justify-center h-10 w-10 rounded-full shadow transition border border-green-100 focus:outline-none focus:ring-2 focus:ring-green-300 cursor-pointer ${
+                        active
+                            ? "bg-green-50 ring-2 ring-green-500 ring-offset-2 shadow-[0_0_10px_2px_rgba(34,197,94,0.6)]"
+                            : "bg-white"
+                    }`}
+                >
+                    <Funnel
+                        size={25}
+                        strokeWidth={0.75}
+                        className="text-green-500 transition-colors duration-200"
+                    />
+                </div>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent
+                align="end"
+                className="w-80 bg-white rounded-2xl shadow-xl border border-gray-100 p-4"
             >
-                <DialogHeader className="p-0 space-y-0">
-                    <DialogTitle
-                        className="text-xl font-bold text-[#28B872] text-left mb-6"
-                        style={{
-                            fontFamily: "'Century Gothic', sans-serif",
-                            fontWeight: 700,
-                        }}
-                    >
-                        Filter Options
-                    </DialogTitle>
-                </DialogHeader>
+                <DropdownMenuLabel className="text-green-600 font-bold mb-4">
+                    Filter Options
+                </DropdownMenuLabel>
 
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-6"
+                    className="space-y-4"
                 >
                     <div>
                         <Label
                             htmlFor="minPrice"
-                            className="text-gray-900 text-base font-normal mb-2 block"
+                            className="text-gray-900 text-sm mb-1 block"
                         >
                             Min Price
                         </Label>
@@ -102,14 +91,10 @@ export default function FilterOptionsModal({
                             placeholder="No minimum"
                             type="text"
                             {...form.register("minPrice")}
-                            className="w-full h-12 rounded-lg border border-gray-200 px-4 text-base shadow-sm focus-visible:ring-[#28B872] focus-visible:ring-offset-0"
-                            style={{
-                                fontFamily: "'Century Gothic', sans-serif",
-                                fontWeight: 300,
-                            }}
+                            className="w-full h-10 rounded-lg border border-gray-200 px-3 text-sm shadow-sm focus-visible:ring-[#28B872] focus-visible:ring-offset-0"
                         />
                         {form.formState.errors.minPrice && (
-                            <p className="text-red-500 text-sm mt-1">
+                            <p className="text-red-500 text-xs mt-1">
                                 {form.formState.errors.minPrice.message}
                             </p>
                         )}
@@ -118,7 +103,7 @@ export default function FilterOptionsModal({
                     <div>
                         <Label
                             htmlFor="maxPrice"
-                            className="text-gray-900 text-base font-normal mb-2 block"
+                            className="text-gray-900 text-sm mb-1 block"
                         >
                             Max Price
                         </Label>
@@ -127,47 +112,33 @@ export default function FilterOptionsModal({
                             placeholder="No maximum"
                             type="text"
                             {...form.register("maxPrice")}
-                            className="w-full h-12 rounded-lg border border-gray-200 px-4 text-base shadow-sm focus-visible:ring-[#28B872] focus-visible:ring-offset-0"
-                            style={{
-                                fontFamily: "'Century Gothic', sans-serif",
-                                fontWeight: 300,
-                            }}
+                            className="w-full h-10 rounded-lg border border-gray-200 px-3 text-sm shadow-sm focus-visible:ring-[#28B872] focus-visible:ring-offset-0"
                         />
                         {form.formState.errors.maxPrice && (
-                            <p className="text-red-500 text-sm mt-1">
+                            <p className="text-red-500 text-xs mt-1">
                                 {form.formState.errors.maxPrice.message}
                             </p>
                         )}
                     </div>
 
-                    <div className="flex items-center space-x-2 pt-2">
+                    <div className="flex items-center space-x-2">
                         <Checkbox
                             id="nearestDate"
                             checked={form.watch("nearestDate")}
                             onCheckedChange={(checked) =>
                                 form.setValue("nearestDate", !!checked)
                             }
-                            className="h-5 w-5 rounded-sm border-gray-300 data-[state=checked]:bg-[#28B872] data-[state=checked]:text-white focus-visible:ring-offset-0 focus-visible:ring-[#28B872]"
+                            className="h-4 w-4 rounded-sm border-gray-300 data-[state=checked]:bg-[#28B872] data-[state=checked]:text-white focus-visible:ring-offset-0 focus-visible:ring-[#28B872]"
                         />
                         <Label
                             htmlFor="nearestDate"
-                            className="text-base font-normal text-gray-800 cursor-pointer select-none"
-                            style={{
-                                fontFamily: "'Century Gothic', sans-serif",
-                                fontWeight: 300,
-                            }}
+                            className="text-sm text-gray-800 cursor-pointer select-none"
                         >
                             Show only trips with nearest date
                         </Label>
                     </div>
-
-                    <div className="pt-4">
-                        <PrimaryButton type="submit" className="w-full">
-                            Apply Filters
-                        </PrimaryButton>
-                    </div>
                 </form>
-            </DialogContent>
-        </Dialog>
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 }

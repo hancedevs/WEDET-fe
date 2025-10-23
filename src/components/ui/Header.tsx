@@ -9,63 +9,8 @@ import type { User, Session, AuthChangeEvent } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import FilterOptionsModal from "@/components/modals/FilterModal";
 import IconButtons from "../home/IconsButton";
-
-/* ========= Helpers ========= */
-
-type DerivedIdentity = {
-    firstName: string | null;
-    lastName: string | null;
-    avatarUrl: string | null;
-};
-
-function deriveNameAndAvatar(user: User): DerivedIdentity {
-    // Metadata from Auth (email/password or OAuth claims mapped by Supabase)
-    const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
-    // Some providers also expose raw claims on the first identity
-    const id0 = (user.identities?.[0]?.identity_data ?? {}) as Record<
-        string,
-        unknown
-    >;
-
-    const pickStr = (
-        obj: Record<string, unknown>,
-        key: string
-    ): string | null =>
-        typeof obj[key] === "string" && obj[key] ? (obj[key] as string) : null;
-
-    const firstName =
-        pickStr(meta, "firstName") ??
-        pickStr(meta, "first_name") ??
-        pickStr(meta, "given_name") ??
-        pickStr(id0, "firstName") ??
-        pickStr(id0, "first_name") ??
-        pickStr(id0, "given_name") ??
-        (typeof meta["name"] === "string"
-            ? (meta["name"] as string).split(" ")[0]
-            : null) ??
-        (typeof id0["name"] === "string"
-            ? (id0["name"] as string).split(" ")[0]
-            : null) ??
-        (typeof user.email === "string" ? user.email.split("@")[0] : null);
-
-    const lastName =
-        pickStr(meta, "lastName") ??
-        pickStr(meta, "last_name") ??
-        pickStr(meta, "family_name") ??
-        pickStr(id0, "lastName") ??
-        pickStr(id0, "last_name") ??
-        pickStr(id0, "family_name");
-
-    const avatarUrl =
-        pickStr(meta, "avatar_url") ??
-        pickStr(meta, "picture") ??
-        pickStr(id0, "avatar_url") ??
-        pickStr(id0, "picture");
-
-    return { firstName, lastName, avatarUrl };
-}
-
-/* ========= Component ========= */
+import { getUserInfo } from "@/lib/utils";
+import FilterDropdown from "@/components/modals/FilterModal";
 
 export default function Header(): JSX.Element {
     const [firstName, setFirstName] = useState<string | null>(null);
@@ -88,7 +33,7 @@ export default function Header(): JSX.Element {
             const user = data.user;
             if (mounted) {
                 if (user) {
-                    const { firstName, avatarUrl } = deriveNameAndAvatar(user);
+                    const { firstName, avatarUrl } = getUserInfo(user);
                     setFirstName(firstName);
                     setAvatarUrl(avatarUrl);
                 } else {
@@ -110,7 +55,7 @@ export default function Header(): JSX.Element {
                     setAvatarUrl(null);
                     return;
                 }
-                const { firstName, avatarUrl } = deriveNameAndAvatar(user);
+                const { firstName, avatarUrl } = getUserInfo(user);
                 setFirstName(firstName);
                 setAvatarUrl(avatarUrl);
             }
@@ -163,30 +108,7 @@ export default function Header(): JSX.Element {
                     />
                 </div>
 
-                <div
-                    onClick={() => {
-                        setOpen(true);
-                        setActive(true);
-                    }}
-                    className={`cursor-pointer rounded-full transition-all duration-200 
-        ${
-            active
-                ? "ring-2 ring-green-500 ring-offset-3 shadow-[0_0_10px_2px_rgba(34,197,94,0.6)]"
-                : ""
-        }`}
-                >
-                    <Funnel
-                        size={25}
-                        strokeWidth={0.75}
-                        className="text-green-500"
-                    />
-                </div>
-
-                <FilterOptionsModal
-                    open={open}
-                    setOpen={setOpen}
-                    setActive={setActive}
-                />
+                <FilterDropdown />
             </div>
         </div>
     );
