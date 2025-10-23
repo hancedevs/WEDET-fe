@@ -44,6 +44,3 @@ export async function listAllTables() {
         console.error("Unexpected error:", err);
     }
 }
-
-// Example usage
-listAllTables();

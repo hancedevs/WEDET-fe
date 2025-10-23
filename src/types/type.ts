@@ -199,3 +199,17 @@ export interface Passenger {
 }
 
 export type Role = "normal_user" | "business_user";
+
+export interface ProfileOption {
+    label: string;
+    icon: React.ReactNode;
+    onClick: () => void;
+    color: string;
+}
+
+export interface BookingItem {
+    id: number;
+    name: string;
+    amount: number;
+    date: string;
+}

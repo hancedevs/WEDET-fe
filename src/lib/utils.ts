@@ -1,7 +1,7 @@
 import { Role } from "@/types/type";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import type { User as SupaUser } from "@supabase/supabase-js";
+import type { User as SupaUser, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabaseClient";
 
 export function cn(...inputs: ClassValue[]) {
@@ -62,4 +62,50 @@ export async function getUserRole(u: SupaUser): Promise<Role> {
         .maybeSingle();
     const row = data as UserRow;
     return isRole(row?.role) ? row.role : "normal_user";
+}
+
+export function getUserInfo(user: User) {
+    const meta = user.user_metadata ?? {};
+    const id0 = user.identities?.[0]?.identity_data ?? {};
+
+    const pickStr = (
+        obj: Record<string, unknown>,
+        key: string
+    ): string | null =>
+        typeof obj[key] === "string" && obj[key] ? (obj[key] as string) : null;
+
+    const firstName =
+        pickStr(meta, "firstName") ??
+        pickStr(meta, "first_name") ??
+        pickStr(meta, "given_name") ??
+        pickStr(id0, "firstName") ??
+        pickStr(id0, "first_name") ??
+        pickStr(id0, "given_name") ??
+        (typeof meta["name"] === "string"
+            ? (meta["name"] as string).split(" ")[0]
+            : null) ??
+        (typeof id0["name"] === "string"
+            ? (id0["name"] as string).split(" ")[0]
+            : null) ??
+        (typeof user.email === "string" ? user.email.split("@")[0] : null);
+
+    const lastName =
+        pickStr(meta, "lastName") ??
+        pickStr(meta, "last_name") ??
+        pickStr(meta, "family_name") ??
+        pickStr(id0, "lastName") ??
+        pickStr(id0, "last_name") ??
+        pickStr(id0, "family_name");
+
+    const avatarUrl =
+        pickStr(meta, "avatar_url") ??
+        pickStr(meta, "picture") ??
+        pickStr(id0, "avatar_url") ??
+        pickStr(id0, "picture");
+
+    const email = user.email ?? null;
+    const phone = user.phone ?? null;
+    const userId = user.id ?? null;
+
+    return { userId, firstName, lastName, email, phone, avatarUrl };
 }

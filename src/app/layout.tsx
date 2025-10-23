@@ -17,8 +17,6 @@ export default function RootLayout({
 }: {
     children: React.ReactNode;
 }) {
-    listAllTables();
-
     return (
         <html lang="en">
             <body className={inter.className}>
