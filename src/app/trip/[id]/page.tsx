@@ -189,7 +189,7 @@ export default function TourPage() {
     };
 
     return (
-        <div className="w-full mx-auto bg-white ">
+        <div className="w-full mx-auto  bg-white ">
             {/* HERO */}
             <div
                 className="relative h-[280px] sm:h-[350px] md:h-[400px] w-full overflow-hidden cursor-pointer"

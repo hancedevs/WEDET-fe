@@ -3,7 +3,7 @@ import { Skeleton } from "../ui/skeleton";
 const UserProfileSkeleton = () => {
     return (
         <div
-            className="min-h-screen bg-gray-50 pb-24"
+            className="min-h-screen bg-gray-50 pb-24 lg:w-[500px]"
             style={{ fontFamily: "'Century Gothic', sans-serif" }}
         >
             <div className="max-w-xl mx-auto p-4">

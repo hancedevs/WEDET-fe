@@ -8,12 +8,12 @@ function BookingsTab({
     profile: any;
 }) {
     return (
-        <div className="p-4">
+        <div className="lg:w-[500px]">
             <div className="relative mb-6">
                 <input
                     type="text"
                     placeholder="Search bookings..."
-                    className="w-full py-3 pl-12 pr-4 text-gray-700 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#28B872] transition shadow-sm"
+                    className="w-full py-3 pl-5 pr-4 text-gray-700 bg-white border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#28B872] transition shadow-sm"
                     style={{ fontFamily: "'Century Gothic', sans-serif" }}
                 />
             </div>
@@ -66,7 +66,7 @@ function BookingsTab({
                 {bookings.map((booking) => (
                     <div
                         key={booking.id}
-                        className="flex justify-between items-center pb-2 border-b border-gray-100"
+                        className="flex justify-between items-center pb-2 "
                     >
                         <div className="font-bold text-lg text-[#28B872]">
                             {booking.name}

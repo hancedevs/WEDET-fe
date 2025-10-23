@@ -98,7 +98,7 @@ export default function UserProfilePage() {
 
     return (
         <div
-            className="min-h-screen bg-white pb-24"
+            className="min-h-screen bg-white pb-36"
             style={{ fontFamily: "'Century Gothic', sans-serif" }}
         >
             <div className="max-w-xl mx-auto p-4">

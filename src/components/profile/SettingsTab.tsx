@@ -11,21 +11,7 @@ function SettingsTab({
     handleLogout: () => Promise<void>;
 }) {
     return (
-        <div className="p-4">
-            <div className="bg-white rounded-3xl shadow-lg p-6 mb-8 border border-gray-100 flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-[#28B872] flex items-center justify-center text-white text-2xl font-bold">
-                    <User className="w-8 h-8" />
-                </div>
-                <div>
-                    <div className="text-xl font-bold text-gray-900">
-                        {`${profile.firstName} ${profile.lastName}`}
-                    </div>
-                    <div className="text-gray-500 text-sm">
-                        {`${profile.email}`}
-                    </div>
-                </div>
-            </div>
-
+        <div className="lg:w-[500px]">
             <div className="bg-white rounded-3xl shadow-lg p-6 border border-gray-100">
                 <ul className="space-y-4">
                     {actionOptions.map((option, index) => (
