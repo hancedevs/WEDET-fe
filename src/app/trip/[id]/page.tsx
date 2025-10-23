@@ -470,36 +470,70 @@ export default function TourPage() {
                 </div>
                 <div className="fixed bottom-0 w-full bg-white p-4 sm:p-6">
                     <button
-                        className="w-full bg-[#28B872] hover:bg-[#28B880] text-white py-3 rounded-[35px] font-bold transition-colors text-sm sm:text-base cursor-pointer"
+                        className={`w-full flex items-center justify-center py-3 rounded-[35px] font-bold transition-colors text-sm sm:text-base cursor-pointer ${
+                            loading
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-[#28B872] hover:bg-[#28B880] text-white"
+                        }`}
                         onClick={async () => {
                             if (loading) return;
 
+                            setLoading(true);
                             const { data: userData } =
                                 await supabase.auth.getUser();
                             const user = userData?.user;
                             if (!user) {
                                 router.push(`/book/${numericId}/step1`);
+                                setLoading(false);
                                 return;
                             }
+
                             const { data: tickets } = await supabase
                                 .from("tickets")
                                 .select("id")
                                 .eq("user_id", user.id)
                                 .limit(1);
+
                             if (tickets && tickets.length > 0) {
                                 router.push(
                                     `/book/${numericId}/book-destination`
                                 );
                             } else {
-                                // router.push(`/book/${numericId}/step1`);
                                 router.push(
                                     `/book/${numericId}/book-destination`
                                 );
                             }
+
+                            setLoading(false);
                         }}
                         disabled={loading}
                     >
-                        {loading ? "…" : "Book now!"}
+                        {loading ? (
+                            <div className="flex items-center gap-2">
+                                <svg
+                                    className="animate-spin h-5 w-5 text-white"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                    ></circle>
+                                    <path
+                                        className="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                    ></path>
+                                </svg>
+                            </div>
+                        ) : (
+                            "Book now!"
+                        )}
                     </button>
                 </div>
             </div>

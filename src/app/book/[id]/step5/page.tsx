@@ -10,6 +10,7 @@ import {
     Calendar,
     Clock,
     ArrowLeft,
+    Home,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import NavBar from "@/components/ui/navBar";
@@ -260,7 +261,7 @@ export default function TicketPage() {
                     aria-label="Back"
                     className="w-9 h-9 inline-flex items-center justify-center rounded-full bg-[#ECECEC] shadow-[0_2px_6px_rgba(0,0,0,0.05)] active:scale-95 transition"
                 >
-                    <ArrowLeft size={20} className="text-[#28B872]" />
+                    <Home size={20} className="text-[#28B872]" />
                 </button>
             </div>
             <div

@@ -7,7 +7,7 @@ export default function SkeletonTopRecommended() {
         <div className="w-full">
             <div className="flex gap-2 justify-between pt-4 px-4"></div>
 
-            <div className="overflow-x-auto px-3">
+            <div className="overflow-x-auto px-3 hide-scrollbar">
                 <div className="flex gap-2 pb-4">
                     {Array.from({ length: 6 }).map((_, i) => (
                         <div key={i} className="shrink-0 w-56">

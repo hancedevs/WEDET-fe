@@ -107,7 +107,7 @@ export default function BookingPage() {
         <div className="min-h-screen bg-white flex flex-col relative font-sans">
             {/* Back button */}
             <button
-                onClick={() => router.push("/home")}
+                onClick={() => router.back()}
                 className="fixed top-5 left-4 w-9 h-9 flex items-center justify-center rounded-full bg-[#ECECEC] z-50 border-none"
             >
                 <ArrowLeft size={24} className="text-[#28B872]" />
