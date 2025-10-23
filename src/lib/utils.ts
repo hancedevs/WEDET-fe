@@ -109,3 +109,96 @@ export function getUserInfo(user: User) {
 
     return { userId, firstName, lastName, email, phone, avatarUrl };
 }
+
+const DEFAULT_TOUR_BUCKET = "tours";
+export const isFullUrl = (s?: string) => !!s && /^https?:\/\//i.test(s);
+export const isDataUrl = (s?: string) => !!s && /^data:/i.test(s);
+export const getStringField = (obj: Record<string, unknown>, k: string) =>
+    typeof obj[k] === "string" ? (obj[k] as string) : undefined;
+export const getNumberField = (obj: Record<string, unknown>, k: string) =>
+    typeof obj[k] === "number" && Number.isFinite(obj[k] as number)
+        ? (obj[k] as number)
+        : undefined;
+export const getStringArray = (v: unknown): string[] | undefined =>
+    Array.isArray(v) && v.every((x) => typeof x === "string")
+        ? (v as string[])
+        : undefined;
+
+export async function toSignedUrl(
+    bucket: string,
+    path: string,
+    secs = 60 * 60 * 6
+) {
+    const key = path.replace(new RegExp(`^${bucket}/`), "");
+    const { data, error } = await supabase.storage
+        .from(bucket)
+        .createSignedUrl(key, secs);
+    if (!error && data?.signedUrl) return data.signedUrl;
+    return supabase.storage.from(bucket).getPublicUrl(key).data.publicUrl;
+}
+export async function toImageUrlFromStorageKey(
+    path: string,
+    bucket = DEFAULT_TOUR_BUCKET
+) {
+    if (isFullUrl(path) || isDataUrl(path)) return path;
+    return toSignedUrl(bucket, path);
+}
+export function fmtMoneyStr(n?: number | null): string {
+    if (!Number.isFinite(n as number)) return "";
+    return new Intl.NumberFormat("en-ET", { maximumFractionDigits: 0 }).format(
+        n as number
+    );
+}
+export function diffDaysInclusive(
+    a?: string | null,
+    b?: string | null
+): number {
+    if (!a || !b) return 0;
+    const da = new Date(a);
+    const db = new Date(b);
+    if (Number.isNaN(da.getTime()) || Number.isNaN(db.getTime())) return 0;
+    const ms = db.getTime() - da.getTime();
+    return Math.max(1, Math.round(ms / (24 * 3600 * 1000)) + 1);
+}
+
+/** Build activities JSON string compatible with Detailfilter:
+ * {
+ *   "day1": { "activities": [{ "time": "08:00", "activity": "..." }], "meals": {...} },
+ *   "day2": { ... }
+ * }
+ */
+export function buildActivitiesJson(val: unknown): string | undefined {
+    // if DB already stores correct JSON string, keep it
+    if (typeof val === "string") {
+        try {
+            JSON.parse(val);
+            return val;
+        } catch {
+            /* fall through and try to convert */
+        }
+    }
+
+    // if we got an array of {time?, activity?}
+    if (Array.isArray(val)) {
+        const normalized = val
+            .filter((x) => x && typeof x === "object")
+            .map((x) => {
+                const o = x as Record<string, unknown>;
+                return {
+                    time: typeof o.time === "string" ? o.time : undefined,
+                    activity:
+                        typeof o.activity === "string" ? o.activity : undefined,
+                };
+            });
+
+        if (normalized.length) {
+            const obj: Record<string, unknown> = {};
+            // put all into day1 (we don't know day boundaries from array)
+            obj["day1"] = { activities: normalized };
+            return JSON.stringify(obj);
+        }
+    }
+
+    // give up
+    return undefined;
+}

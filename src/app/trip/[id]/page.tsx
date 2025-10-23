@@ -10,6 +10,7 @@ import {
     BadgeCheck,
     ArrowLeftCircle,
     ArrowLeft,
+    X, // Import the 'X' icon for closing the modal
 } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -19,95 +20,16 @@ import ResortPage from "@/components/ui/Bilbord";
 import TravelCard from "../../../components/ui/travelcard";
 import { supabase } from "@/lib/supabaseClient";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+    buildActivitiesJson,
+    diffDaysInclusive,
+    fmtMoneyStr,
+    getNumberField,
+    getStringArray,
+    getStringField,
+    toImageUrlFromStorageKey,
+} from "@/lib/utils";
 
-/* ---------- light helpers (no changes to your Detailfilter) ---------- */
-const DEFAULT_TOUR_BUCKET = "tours";
-const isFullUrl = (s?: string) => !!s && /^https?:\/\//i.test(s);
-const isDataUrl = (s?: string) => !!s && /^data:/i.test(s);
-const getStringField = (obj: Record<string, unknown>, k: string) =>
-    typeof obj[k] === "string" ? (obj[k] as string) : undefined;
-const getNumberField = (obj: Record<string, unknown>, k: string) =>
-    typeof obj[k] === "number" && Number.isFinite(obj[k] as number)
-        ? (obj[k] as number)
-        : undefined;
-const getStringArray = (v: unknown): string[] | undefined =>
-    Array.isArray(v) && v.every((x) => typeof x === "string")
-        ? (v as string[])
-        : undefined;
-
-async function toSignedUrl(bucket: string, path: string, secs = 60 * 60 * 6) {
-    const key = path.replace(new RegExp(`^${bucket}/`), "");
-    const { data, error } = await supabase.storage
-        .from(bucket)
-        .createSignedUrl(key, secs);
-    if (!error && data?.signedUrl) return data.signedUrl;
-    return supabase.storage.from(bucket).getPublicUrl(key).data.publicUrl;
-}
-async function toImageUrlFromStorageKey(
-    path: string,
-    bucket = DEFAULT_TOUR_BUCKET
-) {
-    if (isFullUrl(path) || isDataUrl(path)) return path;
-    return toSignedUrl(bucket, path);
-}
-function fmtMoneyStr(n?: number | null): string {
-    if (!Number.isFinite(n as number)) return "";
-    return new Intl.NumberFormat("en-ET", { maximumFractionDigits: 0 }).format(
-        n as number
-    );
-}
-function diffDaysInclusive(a?: string | null, b?: string | null): number {
-    if (!a || !b) return 0;
-    const da = new Date(a);
-    const db = new Date(b);
-    if (Number.isNaN(da.getTime()) || Number.isNaN(db.getTime())) return 0;
-    const ms = db.getTime() - da.getTime();
-    return Math.max(1, Math.round(ms / (24 * 3600 * 1000)) + 1);
-}
-
-/** Build activities JSON string compatible with Detailfilter:
- * {
- *   "day1": { "activities": [{ "time": "08:00", "activity": "..." }], "meals": {...} },
- *   "day2": { ... }
- * }
- */
-function buildActivitiesJson(val: unknown): string | undefined {
-    // if DB already stores correct JSON string, keep it
-    if (typeof val === "string") {
-        try {
-            JSON.parse(val);
-            return val;
-        } catch {
-            /* fall through and try to convert */
-        }
-    }
-
-    // if we got an array of {time?, activity?}
-    if (Array.isArray(val)) {
-        const normalized = val
-            .filter((x) => x && typeof x === "object")
-            .map((x) => {
-                const o = x as Record<string, unknown>;
-                return {
-                    time: typeof o.time === "string" ? o.time : undefined,
-                    activity:
-                        typeof o.activity === "string" ? o.activity : undefined,
-                };
-            });
-
-        if (normalized.length) {
-            const obj: Record<string, unknown> = {};
-            // put all into day1 (we don't know day boundaries from array)
-            obj["day1"] = { activities: normalized };
-            return JSON.stringify(obj);
-        }
-    }
-
-    // give up
-    return undefined;
-}
-
-/* ---------- page ---------- */
 export default function TourPage() {
     const router = useRouter();
     const { id } = useParams<{ id: string }>();
@@ -115,11 +37,12 @@ export default function TourPage() {
 
     const [loading, setLoading] = useState(true);
 
-    // slideshow
     const [currentImage, setCurrentImage] = useState(0);
     const [Images, setImages] = useState<string[]>([]);
 
-    // header data
+    // NEW STATE: To control the full-screen image preview
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
     const [title, setTitle] = useState("");
     const [locationText, setLocationText] = useState("");
     const [durationDays, setDurationDays] = useState(0);
@@ -130,7 +53,6 @@ export default function TourPage() {
     const [priceOldStr, setPriceOldStr] = useState("");
     const [groupSize, setGroupSize] = useState<number | undefined>(undefined);
 
-    // 👉 single object for Detailfilter
     const [tourData, setTourData] = useState<
         | {
               id?: number;
@@ -259,10 +181,20 @@ export default function TourPage() {
         };
     }, [numericId]);
 
+    // Function to handle image click and open the preview
+    const openImagePreview = () => {
+        if (Images.length > 0) {
+            setIsPreviewOpen(true);
+        }
+    };
+
     return (
         <div className="w-full mx-auto bg-white ">
             {/* HERO */}
-            <div className="relative h-[280px] sm:h-[350px] md:h-[400px] w-full overflow-hidden">
+            <div
+                className="relative h-[280px] sm:h-[350px] md:h-[400px] w-full overflow-hidden cursor-pointer"
+                onClick={openImagePreview} // ADDED: Click handler to open the preview
+            >
                 {(loading || Images.length === 0) && (
                     <Skeleton className="absolute inset-0 h-full w-full" />
                 )}
@@ -280,17 +212,24 @@ export default function TourPage() {
                 ))}
 
                 <div className="absolute inset-0 bg-black/40" />
+
+                {/* Controls (Back, Heart, Dots) are kept for good UX */}
                 <div className="absolute top-4 left-4 flex items-center gap-2 z-10">
-                    <button className="p-2 bg-white/80 rounded-full hover:bg-white">
-                        <ArrowLeft
-                            size={20}
-                            className="text-green-500"
-                            onClick={backToHome}
-                        />
+                    <button
+                        className="p-2 bg-white/80 rounded-full hover:bg-white"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            backToHome();
+                        }}
+                    >
+                        <ArrowLeft size={20} className="text-green-500" />
                     </button>
                 </div>
                 <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
-                    <button className="p-2 bg-white/80 rounded-full hover:bg-white">
+                    <button
+                        className="p-2 bg-white/80 rounded-full hover:bg-white"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <Heart size={20} className="text-green-500" />
                     </button>
                 </div>
@@ -298,7 +237,10 @@ export default function TourPage() {
                     {Images.map((_, index) => (
                         <button
                             key={index}
-                            onClick={() => setCurrentImage(index)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setCurrentImage(index);
+                            }}
                             className={`w-2 h-2 rounded-full transition-all ${
                                 currentImage === index
                                     ? "bg-green-500"
@@ -580,6 +522,78 @@ export default function TourPage() {
                     </button>
                 </div>
             </div>
+
+            {/* NEW: Full-Screen Image Preview Modal */}
+            {isPreviewOpen && Images.length > 0 && (
+                <div
+                    className="fixed inset-0 z-[100] bg-black flex items-center justify-center p-4"
+                    onClick={() => setIsPreviewOpen(false)}
+                >
+                    <button
+                        className="absolute top-4 right-4 p-2 bg-white/30 rounded-full hover:bg-white/50 z-20"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsPreviewOpen(false);
+                        }}
+                    >
+                        <X size={24} className="text-white" />
+                    </button>
+
+                    <div className="relative w-full h-full max-w-7xl max-h-screen">
+                        {/* Only display the current image in the modal */}
+                        <Image
+                            src={Images[currentImage]}
+                            alt={`Full-screen view of image ${
+                                currentImage + 1
+                            }`}
+                            fill
+                            className="object-contain"
+                            onClick={(e) => e.stopPropagation()} // Prevent modal close when clicking the image
+                        />
+
+                        {/* Navigation arrows for multiple images */}
+                        {Images.length > 1 && (
+                            <>
+                                <button
+                                    className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/20 rounded-full hover:bg-white/40 transition"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setCurrentImage(
+                                            (prev) =>
+                                                (prev - 1 + Images.length) %
+                                                Images.length
+                                        );
+                                    }}
+                                >
+                                    <ChevronLeft
+                                        size={24}
+                                        className="text-white"
+                                    />
+                                </button>
+                                <button
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/20 rounded-full hover:bg-white/40 transition"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setCurrentImage(
+                                            (prev) => (prev + 1) % Images.length
+                                        );
+                                    }}
+                                >
+                                    <ChevronLeft
+                                        size={24}
+                                        className="text-white transform rotate-180"
+                                    />
+                                </button>
+                            </>
+                        )}
+
+                        {/* Image counter */}
+                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white bg-black/50 px-3 py-1 rounded-full text-sm">
+                            {currentImage + 1} / {Images.length}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
