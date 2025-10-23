@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabaseClient";
 import type { User, Session, AuthChangeEvent } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import FilterOptionsModal from "@/components/modals/FilterModal";
+import IconButtons from "../home/IconsButton";
 
 /* ========= Helpers ========= */
 
@@ -71,6 +72,7 @@ export default function Header(): JSX.Element {
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [open, setOpen] = useState(false);
+    const [active, setActive] = useState(false);
 
     useEffect(() => {
         let mounted = true;
@@ -144,22 +146,7 @@ export default function Header(): JSX.Element {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-5">
-                    <div className="relative inline-block">
-                        <BellDot
-                            className="h-6 w-6 sm:h-6 sm:w-6"
-                            strokeWidth={1}
-                        />
-                        <span className="absolute top-1 right-0.5 h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-red-500 border border-white transform translate-x-1/4 -translate-y-1/4"></span>
-                    </div>
-                    <div className="relative inline-block">
-                        <MessageCircle
-                            className="h-6 w-6 sm:h-6 sm:w-6"
-                            strokeWidth={1}
-                        />
-                        <span className="absolute top-1 right-0.5 h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-red-500 border border-white transform translate-x-1/4 -translate-y-1/4"></span>
-                    </div>
-                </div>
+                <IconButtons />
             </div>
 
             <div className="flex flex-row gap-7 items-center px-3">
@@ -179,8 +166,14 @@ export default function Header(): JSX.Element {
                 <div
                     onClick={() => {
                         setOpen(true);
+                        setActive(true);
                     }}
-                    className="cursor-pointer"
+                    className={`cursor-pointer rounded-full transition-all duration-200 
+        ${
+            active
+                ? "ring-2 ring-green-500 ring-offset-3 shadow-[0_0_10px_2px_rgba(34,197,94,0.6)]"
+                : ""
+        }`}
                 >
                     <Funnel
                         size={25}
@@ -189,7 +182,11 @@ export default function Header(): JSX.Element {
                     />
                 </div>
 
-                <FilterOptionsModal open={open} setOpen={setOpen} />
+                <FilterOptionsModal
+                    open={open}
+                    setOpen={setOpen}
+                    setActive={setActive}
+                />
             </div>
         </div>
     );

@@ -39,9 +39,14 @@ type FilterFormValues = z.infer<typeof filterSchema>;
 type Props = {
     open: boolean;
     setOpen: (open: boolean) => void;
+    setActive: (open: boolean) => void;
 };
 
-export default function FilterOptionsModal({ open, setOpen }: Props) {
+export default function FilterOptionsModal({
+    open,
+    setOpen,
+    setActive,
+}: Props) {
     const form = useForm<FilterFormValues>({
         resolver: zodResolver(filterSchema),
         defaultValues: {
@@ -58,7 +63,13 @@ export default function FilterOptionsModal({ open, setOpen }: Props) {
     };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog
+            open={open}
+            onOpenChange={() => {
+                setOpen(false);
+                setActive(false);
+            }}
+        >
             <DialogContent
                 className="w-11/12 max-w-md p-6 rounded-2xl bg-white border-none shadow-2xl"
                 style={{ fontFamily: "'Century Gothic', sans-serif" }}
