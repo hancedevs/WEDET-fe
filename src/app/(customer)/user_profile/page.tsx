@@ -69,6 +69,16 @@ export default function UserProfilePage() {
 
     const router = useRouter();
 
+    const handleLogout = async () => {
+        const confirmLogout = window.confirm(
+            "Are you sure you want to log out?"
+        );
+        if (confirmLogout) {
+            alert("Logged out successfully!");
+            router.replace("/auth/login");
+        }
+    };
+
     useEffect(() => {
         const loadUser = async () => {
             const { data, error } = await supabase.auth.getUser();
@@ -180,9 +190,7 @@ export default function UserProfilePage() {
                             }
                             return option;
                         })}
-                        handleLogout={async () => {
-                            alert("Logged out successfully!");
-                        }}
+                        handleLogout={handleLogout}
                     />
                 )}
             </div>

@@ -87,9 +87,7 @@ export default function NavBar() {
                                                 "'Century Gothic', sans-serif",
                                             fontWeight: 300,
                                         }}
-                                    >
-                                        {item.label}
-                                    </span>
+                                    ></span>
                                 </div>
                             )}
                         </button>
