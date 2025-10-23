@@ -10,7 +10,8 @@ import {
     BadgeCheck,
     ArrowLeftCircle,
     ArrowLeft,
-    X, // Import the 'X' icon for closing the modal
+    X,
+    Verified, // Import the 'X' icon for closing the modal
 } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -211,7 +212,7 @@ export default function TourPage() {
                     />
                 ))}
 
-                <div className="absolute inset-0 bg-black/40" />
+                <div className="absolute inset-0 bg-black/10" />
 
                 {/* Controls (Back, Heart, Dots) are kept for good UX */}
                 <div className="absolute top-4 left-4 flex items-center gap-2 z-10">
@@ -252,80 +253,71 @@ export default function TourPage() {
             </div>
 
             <div className="relative z-20">
-                <div className="bg-white relative mt-[-1.5rem] left-1/2 transform -translate-x-1/2 w-full max-w-4xl border rounded-t-[35px] p-4 sm:p-5">
-                    <div className="mb-4 mt-3">
-                        {/* Title */}
-                        {loading ? (
-                            <Skeleton className="h-6 w-2/3 mb-2" />
-                        ) : title ? (
-                            <h1 className="text-xl sm:text-2xl font-bold">
-                                {title}
-                            </h1>
-                        ) : null}
-
-                        {/* Ratings row — skeletons only */}
-                        <div className="flex flex-wrap items-center mt-1 gap-2">
-                            <div className="flex items-center">
+                <div className="bg-white relative mt-[-1.5rem] left-1/2 transform -translate-x-1/2 w-full max-w-4xl border rounded-t-[35px] p-4 pb-36 sm:p-5">
+                    <div className="flex flex-wrap items-start justify-between gap-x-2 gap-y-0 mb-0">
+                        <div className="flex-1 min-w-[180px] flex flex-col gap-2">
+                            {loading ? (
+                                <Skeleton className="h-6 w-2/3 mb-0" />
+                            ) : title ? (
+                                <h1 className="text-lg sm:text-xl font-bold leading-tight break-words whitespace-normal max-w-full mb-1">
+                                    {title}
+                                </h1>
+                            ) : null}
+                            {/* Ratings and badge row */}
+                            <div className="flex items-center gap-2 mt-1">
                                 <Star
-                                    size={16}
+                                    size={15}
                                     className="text-yellow-500 fill-yellow-500"
                                 />
+                                <span className="text-sm font-semibold text-black">
+                                    4.7
+                                </span>
+                                <span className="text-xs text-gray-400 font-semibold">
+                                    (156 reviews)
+                                </span>
+                                <span className="px-2 py-0.5 rounded-full border border-green-400 text-green-600 text-xs font-semibold ml-2">
+                                    Moderate
+                                </span>
+                            </div>
+                            {/* Location row (untouched, uses real locationText) */}
+                            <div className="flex items-center mt-1 text-[#959494] font-light text-xs mb-3">
+                                <MapPin
+                                    size={15}
+                                    className="mr-1 text-[#28B872]"
+                                />
                                 {loading ? (
-                                    <Skeleton className="h-3 w-10 ml-2" />
+                                    <Skeleton className="h-3 w-24" />
+                                ) : locationText ? (
+                                    <span>{locationText}</span>
                                 ) : null}
                             </div>
-                            {loading ? <Skeleton className="h-3 w-24" /> : null}
-                            {loading ? (
-                                <Skeleton className="h-5 w-16 rounded-full" />
-                            ) : null}
                         </div>
-
-                        {/* Location */}
-                        <div className="flex items-center mt-2 text-[#959494] font-light text-sm">
-                            <MapPin size={14} className="mr-1 text-[#28B872]" />
-                            {loading ? (
-                                <Skeleton className="h-3 w-24" />
-                            ) : locationText ? (
-                                <span>{locationText}</span>
+                        {/* Price box - right-aligned, compact, vertical */}
+                        <div className="flex flex-col items-end min-w-[120px] max-w-full mt-1">
+                            {typeof discountPercent === "number" &&
+                                discountPercent > 0 && (
+                                    <span className="inline-block bg-[#F00505] rounded-full text-white px-3 py-0.5 font-bold text-xs whitespace-nowrap min-w-fit w-auto mb-2">
+                                        Save {discountPercent}%
+                                    </span>
+                                )}
+                            {priceNowStr ? (
+                                <span className="text-green-500 font-bold text-lg leading-tight">
+                                    {priceNowStr}
+                                </span>
                             ) : null}
-                        </div>
-
-                        {/* Price box */}
-                        <div className="absolute top-7 right-5 rounded-lg p-1 sm:p-3 text-right z-10">
-                            {loading ? (
-                                <>
-                                    <Skeleton className="h-5 w-24 rounded-3xl mb-2" />
-                                    <Skeleton className="h-6 w-24 mb-1" />
-                                    <Skeleton className="h-4 w-20" />
-                                </>
-                            ) : (
-                                <>
-                                    {typeof discountPercent === "number" &&
-                                        discountPercent > 0 && (
-                                            <div className="bg-[#F00505] rounded-[35px] text-white px-2 py-1 font-bold text-xs sm:text-sm">
-                                                Save {discountPercent}%
-                                            </div>
-                                        )}
-                                    {priceNowStr ? (
-                                        <div className="text-green-600 font-bold text-lg sm:text-xl">
-                                            {priceNowStr}
-                                        </div>
-                                    ) : null}
-                                    {priceOldStr ? (
-                                        <div className="text-[#A6A6A6] text-xs sm:text-sm line-through mr-2 sm:mr-6">
-                                            {priceOldStr}
-                                        </div>
-                                    ) : null}
-                                    <div className="text-[#A6A6A6] text-[10px] sm:text-xs mr-1 sm:mr-4">
-                                        {priceNowStr ? "per person" : ""}
-                                    </div>
-                                </>
-                            )}
+                            {priceOldStr ? (
+                                <span className="text-[#A6A6A6] text-xs line-through">
+                                    {priceOldStr}
+                                </span>
+                            ) : null}
+                            <span className="text-[#A6A6A6] text-xs font-semibold">
+                                {priceNowStr ? "per person" : ""}
+                            </span>
                         </div>
                     </div>
 
                     <div className="mb-6">
-                        <div className="flex flex-wrap font-bold gap-1 px-1 sm:px-13">
+                        <div className="flex flex-wrap font-bold gap-2 px-1 sm:px-13">
                             {["Wildlife", "Jungle", "Culture", "Wildlife"].map(
                                 (tag, i) => (
                                     <span
@@ -340,7 +332,7 @@ export default function TourPage() {
                     </div>
 
                     {/* Facts row */}
-                    <div className="mb-6 border border-[#E9F4F4] pl-8 sm:px-10 py-3 sm:py-5 rounded-[35px] flex justify-between sm:gap-0">
+                    <div className="mb-6 border border-[#E9F4F4] pl-8 sm:px-10 py-3 sm:py-5 rounded-[35px] flex flex-wrap justify-between gap-4 sm:gap-0">
                         <div className="min-w-[80px]">
                             <div className="text-xs text-[#959494]">
                                 Duration
@@ -353,7 +345,6 @@ export default function TourPage() {
                                 </div>
                             ) : null}
                         </div>
-
                         <div className="min-w-[80px]">
                             <div className="text-xs text-[#959494]">
                                 Group Size
@@ -367,7 +358,6 @@ export default function TourPage() {
                                 </div>
                             ) : null}
                         </div>
-
                         <div className="min-w-[80px]">
                             <div className="text-xs text-[#959494]">
                                 Min Age
@@ -375,106 +365,71 @@ export default function TourPage() {
                             {loading ? <Skeleton className="h-4 w-8" /> : null}
                         </div>
                     </div>
-
                     {/* Guide card (actual data) */}
-                    <div className="shadow-xl bg-white flex flex-col rounded-[35px] p-3 sm:p-4">
-                        <div className="flex flex-row justify-between items-center mb-4 flex-wrap sm:flex-nowrap">
+                    <div className="shadow-xl bg-white flex flex-col rounded-[35px] p-4 mb-6 ">
+                        <div className="flex flex-row justify-between items-center mb-4 flex-nowrap gap-4">
                             <div className="flex items-center gap-2 min-w-0">
-                                <Avatar className="h-12 w-12 sm:h-15 sm:w-15 border-2 border-green-500">
-                                    {profileLoading ? (
-                                        <AvatarFallback>
-                                            <Skeleton className="h-12 w-12 rounded-full" />
-                                        </AvatarFallback>
-                                    ) : (
-                                        <>
-                                            <AvatarImage
-                                                src={
-                                                    "https://github.com/shadcn.png"
-                                                }
-                                                alt={
-                                                    businessProfile?.business_name ||
-                                                    "Business"
-                                                }
-                                            />
-                                            <AvatarFallback>
-                                                {businessProfile?.business_name
-                                                    ?.substring(0, 2)
-                                                    .toUpperCase() || "BP"}
-                                            </AvatarFallback>
-                                        </>
-                                    )}
-                                </Avatar>
-                                <div className="min-w-0">
-                                    {profileLoading ? (
-                                        <>
-                                            <Skeleton className="h-4 w-32 mb-2" />
-                                            <Skeleton className="h-3 w-24" />
-                                        </>
-                                    ) : (
-                                        <>
-                                            <div className="flex gap-2 items-center">
-                                                <h3 className="font-bold text-sm sm:text-base truncate">
-                                                    {businessProfile?.business_name ||
-                                                        "Tour Operator"}
-                                                </h3>
-                                                <BadgeCheck
-                                                    strokeWidth={3}
-                                                    className="text-green-700 w-4 h-4 sm:w-5 sm:h-5"
-                                                />
-                                            </div>
-                                            <p className="text-gray-500 text-xs sm:text-sm truncate">
-                                                {"Professional tour guide"}
-                                            </p>
-                                        </>
-                                    )}
+                                <div className="h-12 w-12 sm:h-15 sm:w-15 rounded-full overflow-hidden border-2 border-green-500">
+                                    <img
+                                        src={"https://github.com/shadcn.png"} // Placeholder for the actual image, assuming shadcn.png is used here for simplicity as the original is an Ethiopian name and the code uses a placeholder
+                                        alt={"Abebe balcha"}
+                                        className="object-cover h-full w-full"
+                                    />
                                 </div>
-                            </div>
-
-                            <div className="flex flex-col items-end gap-1 min-w-[120px]">
-                                <span className="text-[#959494] font-semibold text-xs sm:text-sm truncate">
-                                    Your Expert Guide
-                                </span>
-                                {profileLoading ? (
-                                    <Skeleton className="h-4 w-10" />
-                                ) : (
-                                    <div className="flex items-center justify-end">
-                                        <Star
-                                            size={16}
-                                            className="text-yellow-500"
-                                        />
-                                        <span className="ml-1 text-sm font-medium">
-                                            4.8
+                                <div className="min-w-0">
+                                    <div className="flex gap-2 items-center">
+                                        <h3 className="font-bold text-base sm:text-lg truncate">
+                                            Abebe balcha
+                                        </h3>
+                                        {/* BadgeCheck icon (simulated with a green checkmark/emoji for pure HTML/Tailwind, or using a component if available) */}
+                                        <span className="text-green-700 w-5 h-5 font-extrabold text-xl leading-none">
+                                            <Verified />
                                         </span>
                                     </div>
-                                )}
+                                    <p className="text-gray-500 text-sm truncate">
+                                        18 years experience
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex flex-col items-end gap-1 min-w-[120px]">
+                                <span className="text-[#959494] font-semibold text-sm truncate">
+                                    Your Expert Guide
+                                </span>
+                                <div className="flex items-center  w-full justify-center">
+                                    {/* Star icon (simulated with a yellow star emoji) */}
+                                    <span className="text-yellow-500 text-lg leading-none">
+                                        &#9733;
+                                    </span>
+                                    <span className="ml-1 text-base font-medium">
+                                        4.7
+                                    </span>
+                                </div>
                             </div>
                         </div>
-
-                        <div className="ml-12">
-                            {profileLoading ? (
-                                <>
-                                    <Skeleton className="h-3 w-full mb-2" />
-                                    <Skeleton className="h-3 w-3/4" />
-                                </>
-                            ) : (
-                                <p className="text-[#959494] text-justify font-bold text-xs sm:text-sm px-2 sm:px-16 mb-4 max-w-[400]">
-                                    {businessProfile?.about ||
-                                        "Professional tour operator with extensive experience in creating memorable travel experiences."}
-                                </p>
-                            )}
+                        <div className="ml-0 sm:ml-0">
+                            <p className="text-[#4e4d4d] sm:text-left text-sm mb-4">
+                                Carlos is a naturalist guide born in the Amazon
+                                basin. His encyclopedic knowledge of rain
+                                ecology, combined with his ability to spot even
+                                the most elusive wildlife, makes him one of
+                                Peru's most respected jungle guides.
+                            </p>
+                            <p className="text-[#4e4d4d] text-justify font-bold text-sm mb-2">
+                                Specialties:
+                            </p>
                         </div>
-
-                        <div className="flex flex-wrap gap-1 px-1 sm:px-13">
-                            {["Adventure", "Culture", "Nature", "Guided"].map(
-                                (tag, i) => (
-                                    <span
-                                        key={i}
-                                        className="flex-1 text-center border border-[#E9F4F4] text-black font-semibold rounded-[35px] px-3 sm:px-3 py-1 text-xs sm:text-sm"
-                                    >
-                                        {tag}
-                                    </span>
-                                )
-                            )}
+                        <div className="flex flex-wrap gap-2">
+                            {["Wildlife", "jungle", "Culture"].map((tag, i) => (
+                                <span
+                                    key={i}
+                                    className="text-center border border-[#E9F4F4] text-black rounded-[35px] px-3 py-1 text-xs sm:text-sm shadow-sm"
+                                >
+                                    {tag}
+                                </span>
+                            ))}
+                            <span className="text-center border border-[#E9F4F4] text-black rounded-[35px] px-3 py-1 text-xs sm:text-sm shadow-sm">
+                                Wildlife
+                            </span>
                         </div>
                     </div>
 
@@ -512,9 +467,10 @@ export default function TourPage() {
                             agencyName=""
                         />
                     ) : null}
-
+                </div>
+                <div className="fixed bottom-0 w-full bg-white p-4 sm:p-6">
                     <button
-                        className="w-full bg-[#28B872] hover:bg-[#28B880] text-white py-3 mt-6 sm:mt-10 mb-16 sm:mb-20 rounded-[35px] font-bold transition-colors text-sm sm:text-base cursor-pointer"
+                        className="w-full bg-[#28B872] hover:bg-[#28B880] text-white py-3 rounded-[35px] font-bold transition-colors text-sm sm:text-base cursor-pointer"
                         onClick={() => router.push(`/book/${numericId}/step1`)}
                         disabled={loading}
                     >
