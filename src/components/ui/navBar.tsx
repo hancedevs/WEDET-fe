@@ -1,98 +1,201 @@
 "use client";
-import React from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { House, MapPin, User } from "lucide-react";
+import { House, LineSquiggle, MapPin, User } from "lucide-react";
+
+const NOTCH_WIDTH = 80;
+const NOTCH_HEIGHT = 25;
+const CONTROL_POINT_OFFSET = 25;
+const TAB_BAR_HEIGHT = 80;
+
+const createTabBarPath = (
+    currentTabIndex: number,
+    totalTabs: number,
+    containerWidth: number
+) => {
+    const TAB_WIDTH = containerWidth / totalTabs;
+
+    let path = `M0,0`;
+
+    const curveStart =
+        TAB_WIDTH * currentTabIndex +
+        TAB_WIDTH / 2 -
+        (NOTCH_WIDTH / 2 + CONTROL_POINT_OFFSET);
+    path += `L${curveStart},0`;
+
+    path += `Q${TAB_WIDTH * currentTabIndex + TAB_WIDTH / 2 - NOTCH_WIDTH / 2},0
+                ${
+                    TAB_WIDTH * currentTabIndex +
+                    TAB_WIDTH / 2 -
+                    NOTCH_WIDTH / 2 +
+                    CONTROL_POINT_OFFSET / 1.55
+                },${NOTCH_HEIGHT}`;
+
+    path += `L${TAB_WIDTH * currentTabIndex + TAB_WIDTH / 2 - 14},${
+        NOTCH_HEIGHT + 8.8
+    } `;
+
+    path += `Q${TAB_WIDTH * currentTabIndex + TAB_WIDTH / 2},${
+        NOTCH_HEIGHT + 15
+    } `;
+    path += `${TAB_WIDTH * currentTabIndex + TAB_WIDTH / 2 + 14},${
+        NOTCH_HEIGHT + 8.8
+    } `;
+
+    path += `L${
+        TAB_WIDTH * currentTabIndex +
+        TAB_WIDTH / 2 +
+        NOTCH_WIDTH / 2 -
+        CONTROL_POINT_OFFSET / 1.55
+    },${NOTCH_HEIGHT}`;
+
+    path += `Q${TAB_WIDTH * currentTabIndex + TAB_WIDTH / 2 + NOTCH_WIDTH / 2},0
+                ${
+                    TAB_WIDTH * currentTabIndex +
+                    TAB_WIDTH / 2 +
+                    NOTCH_WIDTH / 2 +
+                    CONTROL_POINT_OFFSET
+                },0`;
+
+    path += `L${containerWidth},0`;
+    path += `L${containerWidth},${TAB_BAR_HEIGHT} L0,${TAB_BAR_HEIGHT} Z`;
+
+    return path;
+};
 
 export default function NavBar() {
     const router = useRouter();
     const pathname = usePathname();
+    const navRef = useRef<HTMLElement | null>(null);
+    const [containerWidth, setContainerWidth] = useState(0);
+
+    const navItems = useMemo(
+        () => [
+            {
+                label: "Explore",
+                key: "explore",
+                icon: <House size={26} strokeWidth={1.5} />,
+                path: "/home",
+            },
+            {
+                label: "My Trips",
+                key: "trips",
+                icon: <LineSquiggle size={26} strokeWidth={1.5} />,
+                path: "/wishlist",
+            },
+            {
+                label: "Profile",
+                key: "profile",
+                icon: <User size={26} strokeWidth={1.5} />,
+                path: "/user_profile",
+            },
+        ],
+        []
+    );
+
+    const activeIndex = navItems.findIndex((item) => item.path === pathname);
+    const totalTabs = navItems.length;
+
+    useEffect(() => {
+        const updateWidth = () => {
+            if (navRef.current) {
+                // clientWidth is the inner width that matches how flex distributes space
+                setContainerWidth(navRef.current.clientWidth);
+            }
+        };
+
+        updateWidth();
+        window.addEventListener("resize", updateWidth);
+        return () => window.removeEventListener("resize", updateWidth);
+    }, []);
+
+    const svgPath = useMemo(() => {
+        if (containerWidth > 0) {
+            return createTabBarPath(
+                activeIndex === -1 ? 0 : activeIndex,
+                totalTabs,
+                containerWidth
+            );
+        }
+        return "";
+    }, [activeIndex, totalTabs, containerWidth]);
 
     const baseColor = "text-[#959494]";
-    const activeColor = "text-[#28B872]";
-
-    const navItems = [
-        {
-            label: "Explore",
-            key: "explore",
-            icon: <House size={26} strokeWidth={1.5} />,
-            path: "/home",
-        },
-        {
-            label: "My Trips",
-            key: "trips",
-            icon: <MapPin size={26} strokeWidth={1.5} />,
-            path: "/wishlist",
-        },
-        {
-            label: "Profile",
-            key: "profile",
-            icon: <User size={26} strokeWidth={1.5} />,
-            path: "/user_profile",
-        },
-    ];
 
     return (
-        <div className="fixed inset-x-0 bottom-0 z-50 p-4 pb-[env(safe-area-inset-bottom)] flex justify-center">
+        <div className="fixed inset-x-0 bottom-0 z-50 w-full">
             <nav
-                className="w-full max-w-sm h-16 bg-white rounded-full shadow-2xl flex justify-around items-center px-2"
-                style={{
-                    boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-                    minWidth: "280px",
-                }}
+                ref={navRef}
+                className="relative h-20 bg-transparent flex items-end w-full max-w-none "
                 aria-label="Bottom Navigation"
             >
-                {navItems.map((item) => {
-                    const isActive = pathname === item.path;
+                {containerWidth > 0 && (
+                    <svg
+                        viewBox={`0 0 ${containerWidth} ${TAB_BAR_HEIGHT}`}
+                        preserveAspectRatio="none"
+                        width="100%"
+                        height={TAB_BAR_HEIGHT}
+                        className="absolute bottom-0 left-0 right-0 z-0"
+                        style={{
+                            filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.1))",
+                        }}
+                        aria-hidden
+                    >
+                        <path d={svgPath} fill="#FFFFFF" />
+                    </svg>
+                )}
 
-                    return (
-                        <button
-                            key={item.key}
-                            onClick={() => router.push(item.path)}
-                            className={`
-                                flex flex-col items-center cursor-pointer justify-center h-full p-0 m-0 transition-all duration-300 ease-in-out
-                                relative z-10 ${isActive ? "w-1/4" : "w-1/3"}
-                                focus:outline-none 
-                            `}
-                            aria-label={item.label}
-                            aria-current={isActive ? "page" : undefined}
-                        >
-                            {isActive ? (
+                <div className="flex h-full w-full relative z-10 pb-2">
+                    {navItems.map((item, idx) => {
+                        const isActive = pathname === item.path;
+                        const iconTranslateY = isActive ? "-20px" : "0px";
+
+                        return (
+                            <button
+                                key={item.key}
+                                onClick={() => router.push(item.path)}
+                                className="flex-1 flex flex-col items-center justify-center h-full transition-all duration-300 ease-in-out focus:outline-none relative z-10"
+                                aria-label={item.label}
+                                aria-current={isActive ? "page" : undefined}
+                            >
                                 <div
-                                    className={`
-                                        w-14 h-14 rounded-full bg-white shadow-lg border-2 
-                                        flex items-center justify-center transition-all duration-300
-                                        ${baseColor} 
-                                    `}
+                                    className={`w-[50px] h-[50px] rounded-full flex items-center justify-center transition-all duration-300 ease-in-out ${
+                                        isActive
+                                            ? "bg-[#28B872] shadow-lg"
+                                            : "bg-transparent"
+                                    }`}
                                     style={{
-                                        borderColor: "rgba(40, 184, 114, 0.3)",
-                                        boxShadow:
-                                            "0 4px 10px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(40, 184, 114, 0.2)",
-                                        transform: "translateY(-20px)",
+                                        transform: `translateY(${iconTranslateY})`,
+                                        boxShadow: isActive
+                                            ? "0 4px 10px rgba(0, 0, 0, 0.1)"
+                                            : "none",
                                     }}
                                 >
-                                    <div className={activeColor}>
+                                    <div
+                                        className={
+                                            isActive ? "text-white" : baseColor
+                                        }
+                                    >
                                         {item.icon}
                                     </div>
                                 </div>
-                            ) : (
-                                <div
-                                    className={`flex flex-col items-center ${baseColor}`}
-                                >
-                                    {item.icon}
 
-                                    <span
-                                        className="text-xs mt-1"
-                                        style={{
-                                            fontFamily:
-                                                "'Century Gothic', sans-serif",
-                                            fontWeight: 300,
-                                        }}
-                                    ></span>
-                                </div>
-                            )}
-                        </button>
-                    );
-                })}
+                                <span
+                                    className={`text-xs mt-1 transition-all duration-300 ${
+                                        isActive
+                                            ? "text-[#28B872] font-semibold"
+                                            : baseColor
+                                    }`}
+                                    style={{
+                                        fontFamily: "'Fredoka', sans-serif",
+                                    }}
+                                >
+                                    {item.label}
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
             </nav>
         </div>
     );

@@ -72,7 +72,7 @@ export default function Header(): JSX.Element {
 
     return (
         <div className="flex flex-col gap-5">
-            <div className="flex items-center justify-between mt-4 mb-3 px-3">
+            <div className="flex items-center justify-between mt-4  px-3">
                 <div className="flex gap-1 items-center">
                     <Avatar className="h-12 w-12 border-2 border-green-500">
                         <AvatarImage
@@ -98,7 +98,7 @@ export default function Header(): JSX.Element {
                 <div className="relative flex-1">
                     <Input
                         className="w-full rounded-3xl pl-10 placeholder:text-gray-300 
-             border border-[#C0C0C0] 
+             
              focus:border-green-500 focus:ring-2 focus:ring-green-300 focus:outline-none"
                         placeholder="Search Destination"
                     />

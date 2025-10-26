@@ -9,89 +9,40 @@ import {
     CalendarDays,
     Calendar,
     Clock,
-    ArrowLeft,
     Home,
+    User, // Using User for Passenger icon
+    Plane, // Using Plane for the 'flight' element
+    CreditCard, // Using CreditCard for payment/total paid
+    Ticket, // Using Ticket for the main section
+    Tag,
+    ArrowBigDownDash,
+    TrainTrack,
+    MapPlus,
+    Map,
+    Group,
+    CircleUser,
+    Clock1,
+    IdCard,
+    ArrowLeft, // New icon for Guide/Host
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import NavBar from "@/components/ui/navBar";
 import { supabase } from "@/lib/supabaseClient";
-import Pintick from "../../../../../public/Pintick.png";
+import Pintick from "../../../../../public/Pintick.png"; // Assuming Pintick.png is the logo/avatar
+import {
+    diffDaysInclusive,
+    formatDateRange,
+    getNumberField,
+    getStringArray,
+    getStringField,
+    makeBookingId,
+    todayDDMMYYYY,
+    toImageUrlFromStorageKey,
+} from "@/lib/utils";
 
-const DEFAULT_TOUR_BUCKET = "tours";
+// --- Utility Functions (Kept as is for functionality) ---
+
 const FALLBACK_IMG = "/image2.jpg"; // ensure this exists in /public
 
-const isFullUrl = (s?: string) => !!s && /^https?:\/\//i.test(s);
-const isDataUrl = (s?: string) => !!s && /^data:/i.test(s);
-
-async function toSignedUrl(bucket: string, path: string, secs = 60 * 60 * 6) {
-    const key = path.replace(new RegExp(`^${bucket}/`), "");
-    const { data, error } = await supabase.storage
-        .from(bucket)
-        .createSignedUrl(key, secs);
-    if (!error && data?.signedUrl) return data.signedUrl;
-    return supabase.storage.from(bucket).getPublicUrl(key).data.publicUrl;
-}
-async function toImageUrlFromStorageKey(
-    path: string,
-    bucket = DEFAULT_TOUR_BUCKET
-) {
-    if (isFullUrl(path) || isDataUrl(path)) return path;
-    return toSignedUrl(bucket, path);
-}
-function getStringField(row: Record<string, unknown>, key: string) {
-    const v = row[key];
-    return typeof v === "string" ? v : undefined;
-}
-function getStringArray(val: unknown): string[] | undefined {
-    return Array.isArray(val) && val.every((x) => typeof x === "string")
-        ? (val as string[])
-        : undefined;
-}
-function getNumberField(row: Record<string, unknown>, key: string) {
-    const v = row[key];
-    return typeof v === "number" && Number.isFinite(v) ? v : undefined;
-}
-function diffDaysInclusive(a?: string | null, b?: string | null) {
-    if (!a || !b) return 0;
-    const da = new Date(a),
-        db = new Date(b);
-    if (Number.isNaN(da.getTime()) || Number.isNaN(db.getTime())) return 0;
-    const ms = db.getTime() - da.getTime();
-    return Math.max(1, Math.round(ms / 86400000) + 1);
-}
-function formatDateRange(start?: string | null, end?: string | null) {
-    if (!start || !end) return "";
-    const s = new Date(start),
-        e = new Date(end);
-    if (Number.isNaN(s.getTime()) || Number.isNaN(e.getTime())) return "";
-    const sameYear = s.getFullYear() === e.getFullYear();
-    const fmt = (d: Date, opts: Intl.DateTimeFormatOptions) =>
-        d.toLocaleDateString("en-US", opts);
-    return sameYear
-        ? `${fmt(s, { month: "short", day: "numeric" })}-${fmt(e, {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-          })}`
-        : `${fmt(s, { month: "short", day: "numeric", year: "numeric" })}-${fmt(
-              e,
-              { month: "short", day: "numeric", year: "numeric" }
-          )}`;
-}
-function todayDDMMYYYY(d = new Date()) {
-    const dd = String(d.getDate()).padStart(2, "0");
-    const mm = String(d.getMonth() + 1).padStart(2, "0");
-    const yyyy = d.getFullYear();
-    return `${dd}/${mm}/${yyyy}`;
-}
-function makeBookingId(tourId: number) {
-    // Example: WDT-2025-AB12CD  (timestamp + tour id)
-    const year = new Date().getFullYear();
-    const rand = Math.random().toString(36).slice(2, 8).toUpperCase();
-    return `WDT-${year}-${rand}${tourId.toString().padStart(2, "0")}`;
-}
-
-/* ===================== types ===================== */
 type TripSummaryData = {
     imageUrl: string;
     title: string;
@@ -101,7 +52,63 @@ type TripSummaryData = {
     guide: string;
 };
 
-/* ===================== component ===================== */
+const TicketDivider = () => (
+    <div className="relative my-6">
+        {/* Dashed line */}
+        <div className="border-t border-dashed border-gray-300 w-full" />
+        {/* Left Cutout Circle */}
+        <div
+            className="absolute top-1/2 -left-3 transform -translate-y-1/2 h-6 w-6 rounded-full bg-white z-10"
+            style={{ boxShadow: "inset 0 2px 4px rgba(0,0,0,0.06)" }} // Simulate inner shadow for depth
+        />
+        {/* Right Cutout Circle */}
+        <div
+            className="absolute top-1/2 -right-3 transform -translate-y-1/2 h-6 w-6 rounded-full bg-white z-10"
+            style={{ boxShadow: "inset 0 2px 4px rgba(0,0,0,0.06)" }} // Simulate inner shadow for depth
+        />
+    </div>
+);
+
+const SecondaryDetailItem: React.FC<{
+    Icon: React.ElementType;
+    label: string;
+    value: string | undefined | null;
+    loading: boolean;
+    // New prop to apply the style for the desired look
+    isSmall?: boolean;
+}> = ({ Icon, label, value, loading, isSmall = false }) => (
+    <div className="flex flex-col items-center justify-center text-center">
+        {" "}
+        {/* Center content */}
+        {/* Icon removed for closer resemblance to image's small detail section */}
+        <div>
+            <div className="flex ">
+                {Icon ? (
+                    <Icon
+                        className={`mb-1 ${
+                            isSmall ? "w-4 h-4" : "w-5 h-5"
+                        } text-gray-400`}
+                    />
+                ) : null}
+            </div>
+
+            {loading ? (
+                <Skeleton
+                    className={`h-4 ${isSmall ? "w-16" : "w-28"} mt-1 mx-auto`}
+                />
+            ) : (
+                <p
+                    className={`text-gray-400  leading-snug ${
+                        isSmall ? "text-sm" : "text-sm"
+                    }`}
+                >
+                    {value || "N/A"}
+                </p>
+            )}
+        </div>
+    </div>
+);
+
 export default function TicketPage() {
     const { id } = useParams<{ id: string }>();
     const numericId = useMemo(() => Number(id), [id]);
@@ -111,21 +118,18 @@ export default function TicketPage() {
     const [tripImage, setTripImage] = useState<string>(FALLBACK_IMG);
     const router = useRouter();
 
-    // a simple “booking” slice; if you persist data from earlier steps, read from localStorage
     const [travelerName, setTravelerName] = useState<string>("Guest Traveler");
     const [groupSize, setGroupSize] = useState<number>(1);
     const [bookedOn, setBookedOn] = useState<string>(todayDDMMYYYY());
-    const [totalPaid, setTotalPaid] = useState<number>(2900); // fallback total
+    const [totalPaid, setTotalPaid] = useState<number>(2900);
 
-    // price ingredients (if you stored them earlier, read from localStorage; otherwise compute)
     const [perPerson, setPerPerson] = useState<number>(2700);
     const serviceFee = 100;
     const processingFee = 25;
 
-    // booking id per tour, persisted so refresh doesn’t change it
     const [bookingId, setBookingId] = useState<string>("");
 
-    // 1) booking id bootstrap (independent of trip fetch)
+    // --- Original Logic for Data Fetching and State Initialization ---
     useEffect(() => {
         if (!numericId || Number.isNaN(numericId)) return;
         const key = `bookingId:${numericId}`;
@@ -142,7 +146,6 @@ export default function TicketPage() {
         }
     }, [numericId]);
 
-    // 2) read optional client-side info saved by earlier steps (if you wired it)
     useEffect(() => {
         try {
             const fn = localStorage.getItem("booking_firstName") || "";
@@ -157,7 +160,6 @@ export default function TicketPage() {
         setBookedOn(todayDDMMYYYY());
     }, []);
 
-    // 3) fetch trip from Supabase
     useEffect(() => {
         let mounted = true;
         (async () => {
@@ -183,7 +185,6 @@ export default function TicketPage() {
                 const start_date = getStringField(row, "start_date") ?? null;
                 const end_date = getStringField(row, "end_date") ?? null;
 
-                // image
                 let img = FALLBACK_IMG;
                 if (photos.length) {
                     try {
@@ -193,12 +194,11 @@ export default function TicketPage() {
                 }
                 setTripImage(img);
 
-                // text
                 const title =
                     tourName && destination
-                        ? `${tourName}`
+                        ? `${tourName}` // Using tourName as the main title
                         : tourName || destination || "Trip";
-                const location = destination;
+                const location = destination; // Using destination as the location
                 const dateRange = formatDateRange(start_date, end_date);
                 const days = diffDaysInclusive(start_date, end_date);
                 const duration = days > 0 ? `${days} days` : "";
@@ -216,7 +216,6 @@ export default function TicketPage() {
                     guide,
                 });
 
-                // price (prefer total, else price), compute totalPaid if not provided
                 const totalFromDb = getNumberField(row, "total");
                 const priceFromDb = getNumberField(row, "price");
                 const effectivePerPerson = totalFromDb ?? priceFromDb ?? 2700;
@@ -236,10 +235,8 @@ export default function TicketPage() {
         return () => {
             mounted = false;
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [numericId]);
+    }, [numericId, totalPaid, groupSize]);
 
-    // QR payload (unique, no static images; SVG via react-qr-code)
     const qrPayload = useMemo(() => {
         const payload = {
             v: 1,
@@ -247,218 +244,221 @@ export default function TicketPage() {
             tourId: numericId,
             name: travelerName,
             bookedOnISO: new Date().toISOString(),
-            verifyUrl: `/verify/${bookingId}`, // adjust if you expose a verify route
+            verifyUrl: `/verify/${bookingId}`,
         };
         return JSON.stringify(payload);
     }, [bookingId, numericId, travelerName]);
+    // --- End of Original Logic ---
+
+    // Derived values for the UI slots
+    const departureCityCode =
+        trip?.location.split(/\s|,/)[0]?.toUpperCase().slice(0, 3) || "TRP";
+    const arrivalCityCode = "DST"; // Destination is the end
+    const shortTitle = trip?.title.split(/\s/)[0] || "TOUR";
+    const dateForPass = bookedOn.replace(/\//g, "-");
+    const tripImageForAvatar = tripImage;
 
     return (
-        <div className="w-full min-h-screen flex flex-col items-center bg-white">
-            {/* Header */}
-            <div className="w-full flex justify-start mb-2 p-2">
+        <div className="w-full min-h-screen flex flex-col items-center bg-white p-4 sm:p-8 font-sans">
+            <div className="w-full max-w-xl flex justify-start mb-6">
                 <button
-                    onClick={() => router.push("/home")}
-                    aria-label="Back"
-                    className="w-9 h-9 inline-flex items-center justify-center rounded-full bg-[#ECECEC] shadow-[0_2px_6px_rgba(0,0,0,0.05)] active:scale-95 transition"
+                    className="p-2 bg-white/80 rounded-full hover:bg-white"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        router.back();
+                    }}
                 >
-                    <Home size={20} className="text-[#28B872]" />
+                    <ArrowLeft size={20} className="text-green-500" />
                 </button>
             </div>
-            <div
-                className="w-full max-w-md flex flex-col items-center px-6 py-8 shadow-lg"
-                style={{ backgroundColor: "#28B872" }}
-            >
-                <Image
-                    src={Pintick}
-                    alt="Pintick"
-                    width={120}
-                    height={120}
-                    className="mb-4"
-                />
-                <h1 className="text-2xl font-bold text-white">
-                    Adventure Booked
-                </h1>
-            </div>
 
-            {/* Digital Ticket card */}
-            <div
-                className="relative w-[93%] max-w-md px-4 py-7 my-5 mx-auto overflow-hidden"
-                style={{
-                    backgroundColor: "#28B872",
-                    borderRadius: "2.3rem",
-                }}
-            >
-                {/* Half Circle Bottom Left */}
-                <div className="absolute bottom-[-50px] left-6 w-20 h-20 bg-gradient-to-t from-green-500 to-green-300 rounded-full" />
-                {/* Half Circle Top Right */}
-                <div className="absolute -top-5 right-8 w-20 h-14 bg-gradient-to-b from-green-500 to-green-300 rounded-b-full" />
-                {/* Content */}
-                <div className="relative z-10 flex justify-between items-center">
-                    <div>
-                        <h3 className="text-white text-xl font-bold">
-                            Digital Ticket
-                        </h3>
-                        <p className="text-white text-sm font-semibold">
-                            Keep this safe for your trip
-                        </p>
-                    </div>
-                    <div className="text-right">
-                        <p className="text-white text-sm font-semibold">
-                            Booking ID
-                        </p>
-                        {bookingId ? (
-                            <p className="text-white text-base font-semibold">
-                                {bookingId}
+            {/* Main Ticket Container */}
+            <div className="w-full lg:w-[500px]   bg-white shadow-2xl rounded-3xl overflow-hidden">
+                {/* Boarding Pass Header (Dark green Section) */}
+                <div className="bg-[#28B872] text-white p-6 sm:p-8 rounded-t-3xl">
+                    <h1 className="text-xl font-extrabold mb-4 flex justify-center tracking-wide">
+                        Your Ticket
+                    </h1>
+
+                    {/* Passenger & Date Row */}
+                    <div className="flex justify-between items-center mb-6">
+                        <div className="flex items-center space-x-3">
+                            {/* Passenger Avatar (using trip image) */}
+                            <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border-2 border-white shadow-md">
+                                {loading ? (
+                                    <Skeleton className="w-full h-full rounded-full bg-white/50" />
+                                ) : (
+                                    <Image
+                                        src={tripImageForAvatar}
+                                        alt="Traveler"
+                                        width={40}
+                                        height={40}
+                                        className="object-cover w-full h-full"
+                                    />
+                                )}
+                            </div>
+                            <div className="flex flex-col items-start">
+                                <p className="text-sm text-green-200 font-medium uppercase leading-snug">
+                                    {trip?.location}
+                                </p>
+                                <div className="text-base font-bold leading-snug">
+                                    {loading ? (
+                                        <Skeleton className="h-4 w-28 bg-green-300" />
+                                    ) : (
+                                        travelerName
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex flex-col items-end">
+                            <p className="text-sm text-green-200 font-medium uppercase leading-snug">
+                                Booked On
                             </p>
-                        ) : (
-                            <Skeleton className="h-5 w-36" />
-                        )}
+                            <div className="text-base font-bold leading-snug">
+                                {loading ? (
+                                    <Skeleton className="h-4 w-20 bg-green-300" />
+                                ) : (
+                                    dateForPass
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Trip Route Row */}
+                    <div className="flex justify-between items-center text-center mt-4">
+                        {/* Departure (Location) */}
+                        <div className="flex flex-col items-start">
+                            <p className="text-4xl font-extrabold">
+                                {departureCityCode}
+                            </p>
+                            <p className="text-xs text-green-200 uppercase font-semibold mt-1">
+                                {trip?.location || "Loading..."}
+                            </p>
+                        </div>
+
+                        {/* Middle Icon and Name (Trip ID) */}
+                        <div className="flex flex-col items-center">
+                            <Ticket className="w-8 h-8 text-green-200 mb-1 " />
+                            <p className="text-sm font-bold tracking-wider">
+                                {shortTitle}
+                            </p>
+                            <p className="text-xs text-green-200">
+                                {bookingId
+                                    ? `ID: ${bookingId.slice(-6)}`
+                                    : "AG 865"}
+                            </p>
+                        </div>
+                        {/* Arrival (Title) - Using Title as destination */}
+                        <div className="flex flex-col items-end">
+                            <p className="text-4xl font-extrabold">
+                                {arrivalCityCode}
+                            </p>
+                            <p className="text-xs text-green-200 uppercase font-semibold mt-1 ">
+                                {trip?.title || "Loading..."}
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Ticket Summary */}
-            <div className="flex items-center space-x-4 mt-6 w-[90%] max-w-md">
-                {/* Image */}
-                <div className="w-22 h-22 rounded-2xl overflow-hidden flex-shrink-0">
-                    {loading ? (
-                        <Skeleton className="w-20 h-20 rounded-2xl" />
-                    ) : (
-                        <Image
-                            src={tripImage}
-                            alt={trip?.title || "Trip"}
-                            width={80}
-                            height={80}
-                            className="object-cover w-full h-full"
+                {/* Ticket Body (White Section) */}
+                <div className="p-6 sm:p-8">
+                    {/* Main QR Code Section */}
+                    <div className="flex flex-col items-center justify-center mb-6">
+                        {/* Title Above QR Code */}
+
+                        <div className="bg-white p-4 rounded-xl shadow-xl border border-gray-100">
+                            {bookingId ? (
+                                <QRCode
+                                    value={qrPayload}
+                                    size={200} // Slightly larger for prominence
+                                    level="H"
+                                    className="p-1"
+                                    viewBox={`0 0 200 200`} // Ensure proper scaling
+                                />
+                            ) : (
+                                <Skeleton className="w-[200px] h-[200px] rounded-lg" />
+                            )}
+                        </div>
+                    </div>
+
+                    <TicketDivider />
+
+                    <div className="grid grid-cols-4 gap-y-2 gap-x-2 text-sm text-center">
+                        <SecondaryDetailItem
+                            Icon={IdCard} // Icon not visible, but kept for context
+                            label=""
+                            value={`${bookingId.slice(-6)}`} // Hardcoded example
+                            loading={loading}
+                            isSmall={true}
                         />
-                    )}
-                </div>
+                        <SecondaryDetailItem
+                            Icon={Users} // Icon not visible, but kept for context
+                            label=""
+                            value={`${groupSize} ${
+                                groupSize === 1 ? " person" : " people"
+                            }`} // Hardcoded example
+                            loading={loading}
+                            isSmall={true}
+                        />
+                        <SecondaryDetailItem
+                            Icon={CircleUser} // Icon not visible, but kept for context
+                            label=""
+                            value={trip?.guide} // Hardcoded example
+                            loading={loading}
+                            isSmall={true}
+                        />
+                        <SecondaryDetailItem
+                            Icon={Clock1} // Icon not visible, but kept for context
+                            label=""
+                            value={trip?.duration} // Hardcoded example
+                            loading={loading}
+                            isSmall={true}
+                        />
+                    </div>
 
-                {/* Trip Info */}
-                <div className="flex-1">
-                    {loading ? (
-                        <>
-                            <Skeleton className="h-4 w-48 mb-1" />
-                            <Skeleton className="h-3 w-32 mb-2" />
-                            <div className="flex items-center space-x-4 mt-1">
-                                <Skeleton className="h-3 w-24" />
-                                <Skeleton className="h-3 w-16" />
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            <h1 className="text-black font-bold text-base">
-                                {trip?.title}
-                            </h1>
-                            <p className="text-gray-500 text-sm">
-                                {trip?.location}
+                    <TicketDivider />
+
+                    {/* Total Paid / Cost Summary */}
+                    <div className="bg-green-50 border border-green-100 rounded-2xl p-4 sm:p-5 flex flex-row items-center justify-between shadow-sm">
+                        <div className="flex items-center gap-2">
+                            <CreditCard className="w-6 h-6 text-green-500" />
+                            <p className="text-gray-500 font-semibold text-sm sm:text-base">
+                                Total Paid
                             </p>
-                            <div className="flex items-center space-x-4 mt-1 text-black-500 text-sm">
-                                <div className="flex items-center space-x-1">
-                                    <Calendar className="w-4 h-4 text-green-600" />
-                                    <span>{trip?.dateRange}</span>
-                                </div>
-                                <div className="flex items-center space-x-1">
-                                    <Clock className="w-4 h-4 text-green-600" />
-                                    <span>{trip?.duration}</span>
-                                </div>
-                            </div>
-                        </>
-                    )}
+                        </div>
+
+                        {loading ? (
+                            <Skeleton className="h-8 w-32 rounded-lg" />
+                        ) : (
+                            <h3 className="text-green-500 text-xl sm:text-xl font-extrabold tracking-tight">
+                                {totalPaid.toLocaleString()} Br
+                            </h3>
+                        )}
+                    </div>
+                </div>
+                <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-center rounded-b-3xl">
+                    <button className="w-full max-w-sm py-3 px-6 bg-[#28B872] text-white font-bold rounded-full text-lg shadow-lg hover:bg-green-600 transition duration-300 flex items-center justify-center">
+                        <span className="mr-2">Download Ticket</span>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="lucide lucide-download"
+                        >
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" x2="12" y1="15" y2="3" />
+                        </svg>
+                    </button>
                 </div>
             </div>
-
-            <hr className="border-t border-gray-300 my-6 w-[90%] max-w-md" />
-
-            {/* Detail Info */}
-            <div className="w-[95%] max-w-md grid grid-cols-2 gap-y-6 gap-x-6 px-2">
-                {/* Traveler */}
-                <div className="flex items-start space-x-2">
-                    <Users className="text-green-600 w-8 h-8 mt-1" />
-                    <div>
-                        <p className="text-gray-400 text-sm">Traveler</p>
-                        {loading ? (
-                            <Skeleton className="h-4 w-40" />
-                        ) : (
-                            <p className="text-black font-semibold">
-                                {travelerName}
-                            </p>
-                        )}
-                    </div>
-                </div>
-                {/* Group Size */}
-                <div className="flex items-start space-x-2">
-                    <Users className="text-green-600 w-8 h-8 mt-1" />
-                    <div>
-                        <p className="text-gray-400 text-sm">Group Size</p>
-                        {loading ? (
-                            <Skeleton className="h-4 w-16" />
-                        ) : (
-                            <p className="text-black font-semibold">
-                                {groupSize}{" "}
-                                {groupSize === 1 ? "person" : "people"}
-                            </p>
-                        )}
-                    </div>
-                </div>
-                {/* Guide */}
-                <div className="flex items-start space-x-2">
-                    <MapPin className="text-green-600 w-8 h-8 mt-1" />
-                    <div>
-                        <p className="text-gray-400 text-sm">Guide</p>
-                        {loading ? (
-                            <Skeleton className="h-4 w-32" />
-                        ) : (
-                            <p className="text-black font-semibold">
-                                {trip?.guide}
-                            </p>
-                        )}
-                    </div>
-                </div>
-                {/* Booked On */}
-                <div className="flex items-start space-x-2">
-                    <CalendarDays className="text-green-600 w-8 h-8 mt-1" />
-                    <div>
-                        <p className="text-gray-400 text-sm">Booked On</p>
-                        {loading ? (
-                            <Skeleton className="h-4 w-24" />
-                        ) : (
-                            <p className="text-black font-semibold">
-                                {bookedOn}
-                            </p>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-            <hr className="border-t border-gray-300 my-6 w-[90%] max-w-md" />
-
-            {/* QR + Payment */}
-            <div className="flex flex-col items-center">
-                {/* QR: dynamic SVG (not a static image) */}
-                <div className="bg-green-100 p-5 rounded-3xl shadow-md flex items-center justify-center">
-                    {bookingId ? (
-                        <QRCode value={qrPayload} size={200} />
-                    ) : (
-                        <Skeleton className="w-[200px] h-[200px] rounded-xl" />
-                    )}
-                </div>
-
-                <hr className="border-t border-gray-300 my-6 w-[95%] max-w-md" />
-
-                {/* Payment Info */}
-                <div className="bg-gray-100 px-6 py-3 rounded-lg text-center shadow-sm">
-                    <p className="text-gray-500 text-sm">Total Paid</p>
-                    {loading ? (
-                        <Skeleton className="h-7 w-28 mx-auto my-1" />
-                    ) : (
-                        <h3 className="text-green-600 font-bold text-xl">
-                            {totalPaid.toLocaleString()}Br
-                        </h3>
-                    )}
-                    <p className="text-gray-500 text-sm">Payment confirmed</p>
-                </div>
-            </div>
+            <div className="h-10"></div>
         </div>
     );
 }

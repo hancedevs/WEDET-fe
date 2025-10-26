@@ -33,7 +33,7 @@ export default function Page(): JSX.Element {
     const showInitialSkeletons = loading && cards.length === 0;
 
     return (
-        <div className="px-2.5 pb-32">
+        <div className=" pb-32">
             {/* Top Recommended */}
             {showInitialSkeletons ? (
                 <SkeletonTopRecommended />

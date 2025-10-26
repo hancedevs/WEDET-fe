@@ -202,3 +202,34 @@ export function buildActivitiesJson(val: unknown): string | undefined {
     // give up
     return undefined;
 }
+
+export function formatDateRange(start?: string | null, end?: string | null) {
+    if (!start || !end) return "";
+    const s = new Date(start),
+        e = new Date(end);
+    if (Number.isNaN(s.getTime()) || Number.isNaN(e.getTime())) return "";
+    const sameYear = s.getFullYear() === e.getFullYear();
+    const fmt = (d: Date, opts: Intl.DateTimeFormatOptions) =>
+        d.toLocaleDateString("en-US", opts);
+    return sameYear
+        ? `${fmt(s, { month: "short", day: "numeric" })}-${fmt(e, {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+          })}`
+        : `${fmt(s, { month: "short", day: "numeric", year: "numeric" })}-${fmt(
+              e,
+              { month: "short", day: "numeric", year: "numeric" }
+          )}`;
+}
+export function todayDDMMYYYY(d = new Date()) {
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yyyy = d.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+}
+export function makeBookingId(tourId: number) {
+    const year = new Date().getFullYear();
+    const rand = Math.random().toString(36).slice(2, 8).toUpperCase();
+    return `WDT-${year}-${rand}${tourId.toString().padStart(2, "0")}`;
+}

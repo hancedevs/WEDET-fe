@@ -7,13 +7,13 @@ import type { NavItem, NavbarProps } from "@/types/type";
 
 const items = [
     {
-        href: "/Dashbord/TourDash",
+        href: "/TourDash",
         label: "Explore",
         value: "dashbord",
         Icon: House,
     },
     {
-        href: "/Dashbord/TourDash",
+        href: "/Tourlist",
         label: "My Trips",
         value: "my-trips",
         Icon: MapPin,

@@ -253,7 +253,7 @@ export default function TourPage() {
             </div>
 
             <div className="relative z-20">
-                <div className="bg-white relative mt-[-1.5rem] left-1/2 transform -translate-x-1/2 w-full max-w-4xl border rounded-t-[35px] p-4 pb-36 sm:p-5">
+                <div className="bg-white relative mt-[-1.5rem] left-1/2 transform -translate-x-1/2 w-full max-w-4xl shadow-lg rounded-t-[35px] p-4 pb-36 lg:mb-36 sm:p-5">
                     <div className="flex flex-wrap items-start justify-between gap-x-2 gap-y-0 mb-0">
                         <div className="flex-1 min-w-[180px] flex flex-col gap-2">
                             {loading ? (
@@ -468,9 +468,9 @@ export default function TourPage() {
                         />
                     ) : null}
                 </div>
-                <div className="fixed bottom-0 w-full bg-white p-4 sm:p-6">
+                <div className="fixed bottom-0 w-full bg-white p-4 sm:p-6 lg:flex lg:justify-center">
                     <button
-                        className={`w-full flex items-center justify-center py-3 rounded-[35px] font-bold transition-colors text-sm sm:text-base cursor-pointer ${
+                        className={`w-full lg:w-1/2 xl:w-1/3 flex items-center justify-center py-3 rounded-[35px] font-bold transition-colors text-sm sm:text-base cursor-pointer ${
                             loading
                                 ? "bg-gray-400 cursor-not-allowed"
                                 : "bg-[#28B872] hover:bg-[#28B880] text-white"

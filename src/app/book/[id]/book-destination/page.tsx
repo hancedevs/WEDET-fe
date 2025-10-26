@@ -1,8 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, CreditCard, Landmark } from "lucide-react";
+import { ArrowLeft, MinusIcon, PlusIcon } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
-
 import { supabase } from "@/lib/supabaseClient";
 import PaymentMethods from "@/components/Banks/SelectBank";
 
@@ -22,24 +21,23 @@ function ThickCheck({ className = "" }) {
 
 export default function BookingPage() {
     const [seats, setSeats] = useState(4);
-    const maxSeats = 14;
-    const seatPrice = 575;
     const [bookingType, setBookingType] = useState("team");
     const [payment, setPayment] = useState("tell_birr");
     const [previousTickets, setPreviousTickets] = useState<any[]>([]);
     const [userId, setUserId] = useState<string | null>(null);
     const [tripInfo, setTripInfo] = useState<any>(null);
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
     const params = useParams();
     const tourId = params?.id;
+    const maxSeats = 14;
+    const seatPrice = 575;
 
     useEffect(() => {
-        // Fetch current user
         supabase.auth.getUser().then(({ data }) => {
             const user = data?.user;
             if (user) {
                 setUserId(user.id);
-                // Fetch any previous ticket for this user (any trip)
                 supabase
                     .from("tickets")
                     .select("*")
@@ -52,7 +50,6 @@ export default function BookingPage() {
     }, []);
 
     useEffect(() => {
-        // Fetch trip info from Supabase
         if (!tourId) return;
         supabase
             .from("tours")
@@ -64,68 +61,23 @@ export default function BookingPage() {
             });
     }, [tourId]);
 
-    // Format date range
-    function formatDateRange(start?: string | null, end?: string | null) {
-        if (!start || !end) return "";
-        const s = new Date(start),
-            e = new Date(end);
-        if (Number.isNaN(s.getTime()) || Number.isNaN(e.getTime())) return "";
-        const sameYear = s.getFullYear() === e.getFullYear();
-        const fmt = (d: Date, opts: Intl.DateTimeFormatOptions) =>
-            d.toLocaleDateString("en-US", opts);
-        return sameYear
-            ? `${fmt(s, { month: "short", day: "numeric" })}-${fmt(e, {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-              })}`
-            : `${fmt(s, {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-              })}-${fmt(e, {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-              })}`;
-    }
-    function diffDaysInclusive(a?: string | null, b?: string | null) {
-        if (!a || !b) return 0;
-        const da = new Date(a),
-            db = new Date(b);
-        if (Number.isNaN(da.getTime()) || Number.isNaN(db.getTime())) return 0;
-        const ms = db.getTime() - da.getTime();
-        return Math.max(1, Math.round(ms / 86400000) + 1);
-    }
-
-    // Use real group size and price if available
     const groupSize = tripInfo?.group_number ?? maxSeats;
     const pricePerSeat = tripInfo?.total ?? tripInfo?.price ?? seatPrice;
     const totalPrice = seats * pricePerSeat;
 
     return (
-        <div className="min-h-screen bg-white flex flex-col relative font-sans">
-            {/* Back button */}
-            <button
-                onClick={() => router.back()}
-                className="fixed top-5 left-4 w-9 h-9 flex items-center justify-center rounded-full bg-[#ECECEC] z-50 border-none"
-            >
-                <ArrowLeft size={24} className="text-[#28B872]" />
-            </button>
-
-            <div
-                className="
-          flex-1 w-full mx-auto flex flex-col gap-3
-          pt-16 pb-24 px-2 sm:px-3 md:px-4
-          max-w-[480px] sm:max-w-[560px] md:max-w-[680px] lg:max-w-[760px]
-        "
-                style={{ minHeight: "100vh" }}
-            >
+        <div className="min-h-screen lg:w-[500px] bg-white flex flex-col relative font-sans">
+            <div className="flex-1 w-full mx-auto flex flex-col gap-3 pt-16 pb-24 px-2 sm:px-3 md:px-4 max-w-[760px]">
+                <button
+                    onClick={() => router.back()}
+                    className="fixed top-5 left-4 w-9 h-9 flex items-center justify-center rounded-full bg-[#ECECEC] z-50 border-none"
+                >
+                    <ArrowLeft size={24} className="text-[#28B872]" />
+                </button>
                 <span className="text-sm font-bold text-[#BEBEBE] ml-2">
                     Available space or seats
                 </span>
 
-                {/* Seats Card */}
                 <div className="bg-white border-2 rounded-[26px] border-[#E8E8E8] shadow-[0_2px_8px_#00000010] px-4 py-4 flex flex-col gap-2">
                     <div className="flex items-center justify-between gap-2 flex-wrap">
                         <div className="flex flex-col justify-between gap-1">
@@ -141,20 +93,6 @@ export default function BookingPage() {
                             </span>
                         </div>
                         <div className="flex items-center gap-2 mt-2">
-                            {/* Plus button */}
-                            <button
-                                className="w-8 h-8 flex  justify-center rounded-full bg-[#28B872] text-white text-xl font-bold active:scale-95 transition border border-[#28B872]"
-                                onClick={() =>
-                                    setSeats((s) => Math.min(groupSize, s + 1))
-                                }
-                                aria-label="Add seat"
-                            >
-                                +
-                            </button>
-                            <span className="ml-2 px-6 py-2 bg-[#F4F4F4] text-[#4B4B4B] text-lg font-extrabold rounded-[20px] shadow-inner flex items-center justify-center min-w-[44px]">
-                                {seats}
-                            </span>
-                            {/* Minus button  */}
                             <button
                                 className="w-8 h-8 flex justify-center rounded-full bg-white text-[#28B872] text-xl font-bold active:scale-95 transition border border-[#28B872]"
                                 onClick={() =>
@@ -162,12 +100,23 @@ export default function BookingPage() {
                                 }
                                 aria-label="Remove seat"
                             >
-                                –
+                                -
                             </button>
-                            {/* Count */}
+
+                            <span className="ml-2 px-6 py-2 bg-[#F4F4F4] text-[#4B4B4B] text-lg font-extrabold rounded-[20px] shadow-inner flex items-center justify-center min-w-[44px]">
+                                {seats}
+                            </span>
+                            <button
+                                className="w-8 h-8 flex justify-center rounded-full bg-[#28B872] text-white text-xl font-bold active:scale-95 transition border border-[#28B872]"
+                                onClick={() =>
+                                    setSeats((s) => Math.min(groupSize, s + 1))
+                                }
+                                aria-label="Add seat"
+                            >
+                                +
+                            </button>
                         </div>
                     </div>
-                    {/* Price row */}
                     <div className="flex justify-end">
                         <span className="text-[#28B872] font-bold text-base">
                             Total {totalPrice.toLocaleString()} Br
@@ -181,14 +130,12 @@ export default function BookingPage() {
 
                 <div className="bg-white rounded-[26px] border-2 border-[#E8E8E8] shadow-[0_2px_8px_#00000010] px-4 py-4">
                     <div className="flex flex-col gap-3">
-                        {/* Team */}
                         <button
-                            className={`flex items-center border-2 gap-3 w-full px-2 py-3 rounded-full transition
-                ${
-                    bookingType === "team"
-                        ? "border-2 border-[#28B872] shadow-[0_1.5px_8px_#28B87208] bg-white"
-                        : "bg-white border border-[#E8E8E8]"
-                }`}
+                            className={`flex items-center border-2 gap-3 w-full px-2 py-3 rounded-full transition ${
+                                bookingType === "team"
+                                    ? "border-[#28B872] shadow-[0_1.5px_8px_#28B87208] bg-white"
+                                    : "bg-white border border-[#E8E8E8]"
+                            }`}
                             onClick={() => setBookingType("team")}
                         >
                             <span
@@ -212,14 +159,13 @@ export default function BookingPage() {
                                 Team
                             </span>
                         </button>
-                        {/* Personal */}
+
                         <button
-                            className={`flex items-center gap-3 border-2 w-full px-2 py-3 rounded-full transition
-                ${
-                    bookingType === "personal"
-                        ? "border-2 border-[#28B872] shadow-[0_1.5px_8px_#28B87208] bg-white"
-                        : "bg-white border border-[#E8E8E8]"
-                }`}
+                            className={`flex items-center gap-3 border-2 w-full px-2 py-3 rounded-full transition ${
+                                bookingType === "personal"
+                                    ? "border-[#28B872] shadow-[0_1.5px_8px_#28B87208] bg-white"
+                                    : "bg-white border border-[#E8E8E8]"
+                            }`}
                             onClick={() => setBookingType("personal")}
                         >
                             <span
@@ -248,7 +194,6 @@ export default function BookingPage() {
 
                 <PaymentMethods />
 
-                {/* Summary Card  */}
                 <div className="bg-white rounded-[26px] border-2 border-[#E8E8E8] shadow-[0_2px_8px_#00000010] px-4 py-4 flex flex-col mb-3">
                     <div className="text-sm font-bold text-[#BEBEBE] mb-2">
                         Summary
@@ -269,62 +214,100 @@ export default function BookingPage() {
                     </div>
                 </div>
 
-                {/* PAY BUTTON */}
                 <div className="w-full flex justify-center mb-4">
                     <button
-                        className="w-full max-w-[370px] bg-[#28B872] text-white text-xl font-bold py-3 rounded-full shadow-[0_2px_12px_#28B87233]"
+                        className={`w-full flex items-center justify-center py-3 rounded-[35px] font-bold transition-colors text-sm sm:text-base ${
+                            loading
+                                ? "bg-gray-400 cursor-not-allowed text-white"
+                                : "bg-[#28B872] hover:bg-[#28B880] text-white"
+                        }`}
+                        disabled={loading}
                         onClick={async () => {
-                            // Fetch current user
-                            const { data: userData } =
-                                await supabase.auth.getUser();
-                            const user = userData?.user;
-                            if (!user || !tripInfo) return;
-                            // Generate public_ticket_id
-                            const { count } = await supabase
-                                .from("tickets")
-                                .select("id", { count: "exact", head: true })
-                                .eq("tour_id", tourId);
-                            const nextSeq = (count ?? 0) + 1;
-                            const paddedSeq = String(nextSeq).padStart(3, "0");
-                            const public_ticket_id = `WDT-${tourId}-${paddedSeq}`;
-                            // Insert ticket
-                            // Debug: log tripInfo to ensure all fields are present
-                            console.log("tripInfo for ticket", tripInfo);
-                            const ticket = {
-                                tour_id: tourId,
-                                title: tripInfo.tourName,
-                                location: tripInfo.destination,
-                                date_range: tripInfo.start_date,
-                                duration: tripInfo.selectedDay || "",
-                                guide: "", // Add guide if available
-                                people: seats,
-                                total_price: totalPrice,
-                                created_at: new Date().toISOString(),
-                                user_id: user.id,
-                                traveler:
-                                    user.user_metadata?.full_name ||
-                                    user.email ||
-                                    "",
-                                public_ticket_id,
-                                imageurl: tripInfo.photos?.[0] || "",
-                            };
-                            const { error, data: ticketData } = await supabase
-                                .from("tickets")
-                                .insert([ticket])
-                                .select()
-                                .single();
-                            if (!error && ticketData) {
-                                router.push(
-                                    `/book/${tourId}/step5?id=${ticketData.id}`
+                            if (loading) return;
+                            setLoading(true);
+                            try {
+                                const { data: userData } =
+                                    await supabase.auth.getUser();
+                                const user = userData?.user;
+                                if (!user || !tripInfo) return;
+                                const { count } = await supabase
+                                    .from("tickets")
+                                    .select("id", {
+                                        count: "exact",
+                                        head: true,
+                                    })
+                                    .eq("tour_id", tourId);
+                                const nextSeq = (count ?? 0) + 1;
+                                const paddedSeq = String(nextSeq).padStart(
+                                    3,
+                                    "0"
                                 );
-                            } else {
-                                alert(
-                                    "Failed to create ticket. Please try again."
-                                );
+                                const public_ticket_id = `WDT-${tourId}-${paddedSeq}`;
+                                const ticket = {
+                                    tour_id: tourId,
+                                    title: tripInfo.tourName,
+                                    location: tripInfo.destination,
+                                    date_range: tripInfo.start_date,
+                                    duration: tripInfo.selectedDay || "",
+                                    guide: "",
+                                    people: seats,
+                                    total_price: totalPrice,
+                                    created_at: new Date().toISOString(),
+                                    user_id: user.id,
+                                    traveler:
+                                        user.user_metadata?.full_name ||
+                                        user.email ||
+                                        "",
+                                    public_ticket_id,
+                                    imageurl: tripInfo.photos?.[0] || "",
+                                };
+                                const { error, data: ticketData } =
+                                    await supabase
+                                        .from("tickets")
+                                        .insert([ticket])
+                                        .select()
+                                        .single();
+                                if (!error && ticketData) {
+                                    router.push(
+                                        `/book/${tourId}/step5?id=${ticketData.id}`
+                                    );
+                                } else {
+                                    alert(
+                                        "Failed to create ticket. Please try again."
+                                    );
+                                }
+                            } finally {
+                                setLoading(false);
                             }
                         }}
                     >
-                        pay
+                        {loading ? (
+                            <div className="flex items-center gap-2">
+                                <svg
+                                    className="animate-spin h-5 w-5 text-white"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                    ></circle>
+                                    <path
+                                        className="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                    ></path>
+                                </svg>
+                                <span>Processing...</span>
+                            </div>
+                        ) : (
+                            "Pay"
+                        )}
                     </button>
                 </div>
             </div>
