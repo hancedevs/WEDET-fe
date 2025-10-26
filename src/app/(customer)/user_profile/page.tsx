@@ -155,7 +155,7 @@ export default function UserProfilePage() {
                     <div className="flex w-full max-w-sm mx-auto bg-gray-100 p-1 rounded-full mb-6 shadow-inner">
                         <button
                             onClick={() => setActiveTab("bookings")}
-                            className={`flex-1 py-2 text-center text-lg font-semibold rounded-full transition ${
+                            className={`flex-1 py-1.5 text-center text-sm font-semibold rounded-full transition ${
                                 activeTab === "bookings"
                                     ? "bg-[#28B872] text-white shadow-md"
                                     : "text-gray-600 hover:text-[#28B872]"
@@ -165,7 +165,7 @@ export default function UserProfilePage() {
                         </button>
                         <button
                             onClick={() => setActiveTab("settings")}
-                            className={`flex-1 py-2 text-center text-lg font-semibold rounded-full transition ${
+                            className={`flex-1 py-1.5 text-center text-sm font-semibold rounded-full transition ${
                                 activeTab === "settings"
                                     ? "bg-[#28B872] text-white shadow-md"
                                     : "text-gray-600 hover:text-[#28B872]"

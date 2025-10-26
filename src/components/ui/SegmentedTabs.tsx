@@ -4,9 +4,8 @@ import { TripStatus } from "@/types/type";
 import clsx from "clsx";
 
 const items: { label: string; value: TripStatus }[] = [
-    { label: "Upcoming", value: "upcoming" },
-    { label: "Confirming", value: "confirming" },
     { label: "Wishlist", value: "wishlist" },
+    { label: "Confirming", value: "confirming" },
 ];
 
 type Props = {

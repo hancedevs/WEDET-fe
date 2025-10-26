@@ -9,11 +9,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 type Extra = { priority?: boolean; imageWidth?: number; imageQuality?: number };
 
-// helpers: robust numeric parsing + currency formatting
+// helpers
 function toNumber(v: number | string | undefined): number | undefined {
     if (typeof v === "number" && Number.isFinite(v)) return v;
     if (typeof v === "string") {
-        // strip all but digits, dot, minus
         const cleaned = v.replace(/[^\d.-]/g, "");
         if (!cleaned) return undefined;
         const n = Number(cleaned);
@@ -31,7 +30,6 @@ function formatETB(v: number | string | undefined): string {
             maximumFractionDigits: 0,
         }).format(n);
     }
-    // fallback: if it's already a string like "2,700 Br", show as-is
     return typeof v === "string" ? v : "";
 }
 
@@ -53,6 +51,7 @@ function TravelCardBase(props: TravelCardProps & Extra) {
     } = props;
 
     const [loaded, setLoaded] = useState(false);
+    const [liked, setLiked] = useState(false);
     const src = optimizeImageUrl(imageUrl, imageWidth, imageQuality);
 
     const hasDiscount =
@@ -86,9 +85,25 @@ function TravelCardBase(props: TravelCardProps & Extra) {
                     onLoad={() => setLoaded(true)}
                 />
 
-                <div className="absolute top-3 right-3 bg-white/70 backdrop-blur-sm rounded-full p-2">
-                    <Heart className="text-gray-700 w-4 h-4" aria-hidden />
-                </div>
+                <button
+                    type="button"
+                    className="absolute z-10 top-3 right-3 bg-white/70 backdrop-blur-sm rounded-full p-2 transition hover:bg-white"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        e.stopPropagation();
+                        e.preventDefault();
+                        setLiked((prev) => !prev);
+                    }}
+                >
+                    <Heart
+                        className={`w-5 h-5 transition-colors ${
+                            liked
+                                ? "text-green-500 fill-green-500"
+                                : "text-green-500"
+                        }`}
+                        aria-hidden
+                    />
+                </button>
 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 flex flex-col justify-end">
                     <div className="text-white space-y-1 mt-auto">

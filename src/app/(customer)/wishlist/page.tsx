@@ -17,7 +17,8 @@ const ALL_TRIPS: Trip[] = [
         priceBr: 4555,
         durationDays: 2,
         imageUrl: "/tipsimage.png",
-        status: "upcoming",
+        status: "wishlist",
+        tripStatus: "pending",
     },
     {
         id: "2",
@@ -26,7 +27,8 @@ const ALL_TRIPS: Trip[] = [
         priceBr: 2000,
         durationDays: 2,
         imageUrl: "/tipsimage.png",
-        status: "upcoming",
+        status: "wishlist",
+        tripStatus: "accepted",
     },
     {
         id: "3",
@@ -36,6 +38,7 @@ const ALL_TRIPS: Trip[] = [
         durationDays: 2,
         imageUrl: "/tipsimage.png",
         status: "confirming",
+        tripStatus: "pending",
     },
     {
         id: "4",
@@ -45,6 +48,7 @@ const ALL_TRIPS: Trip[] = [
         durationDays: 2,
         imageUrl: "/tipsimage.png",
         status: "confirming",
+        tripStatus: "accepted",
     },
     {
         id: "5",
@@ -54,6 +58,7 @@ const ALL_TRIPS: Trip[] = [
         durationDays: 2,
         imageUrl: "/tipsimage.png",
         status: "wishlist",
+        tripStatus: "pending",
     },
     {
         id: "6",
@@ -63,6 +68,7 @@ const ALL_TRIPS: Trip[] = [
         durationDays: 2,
         imageUrl: "/tipsimage.png",
         status: "wishlist",
+        tripStatus: "accepted",
     },
     {
         id: "7",
@@ -72,11 +78,12 @@ const ALL_TRIPS: Trip[] = [
         durationDays: 2,
         imageUrl: "/tipsimage.png",
         status: "wishlist",
+        tripStatus: "pending",
     },
 ];
 
 export default function TripsPage() {
-    const [tab, setTab] = useState<TripStatus>("upcoming");
+    const [tab, setTab] = useState<TripStatus>("wishlist");
     const trips = useMemo(
         () => ALL_TRIPS.filter((t) => t.status === tab),
         [tab]
@@ -85,25 +92,27 @@ export default function TripsPage() {
 
     return (
         <div className="min-h-dvh flex flex-col  bg-white lg:w-[500px]">
-            <header className="sticky top-0 z-40 bg-white/90 backdrop-blur px-3 py-2 border-b border-[#F0F0F0]">
-                <div className="mx-auto mb-4 w-full max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg">
-                    <button
-                        onClick={() => router.push("/home")}
-                        aria-label="Back"
-                        className="w-9 h-9 inline-flex items-center justify-center rounded-full bg-[#ECECEC] shadow-[0_2px_6px_rgba(0,0,0,0.05)] active:scale-95 transition"
-                    >
-                        <ArrowLeft size={20} className="text-[#28B872]" />
-                    </button>
-                </div>
-            </header>
+            <div className="flex w-full  ">
+                <header className="sticky top-0 z-40 bg-white/90 backdrop-blur px-3 py-2 border-b border-[#F0F0F0]">
+                    <div className="mx-auto mb-4 w-full max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg">
+                        <button
+                            onClick={() => router.push("/home")}
+                            aria-label="Back"
+                            className="w-9 h-9 inline-flex items-center justify-center rounded-full bg-[#ECECEC] shadow-[0_2px_6px_rgba(0,0,0,0.05)] active:scale-95 transition"
+                        >
+                            <ArrowLeft size={20} className="text-[#28B872]" />
+                        </button>
+                    </div>
+                </header>
 
-            {/* Tabs row (allow horizontal scroll on tiny screens) */}
-            {/* Tabs row - sticky */}
-            <div className="sticky top-[60px] z-30 bg-white px-3 py-2 border-b border-[#F0F0F0]">
-                <div className="mx-auto w-full max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg">
-                    <div className="overflow-x-auto no-scrollbar">
-                        <div className="min-w-fit">
-                            <SegmentedTabs value={tab} onChange={setTab} />
+                {/* Tabs row (allow horizontal scroll on tiny screens) */}
+                {/* Tabs row - sticky */}
+                <div className="sticky top-[60px] z-30 bg-white px-3 py-2 border-b border-[#F0F0F0]">
+                    <div className="mx-auto w-[80vw] max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg">
+                        <div className="overflow-x-auto no-scrollbar">
+                            <div className="min-w-fit">
+                                <SegmentedTabs value={tab} onChange={setTab} />
+                            </div>
                         </div>
                     </div>
                 </div>

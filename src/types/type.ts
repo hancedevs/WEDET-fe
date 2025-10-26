@@ -119,6 +119,7 @@ export type Trip = {
     imageUrl: string;
     status: TripStatus;
     available?: boolean;
+    tripStatus: string;
 };
 
 // Tourguie type

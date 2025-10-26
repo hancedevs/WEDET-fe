@@ -34,19 +34,33 @@ function MetaRow({
 }
 
 export default function TripCard({ trip, onBook }: Props) {
-    return (
-        <div
-            className="
-      w-full overflow-hidden
-      max-[380px]:[--s:.92] max-[340px]:[--s:.88]
-    "
-        >
-            <div
-                className="
-        origin-top-left
-        max-[380px]:w-[calc(100%/var(--s))] max-[380px]:scale-[var(--s)]
-      "
+    const isWishlist = trip.status === "wishlist";
+    const isConfirming = trip.status === "confirming";
+
+    const renderStatusBadge = () => {
+        if (!isConfirming) return null;
+
+        const isPending = trip.tripStatus === "pending";
+        const badgeClasses = isPending
+            ? "border-yellow-400 text-yellow-600 bg-[#FFF9E6]"
+            : "border-green-400 text-green-600 bg-[#EAF5EF]";
+
+        const formattedStatus =
+            trip.tripStatus?.charAt(0).toUpperCase() +
+            trip.tripStatus?.slice(1);
+
+        return (
+            <span
+                className={`px-4 py-2 rounded-full border text-xs font-semibold ml-2 ${badgeClasses}`}
             >
+                {formattedStatus}
+            </span>
+        );
+    };
+
+    return (
+        <div className="w-full overflow-hidden max-[380px]:[--s:.92] max-[340px]:[--s:.88]">
+            <div className="origin-top-left max-[380px]:w-[calc(100%/var(--s))] max-[380px]:scale-[var(--s)]">
                 <article
                     className="bg-white border-[3px] border-[#ECECEC] rounded-4xl shadow-[0_2px_10px_rgba(0,0,0,0.08)] px-3 py-4"
                     style={{ fontFamily: "Century Gothic, sans-serif" }}
@@ -94,13 +108,19 @@ export default function TripCard({ trip, onBook }: Props) {
                             </div>
 
                             <div className="mt-4 w-full flex justify-end">
-                                <button
-                                    onClick={() => onBook?.(trip)}
-                                    className="rounded-full bg-[#28B872] text-white text-[14px] font-thin px-5 py-[7px] shadow-[0_3px_6px_rgba(40,184,114,0.3)] border border-[#28B872] active:scale-95 transition"
-                                    style={{ fontFamily: "Century Gothic" }}
-                                >
-                                    Book Trip
-                                </button>
+                                {isWishlist ? (
+                                    <button
+                                        onClick={() => onBook?.(trip)}
+                                        className="rounded-full bg-[#28B872] text-white text-[14px] font-thin px-5 py-[7px] shadow-[0_3px_6px_rgba(40,184,114,0.3)] border border-[#28B872] active:scale-95 transition"
+                                        style={{
+                                            fontFamily: "Century Gothic",
+                                        }}
+                                    >
+                                        Book Trip
+                                    </button>
+                                ) : (
+                                    renderStatusBadge()
+                                )}
                             </div>
                         </div>
                     </div>

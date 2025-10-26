@@ -1,4 +1,7 @@
 import { BookingItem } from "@/types/type";
+import { useRouter } from "next/navigation";
+import Logo from "../../../public/logo.svg";
+import Image from "next/image";
 
 function BookingsTab({
     bookings,
@@ -7,26 +10,31 @@ function BookingsTab({
     bookings: BookingItem[];
     profile: any;
 }) {
+    const router = useRouter();
     return (
         <div className="lg:w-[500px]">
             <div className="relative mb-6">
                 <input
                     type="text"
                     placeholder="Search bookings..."
-                    className="w-full py-3 pl-5 pr-4 text-gray-700 bg-white border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#28B872] transition shadow-sm"
+                    className="w-full py-2 pl-5 pr-4 text-gray-700 bg-white border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#28B872] transition shadow-sm"
                     style={{ fontFamily: "'Century Gothic', sans-serif" }}
                 />
             </div>
 
-            <div className="bg-gradient-to-r from-[#28B872] to-[#145c38] p-6 rounded-3xl shadow-xl mb-8 relative overflow-hidden">
-                <div className="absolute -top-10 -right-10 w-24 h-24 bg-[#3dcc84] rounded-full opacity-30"></div>
-                <div className="absolute -bottom-10 -left-10 w-28 h-28 bg-[#3dcc84] rounded-full opacity-30"></div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-[#3dcc84] rounded-full opacity-10"></div>
+            <div className="bg-gradient-to-l from-[#28B872] to-[#145c38] p-6 rounded-3xl shadow-xl mb-8 relative overflow-hidden">
+                <div className="absolute -top-10 -right-10 w-24 h-24 bg-[#A7F3D0] rounded-full opacity-30"></div>
+                <div className="absolute -bottom-10 -left-10 w-28 h-28 bg-[#A7F3D0] rounded-full opacity-30"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-[#A7F3D0] rounded-full opacity-10"></div>
 
                 <div className="relative z-10">
                     <div className="flex justify-between items-center mb-4">
                         <span className="font-bold text-white text-xl">
-                            Wedet
+                            <Image
+                                src={Logo}
+                                alt="wedet-logo"
+                                className="h-10 w-28 text-white fill-[#FFFF]"
+                            />
                         </span>
                         <div className="w-16 h-8 bg-white rounded-full opacity-30"></div>{" "}
                     </div>
@@ -62,16 +70,19 @@ function BookingsTab({
                 </div>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-6 ">
                 {bookings.map((booking) => (
                     <div
+                        onClick={() => {
+                            router.push(`/book/${2}/step5?id=${2226}`);
+                        }}
                         key={booking.id}
-                        className="flex justify-between items-center pb-2 "
+                        className="flex justify-between items-center pb-2  shadow-sm cursor-pointer p-4 h-20 rounded-3xl"
                     >
                         <div className="font-bold text-lg text-[#28B872]">
                             {booking.name}
                         </div>
-                        <div className="text-right">
+                        <div className="text-left">
                             <div
                                 className={`font-extrabold text-xl ${
                                     booking.amount < 0

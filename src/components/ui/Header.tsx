@@ -11,6 +11,7 @@ import FilterOptionsModal from "@/components/modals/FilterModal";
 import IconButtons from "../home/IconsButton";
 import { getUserInfo } from "@/lib/utils";
 import FilterDropdown from "@/components/modals/FilterModal";
+import { useRouter } from "next/navigation";
 
 export default function Header(): JSX.Element {
     const [firstName, setFirstName] = useState<string | null>(null);
@@ -70,11 +71,17 @@ export default function Header(): JSX.Element {
     const greetingName = loading ? "…" : firstName ?? "Guest";
     const fallbackInitial = (firstName?.[0] ?? "U").toUpperCase();
 
+    const router = useRouter();
     return (
         <div className="flex flex-col gap-5">
             <div className="flex items-center justify-between mt-4  px-3">
                 <div className="flex gap-1 items-center">
-                    <Avatar className="h-12 w-12 border-2 border-green-500">
+                    <Avatar
+                        className="h-12 w-12 border-2 border-green-500"
+                        onClick={() => {
+                            router.push("/user_profile");
+                        }}
+                    >
                         <AvatarImage
                             src={avatarUrl ?? "https://github.com/shadcn.png"}
                             alt="User Avatar"

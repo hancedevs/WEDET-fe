@@ -21,7 +21,7 @@ const PlaceNameCard: React.FC<PlaceNameCardProps> = ({
         router.push("/trip/1");
     };
     return (
-        <div className="relative w-[244px] h-[231px] rounded-xl overflow-hidden shadow-md">
+        <div className="relative w-[244px] h-[231px] rounded-4xl overflow-hidden shadow-md">
             <Image
                 src={image}
                 alt={name}
