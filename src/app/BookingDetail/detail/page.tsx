@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { ArrowLeft } from "lucide-react";
+import React, { useState, useEffect, useCallback } from "react";
+import { ArrowLeft, Pencil, Save } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Detailfilter from "@/components/ui/Detailfilter";
 import Navbar from "@/components/Tourguidecomponents/TourGuideNavbar";
@@ -9,6 +9,7 @@ import PassengerCard from "@/components/ui/PassengerCard";
 import type { Passenger } from "@/types/type";
 import { supabase } from "@/lib/supabaseClient";
 import { Input } from "@/components/ui/input";
+import { initialTourData } from "@/mock/data";
 
 /* ----------------------------- TripCard ----------------------------- */
 interface TripCardProps {
@@ -37,51 +38,79 @@ const TripCard: React.FC<TripCardProps> = ({
     onPassengerListClick,
 }) => {
     const router = useRouter();
+
+    let bgcolor = "#28B872";
+    if (seatsBooked === 0) {
+        bgcolor = "#FF2D2D";
+    } else if (seatsPending > 0) {
+        bgcolor = "#F59E0B";
+    }
+
+    const badgeColor = ["#28B872", "#FF2D2D", "#1D4ED8"].includes(bgcolor)
+        ? "white"
+        : "black";
+
     return (
-        <div className="mx-4 my-2 p-6 border border-green-400 rounded-3xl bg-green-50">
-            <div className="flex justify-between font-semibold text-sm text-gray-600 mb-2">
-                <span>{date}</span>
-                <span>Duration: {duration}</span>
+        <div
+            className={`relative bg-white rounded-4xl p-4 flex flex-col justify-between items-stretch w-full mb-8 cursor-pointer transition hover:scale-[1.02] hover:shadow-xl `}
+            style={{
+                border: `1px solid ${bgcolor}`,
+                boxShadow: `0 4px 8px ${bgcolor}30`,
+            }}
+        >
+            <div className="flex-1 mr-4 min-w-0 pt-3">
+                <span
+                    className="absolute top-[-12px] right-4 text-xs px-3 py-1 rounded-full font-medium shadow-md"
+                    style={{
+                        backgroundColor: bgcolor,
+                        color: badgeColor,
+                    }}
+                >
+                    {date}
+                </span>
             </div>
 
-            <div>
-                <div className="flex justify-between items-start">
-                    <div className="font-semibold">
-                        <h2 className="text-4xl">{title}</h2>
-                        <div className="text-[#B0C8C8] text-sm ml-1">
-                            <p>{pricePerPerson} per person</p>
-                            <p>Capacity: {capacity}</p>
-                            <p>Seat Left: {seatLeft}</p>
-                        </div>
+            <div className="flex justify-between items-start w-full">
+                {/* Left Column */}
+                <div className="flex-1 space-y-1">
+                    <p className="text-sm text-gray-500 font-medium">
+                        Duration: {duration}
+                    </p>
+                    <h2 className="text-2xl font-bold text-gray-800 line-clamp-1">
+                        {title}
+                    </h2>
+                    <div className="text-xs text-[#B0C8C8] space-y-0.5 mt-1">
+                        <p>{pricePerPerson} per person</p>
+                        <p>Capacity: {capacity}</p>
+                        <p>Seat Left: {seatLeft}</p>
                     </div>
+                </div>
 
-                    <div className="text-right mt-5">
-                        <p className="text-2xl mr-16">
-                            <span className="text-[#28B872] font-semibold">
-                                {seatsBooked}
-                            </span>
-                            <span className="text-red-500 font-semibold">
-                                /{seatsPending}
-                            </span>
-                            <span className="text-xs text-[#28B872] ml-1">
-                                Seats
-                            </span>
-                        </p>
-                        <p className="text-4xl font-bold">{totalPrice}</p>
-                    </div>
+                {/* Right Column */}
+                <div className="flex flex-col items-end justify-between ml-4">
+                    <p className="text-xl font-semibold text-start  w-full">
+                        <span className="text-green-600">{seatsBooked}</span>
+                        <span className="text-red-500">/{seatsPending}</span>
+                        <span className="text-xs text-gray-500 ml-1">
+                            Seats
+                        </span>
+                    </p>
+                    <span className="text-3xl font-bold text-gray-900 mt-2">
+                        {totalPrice}
+                    </span>
                 </div>
             </div>
 
-            <div className="flex justify-between">
+            <div className="flex justify-between  mt-4  items-center">
                 <button
                     onClick={onPassengerListClick}
-                    className="mt-4 px-4 py-2 rounded-full bg-[#28B872] text-white text-sm font-semibold"
+                    className="px-4 py-2 rounded-full  bg-[#28B872] text-white text-sm font-semibold hover:bg-green-50 transition"
                 >
                     Passenger List
                 </button>
                 <button
-                    onClick={() => router.push("/ticket")}
-                    className="mt-4 px-4 py-2 rounded-full border border-[#28B872] text-[#28B872] text-sm font-semibold"
+                    onClick={() => {}}
+                    className="px-4 py-2 rounded-full border border-[#28B872] text-[#28B872] text-sm font-semibold hover:bg-green-50 transition"
                 >
                     Generate Ticket
                 </button>
@@ -105,7 +134,6 @@ function PassengerListView({
         "All" | "Paid" | "Pending"
     >("All");
 
-    // Filtered passengers
     const filteredPassengers = passengers.filter((p) => {
         const matchesSearch =
             p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -121,35 +149,33 @@ function PassengerListView({
 
     return (
         <div className="min-h-[60vh] flex flex-col">
-            {/* Header */}
-            <div className="flex items-center space-x-3 p-4">
+            <div className="flex items-center space-x-3 p-4 border-b border-gray-100">
                 <button
                     onClick={onBack}
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200"
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 transition"
                 >
-                    <ArrowLeft className="text-green-600" size={26} />
+                    <ArrowLeft className="text-green-600" size={20} />
                 </button>
                 <div>
-                    <h1 className="text-lg font-bold">{title} – Passengers</h1>
-                    <p className="text-sm font-bold text-gray-500">
+                    <h1 className="text-xl font-bold text-gray-800">
+                        {title} – Passengers
+                    </h1>
+                    <p className="text-sm text-gray-500">
                         {filteredPassengers.length} shown / {passengers.length}{" "}
                         total
                     </p>
                 </div>
             </div>
 
-            {/* Search + Filter Bar */}
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between px-4 mb-4 gap-3">
-                {/* Search box */}
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between px-4 my-4 gap-3">
                 <Input
                     type="text"
                     placeholder="Search by name, email, phone, location..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="rounded-3xl p-6 border-none shadow placeholder:text-gray-300 focus:ring-2 focus:ring-green-300"
+                    className="rounded-xl p-4 border-none shadow-sm w-full md:w-1/2 placeholder:text-gray-400 focus:ring-2 focus:ring-green-500 transition"
                 />
 
-                {/* Status filter */}
                 <select
                     value={statusFilter}
                     onChange={(e) =>
@@ -157,7 +183,7 @@ function PassengerListView({
                             e.target.value as "All" | "Paid" | "Pending"
                         )
                     }
-                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400"
+                    className="px-4 py-2 border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
                 >
                     <option value="All">All Status</option>
                     <option value="Paid">Paid</option>
@@ -165,7 +191,6 @@ function PassengerListView({
                 </select>
             </div>
 
-            {/* List */}
             <div className="flex-1 px-4 mb-20 pb-6">
                 {filteredPassengers.length > 0 ? (
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -182,6 +207,54 @@ function PassengerListView({
         </div>
     );
 }
+
+/* ----------------------------- Loading Skeleton ----------------------------- */
+const LoadingSkeleton = () => (
+    <div className="p-4 animate-pulse">
+        <div className="flex items-center space-x-3 mb-6">
+            <div className="w-10 h-10 rounded-full bg-gray-200"></div>
+            <div className="space-y-1">
+                <div className="h-4 w-48 bg-gray-200 rounded"></div>
+                <div className="h-3 w-32 bg-gray-200 rounded"></div>
+            </div>
+        </div>
+
+        <div className="relative bg-white rounded-2xl p-4 flex justify-between items-stretch w-full mb-8 border border-gray-100 shadow-lg">
+            <div className="flex-1 mr-4 min-w-0 pt-3">
+                <div className="absolute top-[-12px] right-4 h-5 w-20 bg-green-200 rounded-full"></div>
+                <div className="mt-3 space-y-2">
+                    <div className="h-3 w-20 bg-gray-200 rounded"></div>
+                    <div className="h-6 w-3/4 bg-gray-300 rounded"></div>
+                    <div className="h-3 w-28 bg-gray-200 rounded"></div>
+                    <div className="h-3 w-24 bg-gray-200 rounded"></div>
+                </div>
+            </div>
+
+            <div className="flex flex-col items-end justify-between py-2">
+                <div className="space-y-2 mt-4 flex flex-col items-center">
+                    <div className="h-4 w-16 bg-gray-200 rounded"></div>
+                    <div className="h-8 w-24 bg-gray-300 rounded"></div>
+                </div>
+                <div className="space-y-2 mt-4">
+                    <div className="h-7 w-28 bg-green-300 rounded-full"></div>
+                    <div className="h-7 w-28 bg-gray-200 rounded-full"></div>
+                </div>
+            </div>
+        </div>
+
+        <div className="space-y-6 px-4">
+            <div className="h-8 w-1/3 bg-gray-200 rounded-lg"></div>
+            <div className="space-y-3">
+                <div className="h-4 w-full bg-gray-100 rounded"></div>
+                <div className="h-4 w-11/12 bg-gray-100 rounded"></div>
+                <div className="h-4 w-10/12 bg-gray-100 rounded"></div>
+            </div>
+            <div className="h-8 w-1/4 bg-gray-200 rounded-lg"></div>
+            <div className="h-4 w-full bg-gray-100 rounded"></div>
+            <div className="h-4 w-11/12 bg-gray-100 rounded"></div>
+        </div>
+    </div>
+);
 
 /* -------------------------------- Page -------------------------------- */
 interface Tour {
@@ -205,15 +278,14 @@ export default function TourPage() {
     const searchParams = useSearchParams();
     const tourId = searchParams.get("id");
 
-    const [tour, setTour] = useState<Tour | null>(null);
+    const [tour, setTour] = useState<Tour | null>(initialTourData);
+
+    const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // 1) Your trips (added slug to identify active trip)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [trips, setTrips] = useState<any[]>([]);
 
-    // 2) Passengers per trip (using mock data as requested)
     const passengersByTrip: Record<string, Passenger[]> = {
         wenchi: [
             {
@@ -254,12 +326,23 @@ export default function TourPage() {
         ],
     };
 
-    // 3) Simple view toggle state
     const [view, setView] = useState<"details" | "passengers">("details");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [activeTrip, setActiveTrip] = useState<any | null>(null);
 
-    // Fetch tour data from Supabase
+    const handleTourDataUpdate = useCallback((field: keyof any, value: any) => {
+        setTour((prev) => ({
+            ...prev,
+            [field]: value,
+        }));
+    }, []);
+
+    const handleEditSave = () => {
+        if (isEditing) {
+            // In a real application, you would call an API here to persist `tour`
+            console.log("Saving tour data:", tour);
+        }
+        setIsEditing((prev) => !prev);
+    };
     useEffect(() => {
         const fetchTour = async () => {
             if (!tourId) return;
@@ -279,7 +362,6 @@ export default function TourPage() {
                 if (data) {
                     setTour(data);
 
-                    // Convert the tour data to the trips format
                     const duration = getDaysBetweenDates(
                         data.start_date,
                         data.end_date
@@ -295,9 +377,9 @@ export default function TourPage() {
                         title: data.tourName || "Unnamed Tour",
                         pricePerPerson: `$${data.price || 0}`,
                         capacity: data.group_number || 0,
-                        seatLeft: calculateSeatLeft(data.group_number || 0, 10), // Mock booked seats
-                        seatsBooked: 10, // Mock data
-                        seatsPending: 3, // Mock data
+                        seatLeft: calculateSeatLeft(data.group_number || 0, 10),
+                        seatsBooked: 10,
+                        seatsPending: 3,
                         totalPrice: `${data.total || 0} Br`,
                     };
 
@@ -315,7 +397,6 @@ export default function TourPage() {
         fetchTour();
     }, [tourId]);
 
-    // Helper function to calculate days between dates
     const getDaysBetweenDates = (
         startDate: string,
         endDate: string
@@ -326,46 +407,32 @@ export default function TourPage() {
         return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
     };
 
-    // Helper function to format date
     const formatDate = (dateString: string): string => {
         const date = new Date(dateString);
         return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
     };
 
-    // Helper function to calculate seats left
     const calculateSeatLeft = (capacity: number, booked: number): number => {
         return Math.max(0, capacity - booked);
     };
 
     if (loading) {
         return (
-            <div className="flex flex-col min-h-screen bg-white justify-center items-center">
-                <p>Loading tour data...</p>
+            <div className="flex flex-col min-h-screen bg-white">
+                <LoadingSkeleton />
             </div>
         );
     }
 
-    if (error) {
+    if (error || !tour) {
         return (
-            <div className="flex flex-col min-h-screen bg-white justify-center items-center">
-                <p className="text-red-500">{error}</p>
+            <div className="flex flex-col min-h-screen bg-white justify-center items-center p-8">
+                <p className="text-red-500 text-lg mb-4">
+                    {error || "Tour not found"}
+                </p>
                 <button
                     onClick={() => router.back()}
-                    className="mt-4 px-4 py-2 rounded-full bg-[#28B872] text-white"
-                >
-                    Go Back
-                </button>
-            </div>
-        );
-    }
-
-    if (!tour) {
-        return (
-            <div className="flex flex-col min-h-screen bg-white justify-center items-center">
-                <p>Tour not found</p>
-                <button
-                    onClick={() => router.back()}
-                    className="mt-4 px-4 py-2 rounded-full bg-[#28B872] text-white"
+                    className="mt-4 px-6 py-3 rounded-full bg-[#28B872] hover:bg-green-600 text-white font-semibold transition shadow-md"
                 >
                     Go Back
                 </button>
@@ -374,64 +441,73 @@ export default function TourPage() {
     }
 
     return (
-        <div className="flex flex-col min-h-screen bg-white">
-            {view === "details" ? (
-                <>
-                    {/* Header */}
-                    <div className="flex items-center space-x-3 p-4">
-                        <button
-                            onClick={() => router.back()}
-                            className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200"
-                        >
-                            <ArrowLeft className="text-green-600" size={30} />
-                        </button>
-                        <div>
-                            <h1 className="text-lg font-bold">
-                                {tour.tourName || "Tour Details"}
-                            </h1>
-                            <p className="text-sm font-bold text-gray-500">
-                                Details
-                            </p>
+        <div className="flex flex-col min-h-screen bg-white relative">
+            <div className="max-w-4xl mx-auto w-full relative">
+                {view === "details" ? (
+                    <>
+                        <div className="flex items-center space-x-3 p-4 border-b border-gray-100">
+                            <button
+                                onClick={() => router.back()}
+                                className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 transition"
+                            >
+                                <ArrowLeft
+                                    className="text-green-600"
+                                    size={20}
+                                />
+                            </button>
+                            <div>
+                                <h1 className="text-xl font-bold text-gray-800">
+                                    {tour.tourName || "Tour Details"}
+                                </h1>
+                                <p className="text-sm text-gray-500">
+                                    Details Overview
+                                </p>
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Trip cards */}
-                    {trips.map((trip) => (
-                        <TripCard
-                            key={trip.slug}
-                            {...trip}
-                            onPassengerListClick={() => {
-                                setActiveTrip(trip);
-                                setView("passengers");
-                            }}
-                        />
-                    ))}
+                        <div className="px-4">
+                            {trips.map((trip) => (
+                                <TripCard
+                                    key={trip.slug}
+                                    {...trip}
+                                    onPassengerListClick={() => {
+                                        setActiveTrip(trip);
+                                        setView("passengers");
+                                    }}
+                                />
+                            ))}
+                        </div>
 
-                    {/* Main Content */}
-                    <div className="flex-1">
-                        <Detailfilter tourData={tour} />
-                    </div>
+                        <div className="flex-1 px-4 pb-28">
+                            <Detailfilter
+                                tourData={tour}
+                                isEditing={isEditing}
+                                onUpdate={handleTourDataUpdate}
+                            />
+                        </div>
 
-                    {/* Edit Button */}
-                    <div className="px-4 mt-3 mb-10 flex items-center justify-center">
-                        <button
-                            onClick={() => alert("Edit clicked")}
-                            className="w-20 gap-2 px-4 py-2 rounded-full bg-[#28B872] hover:bg-green-600 text-white font-semibold transition-colors"
-                        >
-                            Edit
-                        </button>
-                    </div>
-                </>
-            ) : (
-                // Passenger list view (same page)
-                <PassengerListView
-                    title={activeTrip?.title ?? "Trip"}
-                    passengers={passengersByTrip["wenchi"]}
-                    onBack={() => setView("details")}
-                />
-            )}
-
-            <Navbar active="explore" />
+                        <div className="fixed bottom-0 inset-x-0 flex justify-center px-4 pb-4 z-50 bg-white">
+                            <button
+                                onClick={handleEditSave}
+                                className={`w-2/3 mt-2 max-w-4xl gap-2 px-6 py-3 rounded-full text-white font-bold transition-all shadow-lg flex items-center justify-center
+            ${
+                isEditing
+                    ? "bg-green-600 hover:bg-green-700"
+                    : "bg-[#28B872] hover:bg-green-600"
+            }`}
+                            >
+                                {isEditing ? <>Save Changes</> : <>Edit</>}
+                            </button>
+                        </div>
+                    </>
+                ) : (
+                    <PassengerListView
+                        title={activeTrip?.title ?? "Trip"}
+                        passengers={passengersByTrip["wenchi"]}
+                        onBack={() => setView("details")}
+                    />
+                )}
+            </div>
         </div>
     );
 }

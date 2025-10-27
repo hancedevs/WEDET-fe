@@ -16,7 +16,7 @@ import {
 import { useRouter, useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import NavBar from "@/components/ui/navBar";
-import Detailfilter from "@/components/ui/Detailfilter";
+
 import ResortPage from "@/components/ui/Bilbord";
 import TravelCard from "../../../components/ui/travelcard";
 import { supabase } from "@/lib/supabaseClient";
@@ -30,6 +30,7 @@ import {
     getStringField,
     toImageUrlFromStorageKey,
 } from "@/lib/utils";
+import Detailfilter from "@/components/ui/UserDetailFilter";
 
 export default function TourPage() {
     const router = useRouter();

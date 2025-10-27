@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 "use client";
-import Navbar from "@/components/Tourguidecomponents/TourGuideNavbar";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import Navbar from "@/components/Tourguidecomponents/TourGuideNavbar";
 
 interface Tour {
     id: number;
@@ -48,30 +48,33 @@ const TripCard: React.FC<TripCardProps> = ({
     return (
         <div
             onClick={() => router.push(path)}
-            className="relative bg-white rounded-4xl p-4 flex justify-between items-center w-full mb-8 cursor-pointer transition hover:scale-[1.02] hover:shadow-lg"
+            className={`relative bg-white rounded-4xl py-1 px-4 flex justify-between items-stretch w-full mb-7 cursor-pointer transition hover:scale-[1.02] hover:shadow-xl`}
             style={{
-                boxShadow: `0 4px 12px ${bgcolor}80`,
+                boxShadow: `0 1px 3px ${bgcolor}33`,
             }}
         >
-            <div className="flex-1 mr-4">
-                <div>
+            <div className="flex-1 mr-4 min-w-0">
+                <div className="mt-4 flex  flex-col">
                     <p className="text-xs text-[#B0C8C8]">
                         Duration: {duration}
                     </p>
-                    <h2 className="text-4xl font-semibold">{title}</h2>
+                    <h2 className="text-2xl font-semibold truncate">{title}</h2>
                     <p className="text-xs text-[#B0C8C8]">{price} per person</p>
                     <p className="text-xs text-[#B0C8C8]">
                         Capacity: {capacity}
                     </p>
                 </div>
             </div>
+
             <div className="flex flex-col items-end justify-between h-full">
                 <span
-                    className="absolute top-[-14px] not-[]:text-xs px-3 py-1 rounded-full font-medium mb-2"
+                    className="absolute top-[-12px] right-4 text-xs px-3 py-1 rounded-full font-medium shadow-md"
                     style={{
                         backgroundColor: bgcolor,
                         color:
-                            bgcolor === "#28B872" || bgcolor === "#FF2D2D"
+                            bgcolor === "#28B872" ||
+                            bgcolor === "#FF2D2D" ||
+                            bgcolor === "#1D4ED8"
                                 ? "white"
                                 : "black",
                     }}
@@ -79,17 +82,17 @@ const TripCard: React.FC<TripCardProps> = ({
                     {date}
                 </span>
 
-                <div className="flex flex-col items-center">
-                    <span className="text-5xl font-bold">{day}</span>
-                    <span className="text-sm font-semibold text-black-500">
+                <div className="flex flex-col items-center self-end mt-4">
+                    <span className="text-4xl font-bold">{day}</span>
+                    <span className="text-sm font-semibold text-gray-500">
                         {total}
                     </span>
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            alert("Edit button clicked");
+                            console.log("Edit button clicked for:", title);
                         }}
-                        className="mt-2 px-8 py-1 rounded-full bg-[#28B872] text-white text-sm font-medium hover:bg-green-600 transition"
+                        className="mt-2 px-6 py-2 rounded-full bg-[#28B872] text-white text-sm font-medium hover:bg-green-600 transition shadow-md"
                     >
                         Edit
                     </button>
@@ -99,21 +102,18 @@ const TripCard: React.FC<TripCardProps> = ({
     );
 };
 
-// Helper function to calculate days between dates
 const getDaysBetweenDates = (startDate: string, endDate: string): number => {
     const start = new Date(startDate);
     const end = new Date(endDate);
     const diffTime = Math.abs(end.getTime() - start.getTime());
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end days
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 };
 
-// Helper function to format date
 const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
 };
 
-// Helper function to get random color for cards
 const getRandomColor = (): string => {
     const colors = ["#28B872", "#FF2D2D", "#FFEA00"];
     return colors[Math.floor(Math.random() * colors.length)];
@@ -215,11 +215,64 @@ const Pagination: React.FC<{
     );
 };
 
+const DashboardSkeleton: React.FC = () => (
+    <div className="w-full px-4 py pb-20 animate-pulse">
+        <div className="flex items-center mb-6 mt-4 pr-2">
+            <div className="w-12 h-12 rounded-full bg-gray-200 mr-2"></div>
+            <div className="ml-2">
+                <div className="h-3 bg-gray-200 rounded w-24 mb-1"></div>
+                <div className="h-5 bg-gray-300 rounded w-32"></div>
+            </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 mb-6 w-full">
+            {[...Array(4)].map((_, index) => (
+                <div
+                    key={index}
+                    className="bg-white rounded-4xl shadow-[0_4px_6px_rgba(229,231,235,0.8)] p-4 flex items-center w-full"
+                >
+                    <div className="w-10 h-10 rounded-full bg-gray-200 mr-3"></div>
+                    <div>
+                        <div className="h-3 bg-gray-200 rounded w-20 mb-1"></div>
+                        <div className="h-6 bg-gray-300 rounded w-12"></div>
+                    </div>
+                </div>
+            ))}
+        </div>
+
+        <div className="flex justify-between items-center mb-6 w-full">
+            <div className="h-6 bg-gray-300 rounded w-20"></div>
+            <div className="h-6 bg-green-200 rounded w-24"></div>
+        </div>
+
+        {[...Array(5)].map((_, index) => (
+            <div
+                key={index}
+                className="relative bg-white rounded-4xl p-4 flex justify-between items-center w-full mb-8 shadow-[0_4px_12px_rgba(229,231,235,0.8)]"
+            >
+                <div className="flex-1 mr-4">
+                    <div className="h-3 bg-gray-200 rounded w-24 mb-2"></div>
+                    <div className="h-8 bg-gray-300 rounded w-48 mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-28 mb-1"></div>
+                    <div className="h-3 bg-gray-200 rounded w-20"></div>
+                </div>
+                <div className="flex flex-col items-end">
+                    <div className="absolute top-[-14px] h-6 bg-green-200 rounded-full w-20"></div>
+                    <div className="flex flex-col items-center mt-6">
+                        <div className="h-8 bg-gray-300 rounded w-10 mb-1"></div>
+                        <div className="h-3 bg-gray-200 rounded w-12 mb-2"></div>
+                        <div className="h-7 bg-green-400 rounded-full w-16"></div>
+                    </div>
+                </div>
+            </div>
+        ))}
+    </div>
+);
+
 export default function Dashboard() {
     const router = useRouter();
     const [tours, setTours] = useState<Tour[]>([]);
     const [loading, setLoading] = useState(true);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [user, setUser] = useState<any>(null);
     const [businessProfile, setBusinessProfile] = useState<any>(null);
     const [currentPage, setCurrentPage] = useState(1);
@@ -237,7 +290,6 @@ export default function Dashboard() {
             } = await supabase.auth.getUser();
             if (user) {
                 setUser(user);
-                // Fetch business profile after getting user
                 fetchBusinessProfile(user.id);
             }
         } catch (error) {
@@ -245,7 +297,6 @@ export default function Dashboard() {
         }
     };
 
-    // Add function to fetch business profile
     const fetchBusinessProfile = async (userId: string) => {
         try {
             const { data, error } = await supabase
@@ -288,7 +339,6 @@ export default function Dashboard() {
         router.push("/Tourguide/Tourtrip1");
     };
 
-    // Calculate pagination values
     const indexOfLastTrip = currentPage * tripsPerPage;
     const indexOfFirstTrip = indexOfLastTrip - tripsPerPage;
     const currentTrips = tours.slice(indexOfFirstTrip, indexOfLastTrip);
@@ -296,7 +346,6 @@ export default function Dashboard() {
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
-        // Scroll to top of trips section when page changes
         const tripsSection = document.getElementById("trips-section");
         if (tripsSection) {
             tripsSection.scrollIntoView({ behavior: "smooth" });
@@ -304,18 +353,19 @@ export default function Dashboard() {
     };
 
     if (loading) {
-        return (
-            <div className="min-h-screen w-full flex justify-center items-center">
-                <p>Loading tours...</p>
-            </div>
-        );
+        return <DashboardSkeleton />;
     }
 
     return (
         <div className="min-h-screen w-full">
             <div className="w-full px-4 py pb-20">
                 <div className="flex items-center mb-6 mt-4 pr-2">
-                    <div className="relative w-12 h-12">
+                    <div
+                        className="relative w-12 h-12"
+                        onClick={() => {
+                            router.push("/profile");
+                        }}
+                    >
                         <Image
                             src="/man image.jpg"
                             alt="User"
@@ -324,7 +374,6 @@ export default function Dashboard() {
                         />
                     </div>
                     <div className="ml-2">
-                        {/* Updated to show business name from business_profiles table */}
                         <p className="text-xs">
                             Good morning,{" "}
                             {businessProfile?.business_name ||
@@ -337,9 +386,8 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Stats */}
                 <div className="grid grid-cols-2 gap-4 mb-6 w-full">
-                    <div className="bg-white rounded-4xl shadow-[0_4px_6px_rgba(74,222,128,0.3)] p-4 flex items-center w-full">
+                    <div className="bg-white rounded-4xl shadow-[0_4px_6px_rgba(74,222,128,0.1)] p-4 flex items-center w-full">
                         <Image
                             src="/Tickets.png"
                             alt="Ticket"
@@ -354,7 +402,7 @@ export default function Dashboard() {
                             <h2 className="text-2xl font-bold">280</h2>
                         </div>
                     </div>
-                    <div className="bg-white rounded-4xl shadow-[0_4px_6px_rgba(74,222,128,0.3)] p-4 flex items-center w-full">
+                    <div className="bg-white rounded-4xl shadow-[0_4px_6px_rgba(74,222,128,0.1)] p-4 flex items-center w-full">
                         <div className="flex-shrink-0 mr-3">
                             <Image
                                 src="/refund.png"
@@ -371,7 +419,7 @@ export default function Dashboard() {
                             <h2 className="text-2xl font-bold">31</h2>
                         </div>
                     </div>
-                    <div className="bg-white rounded-4xl shadow-[0_4px_6px_rgba(74,222,128,0.3)] p-4 flex items-center w-full">
+                    <div className="bg-white rounded-4xl shadow-[0_4px_6px_rgba(74,222,128,0.1)] p-4 flex items-center w-full">
                         <Image
                             src="/Next (1).png"
                             alt="Ticket"
@@ -417,7 +465,7 @@ export default function Dashboard() {
                             </span>
                         </div>
                     </div>
-                    <div className="bg-[#F3FCFB] rounded-4xl shadow-[0_4px_6px_rgba(74,222,128,0.3)] p-4 flex items-center w-full">
+                    <div className="bg-[#F3FCFB] rounded-4xl shadow-[0_4px_6px_rgba(74,222,128,0.1)] p-4 flex items-center w-full">
                         <Image
                             src="/trip origin.png"
                             alt="Ticket"
@@ -441,7 +489,6 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Trips Section */}
                 <div
                     id="trips-section"
                     className="flex justify-between items-center mb-6 w-full"
@@ -455,7 +502,6 @@ export default function Dashboard() {
                     </button>
                 </div>
 
-                {/* Trip List */}
                 {tours.length === 0 ? (
                     <p className="text-center py-8">
                         No trips available. Add your first trip!
@@ -487,7 +533,6 @@ export default function Dashboard() {
                             );
                         })}
 
-                        {/* Pagination */}
                         {totalPages > 1 && (
                             <Pagination
                                 currentPage={currentPage}
@@ -498,8 +543,6 @@ export default function Dashboard() {
                     </>
                 )}
             </div>
-
-            <Navbar />
         </div>
     );
 }

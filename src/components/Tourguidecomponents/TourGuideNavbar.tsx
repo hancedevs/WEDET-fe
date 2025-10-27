@@ -2,79 +2,206 @@
 
 import Link from "next/link";
 import clsx from "clsx";
-import { House, MapPin, User } from "lucide-react";
+
 import type { NavItem, NavbarProps } from "@/types/type";
+import React, { useMemo, useState, useEffect, useRef } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { House, LineSquiggle, MapPin, User } from "lucide-react";
 
-const items = [
-    {
-        href: "/TourDash",
-        label: "Explore",
-        value: "dashbord",
-        Icon: House,
-    },
-    {
-        href: "/Tourlist",
-        label: "My Trips",
-        value: "my-trips",
-        Icon: MapPin,
-    },
-    {
-        href: "/profile",
-        label: "Profile",
-        value: "Tour_profile",
-        Icon: User,
-    },
-] as const satisfies readonly NavItem[];
+const NOTCH_WIDTH = 80;
+const NOTCH_HEIGHT = 25;
+const CONTROL_POINT_OFFSET = 25;
+const TAB_BAR_HEIGHT = 80;
 
-export default function Navbar({ active = "explore" }: NavbarProps) {
+const createTabBarPath = (
+    currentTabIndex: number,
+    totalTabs: number,
+    containerWidth: number
+) => {
+    const TAB_WIDTH = containerWidth / totalTabs;
+
+    let path = `M0,0`;
+
+    const curveStart =
+        TAB_WIDTH * currentTabIndex +
+        TAB_WIDTH / 2 -
+        (NOTCH_WIDTH / 2 + CONTROL_POINT_OFFSET);
+    path += `L${curveStart},0`;
+
+    path += `Q${TAB_WIDTH * currentTabIndex + TAB_WIDTH / 2 - NOTCH_WIDTH / 2},0
+                ${
+                    TAB_WIDTH * currentTabIndex +
+                    TAB_WIDTH / 2 -
+                    NOTCH_WIDTH / 2 +
+                    CONTROL_POINT_OFFSET / 1.55
+                },${NOTCH_HEIGHT}`;
+
+    path += `L${TAB_WIDTH * currentTabIndex + TAB_WIDTH / 2 - 14},${
+        NOTCH_HEIGHT + 8.8
+    } `;
+
+    path += `Q${TAB_WIDTH * currentTabIndex + TAB_WIDTH / 2},${
+        NOTCH_HEIGHT + 15
+    } `;
+    path += `${TAB_WIDTH * currentTabIndex + TAB_WIDTH / 2 + 14},${
+        NOTCH_HEIGHT + 8.8
+    } `;
+
+    path += `L${
+        TAB_WIDTH * currentTabIndex +
+        TAB_WIDTH / 2 +
+        NOTCH_WIDTH / 2 -
+        CONTROL_POINT_OFFSET / 1.55
+    },${NOTCH_HEIGHT}`;
+
+    path += `Q${TAB_WIDTH * currentTabIndex + TAB_WIDTH / 2 + NOTCH_WIDTH / 2},0
+                ${
+                    TAB_WIDTH * currentTabIndex +
+                    TAB_WIDTH / 2 +
+                    NOTCH_WIDTH / 2 +
+                    CONTROL_POINT_OFFSET
+                },0`;
+
+    path += `L${containerWidth},0`;
+    path += `L${containerWidth},${TAB_BAR_HEIGHT} L0,${TAB_BAR_HEIGHT} Z`;
+
+    return path;
+};
+
+export default function NavBar() {
+    const router = useRouter();
+    const pathname = usePathname();
+    const navRef = useRef<HTMLElement | null>(null);
+    const [containerWidth, setContainerWidth] = useState(0);
+
+    const navItems = [
+        {
+            path: "/TourDash",
+            label: "Explore",
+            key: "Explore",
+            value: "dashbord",
+            icon: <House size={26} strokeWidth={1.5} />,
+        },
+        {
+            path: "/Tourlist",
+            label: "My Trips",
+            value: "my-trips",
+            key: "my-trips",
+            icon: <MapPin size={26} strokeWidth={1.5} />,
+        },
+        {
+            path: "/profile",
+            label: "Profile",
+            value: "Tour_profile",
+            key: "Tour_profile",
+            icon: <User size={26} strokeWidth={1.5} />,
+        },
+    ];
+
+    const activeIndex = navItems.findIndex((item) => item.path === pathname);
+    const totalTabs = navItems.length;
+
+    useEffect(() => {
+        const updateWidth = () => {
+            if (navRef.current) {
+                // clientWidth is the inner width that matches how flex distributes space
+                setContainerWidth(navRef.current.clientWidth);
+            }
+        };
+
+        updateWidth();
+        window.addEventListener("resize", updateWidth);
+        return () => window.removeEventListener("resize", updateWidth);
+    }, []);
+
+    const svgPath = useMemo(() => {
+        if (containerWidth > 0) {
+            return createTabBarPath(
+                activeIndex === -1 ? 0 : activeIndex,
+                totalTabs,
+                containerWidth
+            );
+        }
+        return "";
+    }, [activeIndex, totalTabs, containerWidth]);
+
+    const baseColor = "text-[#959494]";
+
     return (
-        <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[#ECECEC]">
-            <div
-                className="
-          mx-auto max-w-[430px]
-          px-8 pt-3 pb-4
-          grid grid-cols-3 place-items-center
-          gap-x-12 md:gap-x-20
-        "
-                style={{
-                    paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
-                }}
+        <div className="fixed inset-x-0 bottom-0 z-50 w-full">
+            <nav
+                ref={navRef}
+                className="relative h-20 bg-transparent flex items-end w-full max-w-none "
+                aria-label="Bottom Navigation"
             >
-                {items.map(({ href, label, value, Icon }) => {
-                    const isActive = active === value;
-                    const color = isActive ? "#28B872" : "#9CA3AF";
+                {containerWidth > 0 && (
+                    <svg
+                        viewBox={`0 0 ${containerWidth} ${TAB_BAR_HEIGHT}`}
+                        preserveAspectRatio="none"
+                        width="100%"
+                        height={TAB_BAR_HEIGHT}
+                        className="absolute bottom-0 left-0 right-0 z-0"
+                        style={{
+                            filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.1))",
+                        }}
+                        aria-hidden
+                    >
+                        <path d={svgPath} fill="#FFFFFF" />
+                    </svg>
+                )}
 
-                    return (
-                        <Link
-                            key={value}
-                            href={href}
-                            aria-current={isActive ? "page" : undefined}
-                            className={clsx(
-                                "flex flex-col items-center gap-1 select-none",
-                                isActive ? "text-[#28B872]" : "text-gray-400"
-                            )}
-                        >
-                            <Icon
-                                size={29}
-                                strokeWidth={1}
-                                className="transition-colors"
-                                style={{ color }}
-                                aria-hidden="true"
-                            />
-                            <span
-                                className={clsx(
-                                    "text-[13px] font-semibold tracking-tight",
-                                    isActive
-                                        ? "text-[#28B872]"
-                                        : "text-gray-400"
-                                )}
+                <div className="flex h-full w-full relative z-10 pb-2">
+                    {navItems.map((item, idx) => {
+                        const isActive = pathname === item.path;
+                        const iconTranslateY = isActive ? "-20px" : "0px";
+
+                        return (
+                            <button
+                                key={item.key}
+                                onClick={() => router.push(item.path)}
+                                className="flex-1 flex flex-col items-center justify-center h-full transition-all duration-300 ease-in-out focus:outline-none relative z-10"
+                                aria-label={item.label}
+                                aria-current={isActive ? "page" : undefined}
                             >
-                                {label}
-                            </span>
-                        </Link>
-                    );
-                })}
-            </div>
-        </nav>
+                                <div
+                                    className={`w-[50px] h-[50px] rounded-full flex items-center justify-center transition-all duration-300 ease-in-out ${
+                                        isActive
+                                            ? "bg-[#28B872] shadow-lg"
+                                            : "bg-transparent"
+                                    }`}
+                                    style={{
+                                        transform: `translateY(${iconTranslateY})`,
+                                        boxShadow: isActive
+                                            ? "0 4px 10px rgba(0, 0, 0, 0.1)"
+                                            : "none",
+                                    }}
+                                >
+                                    <div
+                                        className={
+                                            isActive ? "text-white" : baseColor
+                                        }
+                                    >
+                                        {item.icon}
+                                    </div>
+                                </div>
+
+                                <span
+                                    className={`text-xs mt-1 transition-all duration-300 ${
+                                        isActive
+                                            ? "text-[#28B872] font-semibold"
+                                            : baseColor
+                                    }`}
+                                    style={{
+                                        fontFamily: "'Fredoka', sans-serif",
+                                    }}
+                                >
+                                    {item.label}
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
+            </nav>
+        </div>
     );
 }

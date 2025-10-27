@@ -36,7 +36,7 @@ const TripCard: React.FC<TripCardProps> = ({
             className="relative rounded-4xl border-2 p-4 flex justify-between items-center w-full mb-8 cursor-pointer transition hover:scale-[1.02] hover:shadow-lg"
             style={{
                 borderColor,
-                boxShadow: `0 4px 12px ${borderColor}55`, // shadow based on border color
+                boxShadow: `0 1px 1px ${borderColor}`, // shadow based on border color
             }}
             onClick={() => router.push("../BookingDetail/detail")}
         >
