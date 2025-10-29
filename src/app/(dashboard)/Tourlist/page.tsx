@@ -33,7 +33,7 @@ const TripCard: React.FC<TripCardProps> = ({
 
     return (
         <div
-            className="relative rounded-4xl border-2 p-4 flex justify-between items-center w-full mb-8 cursor-pointer transition hover:scale-[1.02] hover:shadow-lg"
+            className="relative rounded-4xl border-1 p-4 flex justify-between items-center w-full mb-8 cursor-pointer transition hover:scale-[1.02] hover:shadow-lg"
             style={{
                 borderColor,
                 boxShadow: `0 1px 1px ${borderColor}`, // shadow based on border color
