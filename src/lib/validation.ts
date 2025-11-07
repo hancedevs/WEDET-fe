@@ -44,6 +44,11 @@ export const genderSchema = z.enum(["male", "female"]).refine((val) => val, {
     message: "Please select your gender",
 });
 
+export const loginPasswordSchema = z
+    .string()
+    .min(1, "Password is required")
+    .min(8, "Password must be at least 8 characters");
+
 export const signupSchema = z.object({
     firstName: nameSchema,
     lastName: nameSchema,
@@ -59,7 +64,7 @@ export const signupSchema = z.object({
 // Form-specific schemas
 export const loginSchema = z.object({
     email: emailSchema,
-    password: passwordSchema,
+    password: loginPasswordSchema,
 });
 
 export const otpSchema = z.object({
@@ -166,8 +171,3 @@ export const BussinessSignupSchema = z.object({
     fayidaId: z.string().min(1, "Fayida ID is required"),
     businessImage: z.string().optional(),
 });
-
-export const loginPasswordSchema = z
-    .string()
-    .min(1, "Password is required")
-    .min(8, "Password must be at least 8 characters");

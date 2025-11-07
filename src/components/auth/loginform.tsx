@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import Logo from "../ui/Logo";
 
 import type { LoginFormData } from "@/types/type";
-import { loginPasswordSchema, loginSchema } from "@/lib/validation";
+import { loginSchema } from "@/lib/validation";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "../ui/sonner";
 import { getUserRole, isEmailVerified } from "@/lib/utils";
@@ -26,7 +26,7 @@ export function LoginPage() {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm<LoginFormData>({ resolver: zodResolver(loginPasswordSchema) });
+    } = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) });
 
     const onSubmit = async (data: LoginFormData) => {
         setSubmitting(true);
