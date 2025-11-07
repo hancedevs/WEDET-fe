@@ -19,7 +19,7 @@ export default function ClientAuthProvider({
             } = await supabase.auth.getSession();
 
             if (!session) {
-                router.replace("/auth/login");
+                router.replace("/");
             }
 
             setLoading(false);
