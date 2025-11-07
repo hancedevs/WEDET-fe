@@ -22,7 +22,7 @@ const filterSchema = z.object({
         .optional()
         .refine(
             (val) => !val || !isNaN(Number(val)),
-            "Min Price must be a number"
+            "Min Price must be a numberr"
         ),
     maxPrice: z
         .string()
