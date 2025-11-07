@@ -484,8 +484,6 @@ export default function TourPage() {
                                 await supabase.auth.getUser();
                             const user = userData?.user;
                             if (!user) {
-                                router.push(`/book/${numericId}/step1`);
-                                setLoading(false);
                                 return;
                             }
 

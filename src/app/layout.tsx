@@ -7,8 +7,11 @@ import ClientAuthProvider from "@/components/ClientAuthProvider/ClientAuthProvid
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-    title: "Your App",
-    description: "Formidable App",
+    title: "Wedet",
+    description: "Wedet",
+    icons: {
+        icon: "/header.png",
+    },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

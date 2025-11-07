@@ -82,11 +82,9 @@ export default function Header(): JSX.Element {
                             router.push("/user_profile");
                         }}
                     >
-                        <AvatarImage
-                            src={avatarUrl ?? "https://github.com/shadcn.png"}
-                            alt="User Avatar"
-                        />
-                        <AvatarFallback>{fallbackInitial}</AvatarFallback>
+                        <AvatarFallback className="font-bold">
+                            {fallbackInitial}
+                        </AvatarFallback>
                     </Avatar>
                     <div>
                         <p className="text-[11px] text-gray-600">
