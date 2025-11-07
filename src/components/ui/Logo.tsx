@@ -5,7 +5,7 @@ function Logo() {
     return (
         <div className="w-full flex justify-center pt-6 ">
             <Image
-                src="/Header.svg"
+                src="/header.svg"
                 alt="Logo slider"
                 width={180}
                 height={180}
