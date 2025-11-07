@@ -1,14 +1,16 @@
 import React from "react";
 import Image from "next/image";
-import logoImage from "../../../public/Header.jpg";
+
 function Logo() {
     return (
-        <div className=" py-8">
+        <div className="w-full flex justify-center pt-6 ">
             <Image
-                src={logoImage}
+                src="/Header.svg"
                 alt="Logo slider"
-                quality={80}
-                className="mx-auto"
+                width={180}
+                height={180}
+                priority
+                className="object-contain h-auto w-44 sm:w-52 md:w-60"
             />
         </div>
     );

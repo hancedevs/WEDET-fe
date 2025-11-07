@@ -11,6 +11,7 @@ import {
     step3Schema,
     step4Schema,
     step1Schema,
+    loginPasswordSchema,
 } from "@/lib/validation";
 
 export interface User {
@@ -156,7 +157,7 @@ export type NavbarProps = {
     active?: NavValue;
 };
 // Schema types
-export type LoginFormData = z.infer<typeof loginSchema>;
+export type LoginFormData = z.infer<typeof loginPasswordSchema>;
 export type SignupFormData = z.infer<typeof signupSchema>;
 export type OTPFormData = z.infer<typeof otpSchema>;
 export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;

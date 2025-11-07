@@ -8,6 +8,7 @@ import { BussinessSignupSchema } from "@/lib/validation";
 import { z } from "zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { AuthInput } from "../ui/AuthInput";
 type FormErrors = Record<string, string>;
 type LicenseTuple = [File | null, File | null];
 
@@ -321,250 +322,260 @@ export default function Signupform() {
     };
 
     return (
-        <div>
+        <div className="min-h-screen bg-auth-background flex flex-col">
             <Logo />
-            <div className="absolute top-30 w-full bg-white flex flex-col rounded-t-3xl justify-center py-6 sm:px-6 lg:px-8">
-                <div className="max-w-sm">
-                    <h2 className="text-xl px-10 mt-3 font-semibold text-black">
+
+            {/* Main Form Card */}
+            <div
+                className="absolute top-[90px] w-full bg-white rounded-t-3xl px-6 py-8 flex flex-col"
+                style={{ boxShadow: "0px -2px 4px rgba(0, 0, 0, 0.07)" }}
+            >
+                <div className="max-w-sm mx-auto w-full">
+                    {/* Title */}
+                    <h2 className="text-[16px] font-semibold text-gray-400 ml-1 mb-2 text-left">
                         Business Profile
                     </h2>
-                </div>
 
-                <div className="mt-4 sm:mx-auto sm:w-full sm:max-w-md">
-                    <div className="px-10 sm:rounded-lg sm:px-10">
-                        <form className="space-y-4" onSubmit={handleSubmit}>
-                            <div className="grid gap-y-8 gap-x-4">
-                                {/* Business name */}
-                                <div className="flex flex-col gap-1">
-                                    <label>Business name</label>
-                                    <Input
-                                        name="BusinessName"
-                                        value={formData.BusinessName}
-                                        onChange={handleChange}
-                                        className="rounded-3xl p-6 border-none shadow focus:ring-2 focus:ring-green-300"
-                                    />
-                                    {errors.BusinessName && (
-                                        <p className="text-red-500 text-xs mt-1 px-2">
-                                            {errors.BusinessName}
-                                        </p>
+                    <form className="space-y-6" onSubmit={handleSubmit}>
+                        {/* Business name */}
+                        <div className="flex flex-col gap-1">
+                            <AuthInput
+                                name="BusinessName"
+                                value={formData.BusinessName}
+                                onChange={handleChange}
+                                placeholder="Bussiness Name"
+                                className="rounded-full border-gray-200 shadow text-gray-900 focus:ring-[#28B872] focus-visible:ring-offset-0"
+                            />
+                            {errors.BusinessName && (
+                                <p className="text-red-500 text-xs pl-2">
+                                    {errors.BusinessName}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Registration Number */}
+                        <div className="flex flex-col gap-1">
+                            <AuthInput
+                                name="registrationNumber"
+                                value={formData.registrationNumber}
+                                onChange={handleChange}
+                                placeholder="Registration Number"
+                                className="rounded-full border-gray-200 shadow text-gray-900 focus:ring-[#28B872]"
+                            />
+                            {errors.registrationNumber && (
+                                <p className="text-red-500 text-xs pl-2">
+                                    {errors.registrationNumber}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Founding date */}
+                        <div className="flex flex-col gap-1 relative w-full">
+                            <div className="relative w-full">
+                                <div
+                                    className="border border-gray-200 p-3 rounded-full shadow-sm focus-within:ring-2 focus-within:ring-[#28B872] focus-within:border-[#28B872]"
+                                    style={{
+                                        fontFamily:
+                                            "'Century Gothic', sans-serif",
+                                    }}
+                                >
+                                    {/* Fake placeholder */}
+                                    {!formData.foundingDate && (
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none">
+                                            Founding date
+                                        </span>
                                     )}
-                                </div>
 
-                                {/* Registration Number */}
-                                <div className="flex flex-col gap-1">
-                                    <label>Registration Number</label>
-                                    <Input
-                                        name="registrationNumber"
-                                        value={formData.registrationNumber}
-                                        onChange={handleChange}
-                                        className="rounded-3xl p-6 border-none shadow focus:ring-2 focus:ring-green-300"
-                                    />
-                                    {errors.registrationNumber && (
-                                        <p className="text-red-500 text-xs mt-1 px-2">
-                                            {errors.registrationNumber}
-                                        </p>
-                                    )}
-                                </div>
-
-                                {/* Founding date */}
-                                <div className="flex flex-col gap-1">
-                                    <label>Founding date</label>
-                                    <Input
+                                    <input
                                         type="date"
                                         name="foundingDate"
                                         value={formData.foundingDate}
                                         onChange={handleChange}
-                                        className="rounded-3xl p-6 border-none shadow focus:ring-2 focus:ring-green-300"
+                                        className="w-full text-gray-900 bg-transparent relative z-10"
                                     />
-                                    {errors.foundingDate && (
-                                        <p className="text-red-500 text-xs mt-1 px-2">
-                                            {errors.foundingDate}
-                                        </p>
-                                    )}
                                 </div>
 
-                                {/* About business */}
-                                <div className="flex flex-col gap-1">
-                                    <label>About your business</label>
-                                    <textarea
-                                        name="aboutBusiness"
-                                        value={formData.aboutBusiness}
-                                        onChange={handleChange}
-                                        className="rounded-3xl w-full p-6 border-none shadow focus:ring-2 focus:ring-green-300"
-                                        rows={4}
-                                    />
-                                    {errors.aboutBusiness && (
-                                        <p className="text-red-500 text-xs mt-1 px-2">
-                                            {errors.aboutBusiness}
-                                        </p>
-                                    )}
-                                </div>
-
-                                <h2 className="font-bold">Account owner</h2>
-
-                                {/* Email */}
-                                <div className="flex flex-col gap-1">
-                                    <label>Email Address*</label>
-                                    <Input
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        className="rounded-3xl p-6 border-none shadow focus:ring-2 focus:ring-green-300"
-                                    />
-                                    {errors.email && (
-                                        <p className="text-red-500 text-xs mt-1 px-2">
-                                            {errors.email}
-                                        </p>
-                                    )}
-                                </div>
-
-                                {/* Phone */}
-                                <div className="flex flex-col gap-1">
-                                    <label>Phone number</label>
-                                    <Input
-                                        name="phoneNumber"
-                                        value={formData.phoneNumber}
-                                        onChange={handleChange}
-                                        className="rounded-3xl p-6 border-none shadow focus:ring-2 focus:ring-green-300"
-                                    />
-                                    {errors.phoneNumber && (
-                                        <p className="text-red-500 text-xs mt-1 px-2">
-                                            {errors.phoneNumber}
-                                        </p>
-                                    )}
-                                </div>
-
-                                {/* Fayda ID */}
-                                <div className="flex flex-col gap-1">
-                                    <label>Fayda ID number</label>
-                                    <Input
-                                        name="fayidaId"
-                                        value={formData.fayidaId}
-                                        onChange={handleChange}
-                                        className="rounded-3xl p-6 border-none shadow focus:ring-2 focus:ring-green-300"
-                                    />
-                                    {errors.fayidaId && (
-                                        <p className="text-red-500 text-xs mt-1 px-2">
-                                            {errors.fayidaId}
-                                        </p>
-                                    )}
-                                </div>
-
-                                {/* Password */}
-                                <div className="flex flex-col gap-1">
-                                    <label>Password</label>
-                                    <Input
-                                        name="password"
-                                        type="password"
-                                        value={formData.password}
-                                        onChange={handleChange}
-                                        className="rounded-3xl p-6 border-none shadow focus:ring-2 focus:ring-green-300"
-                                    />
-                                    {errors.password && (
-                                        <p className="text-red-500 text-xs mt-1 px-2">
-                                            {errors.password}
-                                        </p>
-                                    )}
-                                </div>
-
-                                {/* Upload business license (2 dashed boxes, accept any image) */}
-                                <div className="flex flex-col gap-2">
-                                    <label className="mb-1 font-medium">
-                                        Upload business license
-                                    </label>
-                                    <div className="flex gap-4">
-                                        {[0, 1].map((idx) => {
-                                            const slot = idx as 0 | 1;
-                                            const previewUrl = previews[idx];
-                                            const errorKey = `licenseImages-${idx}`;
-
-                                            return (
-                                                <label
-                                                    key={idx}
-                                                    className="w-24 h-24 cursor-pointer border-2 border-dashed border-green-400 rounded-md flex items-center justify-center overflow-hidden bg-white"
-                                                    title={
-                                                        previewUrl
-                                                            ? "Change image"
-                                                            : "Upload image"
-                                                    }
-                                                >
-                                                    <input
-                                                        type="file"
-                                                        accept="image/*"
-                                                        className="hidden"
-                                                        onChange={handleFileChange(
-                                                            slot
-                                                        )}
-                                                    />
-                                                    {previewUrl ? (
-                                                        // eslint-disable-next-line @next/next/no-img-element
-                                                        <img
-                                                            src={previewUrl}
-                                                            alt="license preview"
-                                                            className="w-full h-full object-cover"
-                                                        />
-                                                    ) : (
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            width="48"
-                                                            height="48"
-                                                            viewBox="0 0 24 24"
-                                                            fill="none"
-                                                            stroke="#4cc274"
-                                                            strokeWidth="1.5"
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                        >
-                                                            <path d="M16 5h6" />
-                                                            <path d="M19 2v6" />
-                                                            <path d="M21 11.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7.5" />
-                                                            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
-                                                            <circle
-                                                                cx="9"
-                                                                cy="9"
-                                                                r="2"
-                                                            />
-                                                        </svg>
-                                                    )}
-                                                    {errors[errorKey] && (
-                                                        <span className="absolute mt-28 text-[11px] text-red-500">
-                                                            {errors[errorKey]}
-                                                        </span>
-                                                    )}
-                                                </label>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <Button
-                                    type="submit"
-                                    className="mx-auto flex p-6 px-28 rounded-3xl bg-[#28b872] hover:bg-[#28b875] font-semibold"
+                                {/* Calendar icon */}
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    strokeWidth={2}
                                 >
-                                    Verify
-                                </Button>
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                    />
+                                </svg>
                             </div>
 
-                            {/* status + root errors */}
-                            {status && (
-                                <p className="text-sm text-gray-600 mt-2 px-2">
-                                    {status}
+                            {errors.foundingDate && (
+                                <p className="text-red-500 text-xs pl-2">
+                                    {errors.foundingDate}
                                 </p>
                             )}
-                            {errors.root && (
-                                <p className="text-red-600 text-sm mt-2 px-2">
-                                    {errors.root}
+                        </div>
+
+                        {/* About */}
+                        <div className="flex flex-col gap-1">
+                            <textarea
+                                name="aboutBusiness"
+                                placeholder="About your business"
+                                value={formData.aboutBusiness}
+                                onChange={handleChange}
+                                className="rounded-3xl w-full p-4 border-input flex h-36  shadow focus:ring-[#28B872] text-gray-400"
+                                rows={4}
+                                style={{
+                                    fontFamily: "'Century Gothic', sans-serif",
+                                }}
+                            />
+                            {errors.aboutBusiness && (
+                                <p className="text-red-500 text-xs pl-2">
+                                    {errors.aboutBusiness}
                                 </p>
                             )}
-                            {errors.registrationNumber && (
-                                <p className="text-red-600 text-sm mt-1 px-2">
-                                    {errors.registrationNumber}
+                        </div>
+
+                        <h2 className="text-[16px] font-semibold text-gray-400 ml-1 mb-2 text-left">
+                            Account owner
+                        </h2>
+
+                        {/* Email */}
+                        <div className="flex flex-col gap-1">
+                            <AuthInput
+                                name="email"
+                                placeholder="Email Address"
+                                value={formData.email}
+                                onChange={handleChange}
+                                className="rounded-full border-gray-200 shadow text-gray-900 focus:ring-[#28B872]"
+                            />
+                            {errors.email && (
+                                <p className="text-red-500 text-xs pl-2">
+                                    {errors.email}
                                 </p>
                             )}
-                        </form>
-                    </div>
+                        </div>
+
+                        {/* Phone */}
+                        <div className="flex flex-col gap-1">
+                            <AuthInput
+                                name="phoneNumber"
+                                value={formData.phoneNumber}
+                                onChange={handleChange}
+                                placeholder="Phone number"
+                                className="rounded-full border-gray-200 shadow focus:ring-[#28B872]"
+                            />
+                            {errors.phoneNumber && (
+                                <p className="text-red-500 text-xs pl-2">
+                                    {errors.phoneNumber}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Fayda ID */}
+                        <div className="flex flex-col gap-1">
+                            <AuthInput
+                                name="fayidaId"
+                                value={formData.fayidaId}
+                                onChange={handleChange}
+                                placeholder="Fayda ID number"
+                                className="rounded-full border-gray-200 shadow focus:ring-[#28B872]"
+                            />
+                            {errors.fayidaId && (
+                                <p className="text-red-500 text-xs pl-2">
+                                    {errors.fayidaId}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Password */}
+                        <div className="flex flex-col gap-1">
+                            <AuthInput
+                                name="password"
+                                type="password"
+                                placeholder="Password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                className="rounded-full border-gray-200 shadow focus:ring-[#28B872]"
+                            />
+                            {errors.password && (
+                                <p className="text-red-500 text-xs pl-2">
+                                    {errors.password}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Upload business license */}
+                        <div className="flex flex-col gap-2">
+                            <label className="text-gray-600 text-sm pl-1">
+                                Upload business license
+                            </label>
+                            <div className="flex gap-4">
+                                {[0, 1].map((idx) => (
+                                    <label
+                                        key={idx}
+                                        className="w-24 h-24 cursor-pointer border-2 border-dashed border-[#28B872] rounded-lg flex items-center justify-center bg-white overflow-hidden"
+                                    >
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={handleFileChange(idx)}
+                                        />
+                                        {previews[idx] ? (
+                                            <img
+                                                src={previews[idx]}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <span className="text-[#28B872] text-xs">
+                                                Upload
+                                            </span>
+                                        )}
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Button */}
+                        <div className="pt-2">
+                            <Button
+                                type="submit"
+                                className="w-full rounded-full bg-[#28B872] hover:bg-[#23a766] text-white font-medium py-3"
+                            >
+                                Verify
+                            </Button>
+                        </div>
+
+                        {/* Existing account */}
+                        <div className="text-center mt-4">
+                            <span className="text-gray-500 text-sm">
+                                Already have an account?{" "}
+                                <button
+                                    type="button"
+                                    onClick={() => router.push("/auth/login")}
+                                    className="text-[#28B872] font-medium hover:underline"
+                                >
+                                    Login
+                                </button>
+                            </span>
+                        </div>
+
+                        {/* Status + Root errors */}
+                        {status && (
+                            <p className="text-sm text-gray-600 text-center">
+                                {status}
+                            </p>
+                        )}
+                        {errors.root && (
+                            <p className="text-red-600 text-sm text-center">
+                                {errors.root}
+                            </p>
+                        )}
+                    </form>
                 </div>
             </div>
         </div>

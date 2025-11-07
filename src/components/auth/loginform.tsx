@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import Logo from "../ui/Logo";
 
 import type { LoginFormData } from "@/types/type";
-import { loginSchema } from "@/lib/validation";
+import { loginPasswordSchema, loginSchema } from "@/lib/validation";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "../ui/sonner";
 import { getUserRole, isEmailVerified } from "@/lib/utils";
@@ -26,7 +26,7 @@ export function LoginPage() {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) });
+    } = useForm<LoginFormData>({ resolver: zodResolver(loginPasswordSchema) });
 
     const onSubmit = async (data: LoginFormData) => {
         setSubmitting(true);
@@ -142,28 +142,21 @@ export function LoginPage() {
         router.push("/auth/forgotpassword");
 
     return (
-        <div
-            className="min-h-screen bg-auth-background flex flex-col"
-            style={{
-                fontFamily: "'Century Gothic', sans-serif",
-                fontWeight: 300,
-            }}
-        >
+        <div className="min-h-screen bg-auth-background flex flex-col">
             {/* Logo */}
             <Logo />
 
             {/* Main Content */}
             {/* Adjusted top position to match image better */}
-            <div className="flex-1 bg-white rounded-t-3xl px-6 py-8 absolute top-[150px] w-full ">
+            <div
+                className="flex-1 bg-white rounded-t-3xl px-6 py-8 absolute top-[100px] w-full  shadow-lg"
+                style={{
+                    boxShadow: "0px -2px 4px rgba(0, 0, 0, 0.08)",
+                }}
+            >
                 <div className="max-w-sm mx-auto">
                     {/*  header */}
-                    <h1
-                        className="text-xl text-[#959494] ml-1 mb-6 text-left"
-                        style={{
-                            fontFamily: "'Century Gothic'",
-                            fontWeight: 700,
-                        }}
-                    >
+                    <h1 className="text-[16px] font-semibold text-gray-400 ml-1 mb-2 text-left">
                         Login to your account
                     </h1>
 

@@ -15,7 +15,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
             className={`
         w-full 
         rounded-full 
-        py-5 
+        py-4 
         bg-[#28B872] 
         hover:bg-[#1f9d62] 
         text-white 
