@@ -1,6 +1,6 @@
 import { BookingItem } from "@/types/type";
 import { useRouter } from "next/navigation";
-import Logo from "../../../public/logo.svg";
+import Logo from "../../../public/logo_white.svg";
 import Image from "next/image";
 
 function BookingsTab({
@@ -33,7 +33,7 @@ function BookingsTab({
                             <Image
                                 src={Logo}
                                 alt="wedet-logo"
-                                className="h-10 w-28 text-white fill-[#FFFF]"
+                                className="h-7 w-28 text-white fill-[#FFFF]"
                             />
                         </span>
                         <div className="w-16 h-8 bg-white rounded-full opacity-30"></div>{" "}

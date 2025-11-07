@@ -1,26 +1,21 @@
-import type React from "react";
-import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "../components/ui/sonner";
-import { listAllTables } from "@/lib/listTables";
+import { Toaster } from "@/components/ui/sonner";
+import ClientAuthProvider from "@/components/ClientAuthProvider/ClientAuthProvider";
+
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
-    title: "Wedet - Travel Discovery App",
-    description:
-        "Discover amazing travel destinations and plan your next adventure",
+export const metadata = {
+    title: "Your App",
+    description: "Formidable App",
 };
 
-export default function RootLayout({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
     return (
-        <html lang="en">
-            <body className={inter.className}>
-                <div>{children}</div>
+        <html lang="en" className={inter.className}>
+            <body>
+                <ClientAuthProvider>{children}</ClientAuthProvider>
                 <Toaster />
             </body>
         </html>

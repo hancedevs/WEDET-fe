@@ -74,6 +74,19 @@ export function getUserInfo(user: User) {
     ): string | null =>
         typeof obj[key] === "string" && obj[key] ? (obj[key] as string) : null;
 
+    // If businessProfile exists, pick businessName and email from it
+    const businessProfile = (meta.businessProfile ?? id0.businessProfile) as
+        | Record<string, unknown>
+        | undefined;
+
+    const businessName = businessProfile
+        ? pickStr(businessProfile, "BusinessName")
+        : null;
+
+    const businessEmail = businessProfile
+        ? pickStr(businessProfile, "email")
+        : null;
+
     const firstName =
         pickStr(meta, "firstName") ??
         pickStr(meta, "first_name") ??
@@ -103,13 +116,20 @@ export function getUserInfo(user: User) {
         pickStr(id0, "avatar_url") ??
         pickStr(id0, "picture");
 
-    const email = user.email ?? null;
+    const email = businessEmail ?? user.email ?? null; // prioritize business email
     const phone = user.phone ?? null;
     const userId = user.id ?? null;
 
-    return { userId, firstName, lastName, email, phone, avatarUrl };
+    return {
+        userId,
+        firstName,
+        lastName,
+        email,
+        phone,
+        avatarUrl,
+        businessName,
+    };
 }
-
 const DEFAULT_TOUR_BUCKET = "tours";
 export const isFullUrl = (s?: string) => !!s && /^https?:\/\//i.test(s);
 export const isDataUrl = (s?: string) => !!s && /^data:/i.test(s);

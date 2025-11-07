@@ -70,39 +70,50 @@ export default function UserProfilePage() {
     const router = useRouter();
 
     const handleLogout = async () => {
-        const confirmLogout = window.confirm(
-            "Are you sure you want to log out?"
-        );
-        if (confirmLogout) {
-            alert("Logged out successfully!");
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                console.error("Logout error:", error.message);
+                alert("Failed to log out. Please try again.");
+                return;
+            }
+
             router.replace("/auth/login");
+        } catch (err) {
+            console.error("Unexpected logout error:", err);
+            alert("An unexpected error occurred. Please try again.");
         }
     };
 
     useEffect(() => {
         const loadUser = async () => {
-            const { data, error } = await supabase.auth.getUser();
+            const { data: sessionData, error: sessionError } =
+                await supabase.auth.getSession();
+            if (sessionError || !sessionData.session) {
+                console.log("No session, redirecting to login");
+                router.replace("/auth/login");
+                return;
+            }
 
+            const { data, error } = await supabase.auth.getUser();
             if (error) {
-                console.error("supabase.auth.getUser error:", error.message);
-                setLoading(false);
+                console.error("getUser error:", error.message);
                 return;
             }
 
             const user = data.user;
             if (user) {
                 const userInfo = getUserInfo(user);
-                console.log("User Info:", userInfo);
                 setProfile(userInfo);
             } else {
-                setProfile(null);
+                await supabase.auth.signOut();
+                router.replace("/auth/login");
             }
-
             setLoading(false);
         };
 
         void loadUser();
-    }, []);
+    }, [router]);
 
     if (loading) return <UserProfileSkeleton />;
 

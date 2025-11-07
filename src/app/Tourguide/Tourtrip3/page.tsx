@@ -263,7 +263,7 @@ export default function Step3Page() {
             return;
         }
 
-        router.push("/Dashbord/TourDash");
+        router.push("/TourDash");
     };
 
     const onError: SubmitErrorHandler<StepthreeFormData> = (e) => {

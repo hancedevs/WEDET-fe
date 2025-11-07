@@ -30,7 +30,7 @@ export default function NotFound() {
                 </p>
 
                 <a
-                    href="/home"
+                    href="/"
                     className="inline-flex items-center justify-center w-full px-6 py-3 border border-transparent text-lg font-semibold rounded-xl text-white bg-[#28B872] hover:bg-[#209f63] transition-colors shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-[#28B872]/50"
                 >
                     Back to Home Base

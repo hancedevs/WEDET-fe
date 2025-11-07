@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,6 +9,7 @@ import { PageIndicator } from "../ui/page-indicator";
 import { ONBOARDING_STEPS } from "@/lib/utils";
 import type { OnboardingStep } from "@/types/type";
 import type { Variants } from "framer-motion";
+import { supabase } from "@/lib/supabaseClient";
 
 export function OnboardingScreen() {
     const [currentStep, setCurrentStep] = useState(0);
@@ -16,6 +17,20 @@ export function OnboardingScreen() {
     const router = useRouter();
 
     const currentData: OnboardingStep = ONBOARDING_STEPS[currentStep];
+
+    useEffect(() => {
+        const checkSession = async () => {
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
+            if (session) {
+                if (session?.user?.user_metadata?.role === "business_user")
+                    router.push("/TourDash");
+                else router.push("/home");
+            }
+        };
+        void checkSession();
+    }, [router]);
 
     const handleContinue = () => {
         if (currentStep < ONBOARDING_STEPS.length - 1) {

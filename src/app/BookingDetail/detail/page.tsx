@@ -10,6 +10,13 @@ import type { Passenger } from "@/types/type";
 import { supabase } from "@/lib/supabaseClient";
 import { Input } from "@/components/ui/input";
 import { initialTourData } from "@/mock/data";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 /* ----------------------------- TripCard ----------------------------- */
 interface TripCardProps {
@@ -173,22 +180,26 @@ function PassengerListView({
                     placeholder="Search by name, email, phone, location..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="rounded-xl p-4 border-none shadow-sm w-full md:w-1/2 placeholder:text-gray-400 focus:ring-2 focus:ring-green-500 transition"
+                    className="rounded-2xl p-4 border-none shadow-sm w-full md:w-1/2 placeholder:text-gray-400 focus:ring-2 focus:ring-green-500 transition"
                 />
 
-                <select
-                    value={statusFilter}
-                    onChange={(e) =>
-                        setStatusFilter(
-                            e.target.value as "All" | "Paid" | "Pending"
-                        )
-                    }
-                    className="px-4 py-2 border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
-                >
-                    <option value="All">All Status</option>
-                    <option value="Paid">Paid</option>
-                    <option value="Pending">Pending</option>
-                </select>
+                <div className="w-1/3">
+                    <Select
+                        value={statusFilter}
+                        onValueChange={(value) =>
+                            setStatusFilter(value as "All" | "Paid" | "Pending")
+                        }
+                    >
+                        <SelectTrigger className="w-full md:w-[200px] rounded-xl shadow-sm focus:ring-green-500">
+                            <SelectValue placeholder="Filter by status" />
+                        </SelectTrigger>
+                        <SelectContent className="border-0 ">
+                            <SelectItem value="All">All Status</SelectItem>
+                            <SelectItem value="Paid">Paid</SelectItem>
+                            <SelectItem value="Pending">Pending</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
 
             <div className="flex-1 px-4 mb-20 pb-6">
