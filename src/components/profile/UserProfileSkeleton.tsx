@@ -4,7 +4,7 @@ const UserProfileSkeleton = () => {
     return (
         <div
             className="min-h-screen bg-gray-50 pb-24 lg:w-[500px]"
-            style={{ fontFamily: "'Century Gothic', sans-serif" }}
+            style={{ fontFamily: "'Red Hat', sans-serif" }}
         >
             <div className="max-w-xl mx-auto p-4">
                 <div className="flex items-center justify-between mb-8">

@@ -224,7 +224,7 @@ export function LoginPage() {
                                 onClick={handleNavigateToforgotpassword}
                                 className="text-sm text-gray-400 hover:underline"
                                 style={{
-                                    fontFamily: "'Century Gothic'",
+                                    fontFamily: "'Red Hat'",
                                     fontWeight: 300,
                                 }}
                                 disabled={submitting}
@@ -246,8 +246,7 @@ export function LoginPage() {
                                 <span
                                     className="px-2 bg-white text-gray-500"
                                     style={{
-                                        fontFamily:
-                                            "'Century Gothic', sans-serif",
+                                        fontFamily: "'Red Hat', sans-serif",
                                         fontWeight: 300,
                                     }}
                                 >
@@ -263,7 +262,7 @@ export function LoginPage() {
                             onClick={handlePhone}
                             className="w-full rounded-full py-5 border-gray-200 text-gray-600 hover:bg-gray-100 flex items-center justify-center space-x-2 h-auto"
                             style={{
-                                fontFamily: "'Century Gothic', sans-serif",
+                                fontFamily: "'Red Hat', sans-serif",
                                 fontWeight: 300,
                             }}
                             disabled={submitting}
@@ -289,7 +288,7 @@ export function LoginPage() {
                             onClick={handleGoogle}
                             className="w-full rounded-full py-5 border-gray-200 text-gray-600 hover:bg-gray-100 flex items-center justify-center space-x-2 h-auto"
                             style={{
-                                fontFamily: "'Century Gothic', sans-serif",
+                                fontFamily: "'Red Hat', sans-serif",
                                 fontWeight: 300,
                             }}
                             disabled={submitting}
@@ -327,7 +326,7 @@ export function LoginPage() {
                             onClick={handleApple}
                             className="w-full rounded-full py-5 border-gray-200 text-gray-600 hover:bg-gray-100 flex items-center justify-center space-x-2 h-auto"
                             style={{
-                                fontFamily: "'Century Gothic', sans-serif",
+                                fontFamily: "'Red Hat', sans-serif",
                                 fontWeight: 300,
                             }}
                             disabled={submitting}
@@ -356,7 +355,7 @@ export function LoginPage() {
                             <span
                                 className="text-gray-500 text-sm"
                                 style={{
-                                    fontFamily: "'Century Gothic', sans-serif",
+                                    fontFamily: "'Red Hat', sans-serif",
                                     fontWeight: 300,
                                 }}
                             >
@@ -376,7 +375,7 @@ export function LoginPage() {
                             <span
                                 className="text-gray-500 text-sm"
                                 style={{
-                                    fontFamily: "'Century Gothic', sans-serif",
+                                    fontFamily: "'Red Hat', sans-serif",
                                     fontWeight: 300,
                                 }}
                             >

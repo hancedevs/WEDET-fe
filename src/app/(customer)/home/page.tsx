@@ -47,7 +47,7 @@ export default function Page(): JSX.Element {
                 <h2
                     className="text-gray-500 text-xs"
                     style={{
-                        fontFamily: "'Century Gothic', sans-serif",
+                        fontFamily: "'Red Hat', sans-serif",
                         fontWeight: 500,
                     }}
                 >
@@ -56,7 +56,7 @@ export default function Page(): JSX.Element {
                 <button
                     className="text-gray-400 text-xs mr-4"
                     style={{
-                        fontFamily: "'Century Gothic', sans-serif",
+                        fontFamily: "'Red Hat', sans-serif",
                         fontWeight: 300,
                     }}
                 >

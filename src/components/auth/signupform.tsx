@@ -272,8 +272,7 @@ export default function Signupform() {
                                                         : "border-gray-200"
                                                 )}
                                                 style={{
-                                                    fontFamily:
-                                                        "'Century Gothic'",
+                                                    fontFamily: "'Red Hat'",
                                                     fontWeight: 300,
                                                 }}
                                                 disabled={isSubmitting}
@@ -433,8 +432,7 @@ export default function Signupform() {
                                         htmlFor="agreeToTerms"
                                         className="text-sm font-normal text-[#959494] ml-2 leading-relaxed cursor-pointer"
                                         style={{
-                                            fontFamily:
-                                                "'Century Gothic', sans-serif",
+                                            fontFamily: "'Red Hat', sans-serif",
                                         }}
                                     >
                                         By selecting Create account I agree to
@@ -463,8 +461,7 @@ export default function Signupform() {
                                     <span
                                         className="text-gray-500 text-sm"
                                         style={{
-                                            fontFamily:
-                                                "'Century Gothic', sans-serif",
+                                            fontFamily: "'Red Hat', sans-serif",
                                             fontWeight: 300,
                                         }}
                                     >

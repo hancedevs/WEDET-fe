@@ -18,7 +18,7 @@ function BookingsTab({
                     type="text"
                     placeholder="Search bookings..."
                     className="w-full py-2 pl-5 pr-4 text-gray-700 bg-white border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#28B872] transition shadow-sm"
-                    style={{ fontFamily: "'Century Gothic', sans-serif" }}
+                    style={{ fontFamily: "'Red Hat', sans-serif" }}
                 />
             </div>
 

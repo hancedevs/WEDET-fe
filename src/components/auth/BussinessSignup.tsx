@@ -375,8 +375,7 @@ export default function Signupform() {
                                 <div
                                     className="border border-gray-200 p-3 rounded-full shadow-sm focus-within:ring-2 focus-within:ring-[#28B872] focus-within:border-[#28B872]"
                                     style={{
-                                        fontFamily:
-                                            "'Century Gothic', sans-serif",
+                                        fontFamily: "'Red Hat', sans-serif",
                                     }}
                                 >
                                     {/* Fake placeholder */}
@@ -429,7 +428,7 @@ export default function Signupform() {
                                 className="rounded-3xl w-full p-4 border-input flex h-36  shadow focus:ring-[#28B872] text-gray-400"
                                 rows={4}
                                 style={{
-                                    fontFamily: "'Century Gothic', sans-serif",
+                                    fontFamily: "'Red Hat', sans-serif",
                                 }}
                             />
                             {errors.aboutBusiness && (

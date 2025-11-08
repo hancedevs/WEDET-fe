@@ -7,7 +7,7 @@ export default function NotFound() {
     return (
         <div
             className="flex flex-col items-center justify-center min-h-screen text-center bg-gradient-to-br from-gray-50 to-[#e6f9f0] p-6"
-            style={{ fontFamily: "'Century Gothic', sans-serif" }}
+            style={{ fontFamily: "'Red Hat', sans-serif" }}
         >
             <div className="bg-white p-10 rounded-3xl shadow-2xl max-w-md w-full border border-gray-100">
                 <div className="flex justify-center mb-6">

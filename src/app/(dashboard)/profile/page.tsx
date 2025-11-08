@@ -105,7 +105,7 @@ export default function BusinessProfilePage(): React.JSX.Element {
     return (
         <div
             className="min-h-screen bg-white pb-20"
-            style={{ fontFamily: "'Century Gothic', sans-serif" }}
+            style={{ fontFamily: "'Red Hat', sans-serif" }}
         >
             <div className="max-w-xl mx-auto p-4">
                 {/* Header */}

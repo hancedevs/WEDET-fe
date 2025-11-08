@@ -22,7 +22,7 @@ function MetaRow({
     return (
         <div
             className="flex items-start gap-2"
-            style={{ fontFamily: "Century Gothic, sans-serif" }}
+            style={{ fontFamily: "Red Hat, sans-serif" }}
         >
             <div className="mt-[2px]">{icon}</div>
             <div className="leading-tight">
@@ -63,7 +63,7 @@ export default function TripCard({ trip, onBook }: Props) {
             <div className="origin-top-left max-[380px]:w-[calc(100%/var(--s))] max-[380px]:scale-[var(--s)]">
                 <article
                     className="bg-white border-[3px] border-[#ECECEC] rounded-4xl shadow-[0_2px_10px_rgba(0,0,0,0.08)] px-3 py-4"
-                    style={{ fontFamily: "Century Gothic, sans-serif" }}
+                    style={{ fontFamily: "Red Hat, sans-serif" }}
                 >
                     <div className="flex gap-4 items-start">
                         <div className="relative w-[160px] h-[200px] rounded-3xl overflow-hidden shrink-0 bg-gray-100">
@@ -113,7 +113,7 @@ export default function TripCard({ trip, onBook }: Props) {
                                         onClick={() => onBook?.(trip)}
                                         className="rounded-full bg-[#28B872] text-white text-[14px] font-thin px-5 py-[7px] shadow-[0_3px_6px_rgba(40,184,114,0.3)] border border-[#28B872] active:scale-95 transition"
                                         style={{
-                                            fontFamily: "Century Gothic",
+                                            fontFamily: "Red Hat",
                                         }}
                                     >
                                         Book Trip

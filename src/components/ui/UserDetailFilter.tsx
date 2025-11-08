@@ -63,7 +63,7 @@ const Detailfilter = ({ tourData }: DetailfilterProps) => {
                 return (
                     <div
                         style={{
-                            fontFamily: "'Century Gothic', sans-serif",
+                            fontFamily: "'Red Hat', sans-serif",
                             fontWeight: 300,
                         }}
                     >

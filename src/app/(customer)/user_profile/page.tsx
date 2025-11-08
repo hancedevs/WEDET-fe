@@ -120,7 +120,7 @@ export default function UserProfilePage() {
     return (
         <div
             className="min-h-screen bg-white pb-36"
-            style={{ fontFamily: "'Century Gothic', sans-serif" }}
+            style={{ fontFamily: "'Red Hat', sans-serif" }}
         >
             <div className="max-w-xl mx-auto p-4">
                 {/* Header Section */}

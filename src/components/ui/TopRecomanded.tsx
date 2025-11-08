@@ -11,7 +11,7 @@ export default function TopRecommended({ cards }: { cards: TravelCardVM[] }) {
         <div
             className="w-full "
             style={{
-                fontFamily: "'Century Gothic', sans-serif",
+                fontFamily: "'Red Hat', sans-serif",
                 fontWeight: 200,
             }}
         >

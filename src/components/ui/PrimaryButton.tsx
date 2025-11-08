@@ -24,7 +24,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
         ${className}
       `}
             style={{
-                fontFamily: "'Century Gothic', sans-serif",
+                fontFamily: "'Red Hat', sans-serif",
                 fontWeight: 300,
             }}
             {...props}

@@ -11,7 +11,7 @@ export default function CategorySelector() {
                 <h2
                     className="text-gray-400 text-xs"
                     style={{
-                        fontFamily: "'Century Gothic', sans-serif",
+                        fontFamily: "'Red Hat', sans-serif",
                         fontWeight: 300,
                     }}
                 >
@@ -20,7 +20,7 @@ export default function CategorySelector() {
                 <button
                     className="text-gray-400 text-xs"
                     style={{
-                        fontFamily: "'Century Gothic', sans-serif",
+                        fontFamily: "'Red Hat', sans-serif",
                         fontWeight: 300,
                     }}
                 >
@@ -46,7 +46,7 @@ export default function CategorySelector() {
           }
         `}
                         style={{
-                            fontFamily: "'Century Gothic', sans-serif",
+                            fontFamily: "'Red Hat', sans-serif",
                             fontWeight: selected === yes ? 600 : 400,
                         }}
                     >

@@ -25,7 +25,7 @@ const AuthInput = React.forwardRef<HTMLInputElement, AuthInputProps>(
           ${className}
         `}
                 style={{
-                    fontFamily: "'Century Gothic'",
+                    fontFamily: "'Red Hat'",
                     fontWeight: 300,
                 }}
                 {...props}

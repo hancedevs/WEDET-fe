@@ -23,7 +23,7 @@ export default function TripSummary({
         >
             <h2
                 className="font-semibold text-sm text-gray-900"
-                style={{ fontFamily: "'Century Gothic', sans-serif" }}
+                style={{ fontFamily: "'Red Hat', sans-serif" }}
             >
                 Trip Summary
             </h2>
@@ -40,7 +40,7 @@ export default function TripSummary({
                 <div className="flex flex-col justify-between text-sm space-y-0.5 py-0.5">
                     <h3
                         className="font-bold text-gray-900"
-                        style={{ fontFamily: "'Century Gothic', sans-serif" }}
+                        style={{ fontFamily: "'Red Hat', sans-serif" }}
                     >
                         {title}
                     </h3>
@@ -52,7 +52,7 @@ export default function TripSummary({
                         <span
                             className="text-gray-600"
                             style={{
-                                fontFamily: "'Century Gothic', sans-serif",
+                                fontFamily: "'Red Hat', sans-serif",
                             }}
                         >
                             {location}
@@ -66,7 +66,7 @@ export default function TripSummary({
                         <span
                             className="text-gray-600"
                             style={{
-                                fontFamily: "'Century Gothic', sans-serif",
+                                fontFamily: "'Red Hat', sans-serif",
                             }}
                         >
                             {dateRange}
@@ -80,7 +80,7 @@ export default function TripSummary({
                         <span
                             className="text-gray-600"
                             style={{
-                                fontFamily: "'Century Gothic', sans-serif",
+                                fontFamily: "'Red Hat', sans-serif",
                             }}
                         >
                             {duration}
@@ -89,7 +89,7 @@ export default function TripSummary({
                     <span
                         className="text-gray-600"
                         style={{
-                            fontFamily: "'Century Gothic', sans-serif",
+                            fontFamily: "'Red Hat', sans-serif",
                             fontSize: 13,
                         }}
                     >

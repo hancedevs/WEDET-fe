@@ -20,7 +20,7 @@ function SettingsTab({
                                 onClick={option.onClick}
                                 className="flex items-center gap-3 w-full text-left py-2 hover:bg-gray-50 rounded-lg transition"
                                 style={{
-                                    fontFamily: "'Century Gothic', sans-serif",
+                                    fontFamily: "'Red Hat', sans-serif",
                                 }}
                             >
                                 <div
