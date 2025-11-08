@@ -21,7 +21,9 @@ export default function AuthLayout({
             if (session) {
                 if (session?.user?.user_metadata?.role === "business_user")
                     router.push("/TourDash");
-                else router.push("/home");
+                else if (session?.user?.user_metadata?.role === "normal_user")
+                    router.push("/home");
+                else return;
             }
         };
         void checkSession();

@@ -114,6 +114,7 @@ export default function Signupform() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
         if (!validateForm()) {
             toast.error("Please fix the highlighted fields.");
             return;
@@ -154,8 +155,30 @@ export default function Signupform() {
             });
 
             if (error) {
-                toast.error(error.message, { id: tid });
+                if (error.message.includes("User already registered")) {
+                    toast.error(
+                        "This email is already registered. Please log in.",
+                        { id: tid }
+                    );
+                } else {
+                    toast.error(error.message, { id: tid });
+                }
                 setErrors((p) => ({ ...p, root: error.message }));
+                return;
+            }
+
+            // ✅ Detect existing unverified email
+            if (
+                signUpData?.user &&
+                Array.isArray(signUpData.user.identities) &&
+                signUpData.user.identities.length === 0
+            ) {
+                toast.error(
+                    "This email is already pending verification. Please check your email inbox.",
+                    {
+                        id: tid,
+                    }
+                );
                 return;
             }
 
@@ -165,8 +188,9 @@ export default function Signupform() {
                 "Account created! Please check your email to verify your account and then log in.",
                 { id: tid, duration: 8000 }
             );
-            router.replace("/auth/login");
+            router.push("/auth/login");
         } catch (err: unknown) {
+            console.error(err);
             const message =
                 err instanceof Error ? err.message : "Something went wrong";
             toast.error(message, { id: tid });
@@ -274,9 +298,13 @@ export default function Signupform() {
                                                 captionLayout="dropdown"
                                                 selected={formData.dateOfBirth}
                                                 onSelect={handleDateChange}
-                                                initialFocus
-                                                fromYear={1900}
-                                                toYear={new Date().getFullYear()}
+                                                month={formData.dateOfBirth}
+                                                onMonthChange={(month) =>
+                                                    setFormData((prev) => ({
+                                                        ...prev,
+                                                        dateOfBirth: month,
+                                                    }))
+                                                }
                                                 className="p-3"
                                             />
                                         </PopoverContent>

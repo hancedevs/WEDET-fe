@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function ClientAuthProvider({
@@ -11,14 +11,28 @@ export default function ClientAuthProvider({
 }) {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
-
+    const pathname = usePathname();
     useEffect(() => {
         const checkSession = async () => {
+            const onboard = localStorage.getItem("onboard");
             const {
                 data: { session },
             } = await supabase.auth.getSession();
 
-            if (!session) {
+            if (onboard) {
+                if (!session) {
+                    const authRoutes = [
+                        "/auth/login",
+                        "/auth/signup",
+                        "/auth/forgot-password",
+                    ];
+
+                    if (!authRoutes.includes(pathname)) {
+                        router.replace("/auth/login");
+                    }
+                }
+            }
+            if (onboard === undefined) {
                 router.replace("/");
             }
 

@@ -22,23 +22,23 @@ export const nameSchema = z
     .max(50, "Must be less than 50 characters")
     .regex(/^[a-zA-Z]+$/, "Must contain only letters");
 
-export const dateOfBirthSchema = z
-    .string()
-    .min(1, "Date of birth is required")
-    .refine((val) => !isNaN(Date.parse(val)), {
-        message: "Please enter a valid date",
-    })
-    .refine((val) => {
-        const dob = new Date(val);
-        const now = new Date();
-        return dob < now;
-    }, "Date of birth must be in the past")
-    .refine((val) => {
-        const dob = new Date(val);
-        const now = new Date();
-        const age = now.getFullYear() - dob.getFullYear();
-        return age >= 1;
-    }, "You must be at least 13 years old");
+export const dateOfBirthSchema = z.any().refine((dob) => {
+    if (!dob) return false;
+    const dateObj = new Date(dob);
+    if (isNaN(dateObj.getTime())) return false;
+
+    console.log(dateObj);
+    const now = new Date();
+    let age = now.getFullYear() - dateObj.getFullYear();
+
+    const monthDiff = now.getMonth() - dateObj.getMonth();
+    const dayDiff = now.getDate() - dateObj.getDate();
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+        age -= 1;
+    }
+
+    return age >= 13;
+}, "You must be at least 13 years old");
 
 export const genderSchema = z.enum(["male", "female"]).refine((val) => val, {
     message: "Please select your gender",

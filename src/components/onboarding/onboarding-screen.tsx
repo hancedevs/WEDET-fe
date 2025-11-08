@@ -36,13 +36,16 @@ export function OnboardingScreen() {
         if (currentStep < ONBOARDING_STEPS.length - 1) {
             setDirection(1);
             setCurrentStep((prev) => prev + 1);
+            localStorage.setItem("onboard", "true");
         } else {
             router.push("/auth/login");
+            localStorage.setItem("onboard", "true");
         }
     };
 
     const handleSkip = () => {
         router.push("/auth/login");
+        localStorage.setItem("onboard", "true");
     };
 
     const slideVariants: Variants = {

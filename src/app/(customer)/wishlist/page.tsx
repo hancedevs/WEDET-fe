@@ -108,9 +108,9 @@ export default function TripsPage() {
                 {/* Tabs row (allow horizontal scroll on tiny screens) */}
                 {/* Tabs row - sticky */}
                 <div className="sticky top-[60px] z-30 bg-white px-3 py-2 border-b border-[#F0F0F0]">
-                    <div className="mx-auto w-[80vw] max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg">
+                    <div className="mx-auto w-[80vw] lg:w-[50vw] max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg overflow-hidden">
                         <div className="overflow-x-auto no-scrollbar">
-                            <div className="min-w-fit">
+                            <div className="min-w-fit max-w-2xl">
                                 <SegmentedTabs value={tab} onChange={setTab} />
                             </div>
                         </div>
