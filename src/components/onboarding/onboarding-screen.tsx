@@ -28,6 +28,12 @@ export function OnboardingScreen() {
                     router.push("/TourDash");
                 else router.push("/home");
             }
+            {
+                const onboard = localStorage.getItem("onboard");
+                if (onboard) {
+                    router.push("/home");
+                }
+            }
         };
         void checkSession();
     }, [router]);
