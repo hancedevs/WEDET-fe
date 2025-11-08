@@ -78,7 +78,7 @@ export default function UserProfilePage() {
                 return;
             }
 
-            router.replace("/auth/login");
+            router.replace("/home");
         } catch (err) {
             console.error("Unexpected logout error:", err);
             alert("An unexpected error occurred. Please try again.");

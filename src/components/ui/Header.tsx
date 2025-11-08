@@ -72,6 +72,7 @@ export default function Header(): JSX.Element {
     const fallbackInitial = (firstName?.[0] ?? "U").toUpperCase();
 
     const router = useRouter();
+    console.log(firstName);
     return (
         <div className="flex flex-col gap-5">
             <div className="flex items-center justify-between mt-4  px-3">
@@ -96,7 +97,7 @@ export default function Header(): JSX.Element {
                     </div>
                 </div>
 
-                <IconButtons />
+                {firstName && <IconButtons />}
             </div>
 
             <div className="flex flex-row gap-7 items-center px-3">

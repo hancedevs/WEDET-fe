@@ -2,6 +2,7 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { House, LineSquiggle, MapPin, User } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
 
 const NOTCH_WIDTH = 80;
 const NOTCH_HEIGHT = 25;
@@ -93,6 +94,20 @@ export default function NavBar() {
         []
     );
 
+    const handleTabClick = async (path: string) => {
+        const protectedPages = ["/wishlist", "/user_profile"];
+        if (protectedPages.includes(path)) {
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
+            if (!session) {
+                router.push("/auth/login"); // redirect to login if not logged in
+                return;
+            }
+        }
+        router.push(path); // otherwise go to the page
+    };
+
     const activeIndex = navItems.findIndex((item) => item.path === pathname);
     const totalTabs = navItems.length;
 
@@ -153,7 +168,7 @@ export default function NavBar() {
                         return (
                             <button
                                 key={item.key}
-                                onClick={() => router.push(item.path)}
+                                onClick={() => handleTabClick(item.path)}
                                 className="flex-1 flex flex-col items-center justify-center h-full transition-all duration-300 ease-in-out focus:outline-none relative z-10"
                                 aria-label={item.label}
                                 aria-current={isActive ? "page" : undefined}

@@ -25,9 +25,17 @@ export default function ClientAuthProvider({
                         "/auth/login",
                         "/auth/signup",
                         "/auth/forgot-password",
+                        "/home",
+                        (url: string) => url.startsWith("/trip/"),
                     ];
 
-                    if (!authRoutes.includes(pathname)) {
+                    const isAuthRoute = authRoutes.some((route) =>
+                        typeof route === "string"
+                            ? route === pathname
+                            : route(pathname)
+                    );
+
+                    if (!isAuthRoute) {
                         router.replace("/auth/login");
                     }
                 }

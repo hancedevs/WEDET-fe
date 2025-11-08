@@ -484,6 +484,7 @@ export default function TourPage() {
                                 await supabase.auth.getUser();
                             const user = userData?.user;
                             if (!user) {
+                                router.push("/auth/login");
                                 return;
                             }
 

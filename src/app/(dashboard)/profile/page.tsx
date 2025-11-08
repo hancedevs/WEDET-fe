@@ -67,7 +67,7 @@ export default function BusinessProfilePage(): React.JSX.Element {
         try {
             const { error } = await supabase.auth.signOut();
             if (error) throw error;
-            router.replace("/auth/login");
+            router.replace("/home");
         } catch (err) {
             console.error("Logout error:", err);
             alert("Failed to log out. Please try again.");
