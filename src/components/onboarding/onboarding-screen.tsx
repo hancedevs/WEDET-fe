@@ -38,13 +38,13 @@ export function OnboardingScreen() {
             setCurrentStep((prev) => prev + 1);
             localStorage.setItem("onboard", "true");
         } else {
-            router.push("/auth/login");
+            router.push("/home");
             localStorage.setItem("onboard", "true");
         }
     };
 
     const handleSkip = () => {
-        router.push("/auth/login");
+        router.push("/home");
         localStorage.setItem("onboard", "true");
     };
 
