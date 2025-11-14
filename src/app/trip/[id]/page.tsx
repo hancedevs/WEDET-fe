@@ -367,70 +367,118 @@ export default function TourPage() {
                         </div>
                     </div>
                     {/* Guide card (actual data) */}
-                    <div className="shadow-xl bg-white flex flex-col rounded-[35px] p-4 mb-6 ">
+                    <div className="shadow-xl bg-white flex flex-col rounded-[35px] p-4 mb-6">
                         <div className="flex flex-row justify-between items-center mb-4 flex-nowrap gap-4">
+                            {/* Avatar + Name */}
                             <div className="flex items-center gap-2 min-w-0">
-                                <div className="h-12 w-12 sm:h-15 sm:w-15 rounded-full overflow-hidden border-2 border-green-500">
-                                    <img
-                                        src={"https://github.com/shadcn.png"} // Placeholder for the actual image, assuming shadcn.png is used here for simplicity as the original is an Ethiopian name and the code uses a placeholder
-                                        alt={"Abebe balcha"}
-                                        className="object-cover h-full w-full"
-                                    />
+                                <div className="h-12 w-12 rounded-full overflow-hidden border-2 border-green-500 flex items-center justify-center">
+                                    {loading ? (
+                                        <Skeleton className="h-12 w-12 rounded-full" />
+                                    ) : (
+                                        businessProfile?.business_name && (
+                                            <Avatar className="h-12 w-12">
+                                                <AvatarFallback className="flex items-center justify-center bg-green-100 text-green-700 text-lg font-semibold">
+                                                    {businessProfile.business_name
+                                                        .charAt(0)
+                                                        .toUpperCase()}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                        )
+                                    )}
                                 </div>
-                                <div className="min-w-0">
+
+                                <div className="min-w-0 flex flex-col">
                                     <div className="flex gap-2 items-center">
-                                        <h3 className="font-bold text-base sm:text-lg truncate">
-                                            Abebe balcha
-                                        </h3>
-                                        {/* BadgeCheck icon (simulated with a green checkmark/emoji for pure HTML/Tailwind, or using a component if available) */}
-                                        <span className="text-green-700 w-5 h-5 font-extrabold text-xl leading-none">
-                                            <Verified />
+                                        {loading ? (
+                                            <Skeleton className="h-5 w-28" />
+                                        ) : (
+                                            <h3 className="font-bold text-base sm:text-lg truncate">
+                                                {businessProfile?.business_name}
+                                            </h3>
+                                        )}
+
+                                        {loading ? (
+                                            <Skeleton className="h-4 w-4 rounded-full" />
+                                        ) : (
+                                            <span className="text-green-700 w-5 h-5 font-extrabold text-xl leading-none">
+                                                <Verified />
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {loading ? (
+                                        <Skeleton className="h-4 w-24 mt-1" />
+                                    ) : (
+                                        <p className="text-gray-500 text-sm truncate">
+                                            18 years experience
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Rating */}
+                            <div className="flex flex-col items-end gap-1 min-w-[120px]">
+                                {loading ? (
+                                    <Skeleton className="h-4 w-28" />
+                                ) : (
+                                    <span className="text-[#959494] font-semibold text-sm truncate">
+                                        Your Expert Guide
+                                    </span>
+                                )}
+
+                                {loading ? (
+                                    <Skeleton className="h-5 w-16" />
+                                ) : (
+                                    <div className="flex items-center justify-center w-full">
+                                        <span className="text-yellow-500 text-lg leading-none">
+                                            &#9733;
+                                        </span>
+                                        <span className="ml-1 text-base font-medium">
+                                            4.7
                                         </span>
                                     </div>
-                                    <p className="text-gray-500 text-sm truncate">
-                                        18 years experience
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex flex-col items-end gap-1 min-w-[120px]">
-                                <span className="text-[#959494] font-semibold text-sm truncate">
-                                    Your Expert Guide
-                                </span>
-                                <div className="flex items-center  w-full justify-center">
-                                    {/* Star icon (simulated with a yellow star emoji) */}
-                                    <span className="text-yellow-500 text-lg leading-none">
-                                        &#9733;
-                                    </span>
-                                    <span className="ml-1 text-base font-medium">
-                                        4.7
-                                    </span>
-                                </div>
+                                )}
                             </div>
                         </div>
+
+                        {/* About Section */}
                         <div className="ml-0 sm:ml-0">
-                            <p className="text-[#4e4d4d] sm:text-left text-sm mb-4">
-                                Carlos is a naturalist guide born in the Amazon
-                                basin. His encyclopedic knowledge of rain
-                                ecology, combined with his ability to spot even
-                                the most elusive wildlife, makes him one of
-                                Peru's most respected jungle guides.
-                            </p>
-                            <p className="text-[#4e4d4d] text-justify font-bold text-sm mb-2">
-                                Specialties:
-                            </p>
+                            {loading ? (
+                                <Skeleton className="h-16 w-full mb-4" />
+                            ) : (
+                                <p className="text-[#4e4d4d] sm:text-left text-sm mb-4">
+                                    {businessProfile?.about}
+                                </p>
+                            )}
+
+                            {loading ? (
+                                <Skeleton className="h-4 w-20 mb-2" />
+                            ) : (
+                                <p className="text-[#4e4d4d] text-justify font-bold text-sm mb-2">
+                                    Specialties:
+                                </p>
+                            )}
                         </div>
+
+                        {/* Specialties Tags */}
                         <div className="flex flex-wrap gap-2">
-                            {["Wildlife", "jungle", "Culture"].map((tag, i) => (
-                                <span
-                                    key={i}
-                                    className="text-center border border-[#E9F4F4] text-black rounded-[35px] px-3 py-1 text-xs sm:text-sm shadow-sm"
-                                >
-                                    {tag}
-                                </span>
-                            ))}
-                            <span className="text-center border border-[#E9F4F4] text-black rounded-[35px] px-3 py-1 text-xs sm:text-sm shadow-sm">
-                                Wildlife
-                            </span>
+                            {loading
+                                ? [...Array(3)].map((_, i) => (
+                                      <Skeleton
+                                          key={i}
+                                          className="h-6 w-20 rounded-[35px]"
+                                      />
+                                  ))
+                                : ["Wildlife", "jungle", "Culture"].map(
+                                      (tag, i) => (
+                                          <span
+                                              key={i}
+                                              className="text-center border border-[#E9F4F4] text-black rounded-[35px] px-3 py-1 text-xs sm:text-sm shadow-sm"
+                                          >
+                                              {tag}
+                                          </span>
+                                      )
+                                  )}
                         </div>
                     </div>
 

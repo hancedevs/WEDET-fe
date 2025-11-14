@@ -10,7 +10,7 @@ export const metadata = {
     title: "Wedet",
     description: "Wedet",
     icons: {
-        icon: "/header.png",
+        icon: "/logotwo.png",
     },
 };
 
