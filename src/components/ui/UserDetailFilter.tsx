@@ -121,35 +121,39 @@ const Detailfilter = ({ tourData }: DetailfilterProps) => {
                                             key={dayKey}
                                             className="flex gap-x-2 items-start"
                                         >
-                                            <div
-                                                className="relative"
-                                                style={{ width: 24 }}
-                                            >
-                                                {!isLast && (
-                                                    <div
-                                                        className="absolute left-[9px] top-[10px] border-l-2 border-dotted border-[#28B872]"
-                                                        style={{
-                                                            height: `${
-                                                                connectorHeights[
-                                                                    index
-                                                                ] ?? 0
-                                                            }px`,
-                                                        }}
-                                                    />
-                                                )}
+                                            <div className="absolute left-5 lg:left-5">
+                                                <div
+                                                    className="relative "
+                                                    style={{ width: 24 }}
+                                                >
+                                                    {!isLast && (
+                                                        <div
+                                                            className="absolute left-[9px] top-[10px] border-l-2 border-dotted border-[#28B872]"
+                                                            style={{
+                                                                height: `${
+                                                                    connectorHeights[
+                                                                        index
+                                                                    ] ?? 0
+                                                                }px`,
+                                                            }}
+                                                        />
+                                                    )}
 
-                                                <div className="absolute left-0 top-[2px] w-4 h-4 bg-[#28B872] rounded-full z-10">
-                                                    <span className="absolute top-1/2 left-1/2 h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-white border border-white transform -translate-x-1/2 -translate-y-1/2"></span>
+                                                    <div className="absolute left-0 top-[2px] w-4 h-4 bg-[#28B872] rounded-full z-10">
+                                                        <span className="absolute top-1/2 left-1/2 h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-white border border-white transform -translate-x-1/2 -translate-y-1/2"></span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="grid   ml-5 ">
+                                                    <p className="font-semibold leading-tight mb-0">
+                                                        Day{" "}
+                                                        {dayKey.replace(
+                                                            "day",
+                                                            ""
+                                                        )}
+                                                    </p>
                                                 </div>
                                             </div>
-
-                                            <div className="grid mr-3">
-                                                <p className="font-semibold leading-tight mb-0">
-                                                    Day{" "}
-                                                    {dayKey.replace("day", "")}
-                                                </p>
-                                            </div>
-
                                             <div
                                                 ref={(el) => {
                                                     cardRefs.current[index] =
