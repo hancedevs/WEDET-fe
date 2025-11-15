@@ -194,7 +194,7 @@ export default function UserProfilePage() {
                 {/* Content */}
                 {activeTab === "bookings" ? (
                     loadingBookings ? (
-                        <div className="space-y-4">
+                        <div className="space-y-4 lg:w-[500px]">
                             {[...Array(3)].map((_, i) => (
                                 <div
                                     key={i}
