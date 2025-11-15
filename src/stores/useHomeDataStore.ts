@@ -4,15 +4,17 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { fetchToursForHome, type TravelCardVM } from "@/lib/toursRepo";
 
-type HomeState = {
+interface HomeState {
     cards: TravelCardVM[];
     loading: boolean;
     error?: string;
     lastFetched: number | null;
+    query: string;
+    setQuery: (q: string) => void;
+    clear: () => void;
     ensure: (minCount?: number) => Promise<void>;
     refresh: (minCount?: number) => Promise<void>;
-    clear: () => void;
-};
+}
 
 const STALE_MS = 5 * 60_000; // 5 minutes
 const KEY = "home-cards";
@@ -73,23 +75,20 @@ export const useHomeDataStore = create<HomeState>()(
             loading: false,
             error: undefined,
             lastFetched: null,
-
+            query: "",
+            setQuery: (q: string) => set({ query: q }),
             clear: () => {
                 set({ cards: [], lastFetched: null });
                 try {
                     sessionStorage.removeItem(KEY);
-                } catch {
-                    // ignore
-                }
+                } catch {}
             },
-
             ensure: async (minCount = 12) => {
                 const { cards, lastFetched } = get();
                 const fresh =
                     lastFetched !== null && Date.now() - lastFetched < STALE_MS;
                 const enough = cards.length >= minCount;
                 if (fresh && enough) return;
-
                 set({ loading: cards.length === 0, error: undefined });
                 try {
                     const items = await fetchToursForHome(minCount);
@@ -104,7 +103,6 @@ export const useHomeDataStore = create<HomeState>()(
                     set({ loading: false, error: message });
                 }
             },
-
             refresh: async (minCount = 12) => {
                 set({ loading: true, error: undefined });
                 try {
@@ -144,34 +142,6 @@ export const useHomeDataStore = create<HomeState>()(
                 lastFetched: s.lastFetched,
             }),
             version: 3,
-            migrate: (persisted: unknown, version: number) => {
-                if (!persisted || typeof persisted !== "object")
-                    return persisted;
-                const p = persisted as {
-                    cards?: TravelCardVM[];
-                    lastFetched?: number | null;
-                };
-                if (version < 3 && Array.isArray(p.cards)) {
-                    p.cards = p.cards
-                        .slice(0, MAX_CACHE_CARDS)
-                        .map<LightCard>((c) => ({
-                            id: c.id,
-                            imageUrl: c.imageUrl,
-                            placeName: c.placeName,
-                            location: c.location,
-                            tripDuration: c.tripDuration,
-                            price: c.price,
-                            oldPrice: c.oldPrice,
-                            discountPercent: c.discountPercent,
-                            rating: c.rating,
-                            reviews: c.reviews,
-                            agencyName: c.agencyName,
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            agencyAbout: (c as any).agencyAbout, // may be undefined on older caches
-                        })) as unknown as TravelCardVM[];
-                }
-                return p as unknown;
-            },
         }
     )
 );

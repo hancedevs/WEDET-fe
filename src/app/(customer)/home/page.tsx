@@ -1,18 +1,15 @@
 "use client";
 
-import { JSX, useEffect } from "react";
-import NavBar from "@/components/ui/navBar";
-import Header from "@/components/ui/Header";
-import TopRecommended from "@/components/ui/TopRecomanded";
-import CategorySelector from "@/components/ui/catagory";
-import TravelCard from "@/components/ui/travelcard";
+import { JSX, useEffect, useMemo } from "react";
+import Link from "next/link";
 import { useHomeDataStore } from "@/stores/useHomeDataStore";
+import TravelCard from "@/components/ui/travelcard";
 import SkeletonTripCard from "@/components/ui/SkeletonTripCard";
 import SkeletonTopRecommended from "@/components/ui/SkeletonTopRecommended";
+import TopRecommended from "@/components/ui/TopRecomanded";
+import CategorySelector from "@/components/ui/catagory";
 import { Skeleton } from "@/components/ui/skeleton";
-import Link from "next/link";
 
-// Convert "2,700" -> 2700 safely
 function toNum(v: string | number | null | undefined): number | undefined {
     if (typeof v === "number") return Number.isFinite(v) ? v : undefined;
     if (typeof v === "string") {
@@ -23,23 +20,35 @@ function toNum(v: string | number | null | undefined): number | undefined {
 }
 
 export default function Page(): JSX.Element {
-    const { cards, loading, ensure } = useHomeDataStore();
+    const cards = useHomeDataStore((s) => s.cards);
+    const loading = useHomeDataStore((s) => s.loading);
+    const ensure = useHomeDataStore((s) => s.ensure);
+    const query = useHomeDataStore((s) => s.query);
 
     useEffect(() => {
         void ensure(12);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [ensure]);
+
+    const filteredCards = useMemo(() => {
+        if (!query.trim()) return cards;
+        const q = query.toLowerCase();
+        return cards.filter(
+            (c) =>
+                c.placeName?.toLowerCase().includes(q) ||
+                c.location?.toLowerCase().includes(q) ||
+                c.agencyName?.toLowerCase().includes(q)
+        );
+    }, [cards, query]);
 
     const showInitialSkeletons = loading && cards.length === 0;
 
     return (
-        <div className=" pb-32">
-            {/* Top Recommended */}
+        <div className="pb-32">
             {showInitialSkeletons ? (
                 <SkeletonTopRecommended />
-            ) : (
+            ) : query.trim() === "" ? (
                 <TopRecommended cards={cards} />
-            )}
+            ) : null}
 
             <CategorySelector />
 
@@ -64,15 +73,16 @@ export default function Page(): JSX.Element {
                 </button>
             </div>
 
-            {/* Trip list */}
             {showInitialSkeletons ? (
                 <div className="p-2 grid grid-cols-1 gap-6">
                     {Array.from({ length: 6 }).map((_, i) => (
                         <SkeletonTripCard key={i} />
                     ))}
                 </div>
-            ) : cards.length === 0 ? (
-                <div className="p-2 text-xs text-gray-400">No trips yet.</div>
+            ) : filteredCards.length === 0 ? (
+                <div className="p-2 text-xs text-gray-400  text-center">
+                    No trips found.
+                </div>
             ) : (
                 <>
                     {loading && (
@@ -80,36 +90,33 @@ export default function Page(): JSX.Element {
                             <Skeleton className="h-3 w-24 rounded" />
                         </div>
                     )}
-
                     <div className="p-2 grid grid-cols-1 gap-6">
-                        {cards.map((c, i) => {
-                            const tooltip = c.agencyAbout
-                                ? `${c.agencyName} — ${c.agencyAbout}`
-                                : c.agencyName;
-
-                            return (
-                                <Link
-                                    key={c.id}
-                                    href={`/trip/${c.id}`}
-                                    className="block"
-                                    title={tooltip}
-                                >
-                                    <TravelCard
-                                        imageUrl={c.imageUrl}
-                                        placeName={c.placeName}
-                                        location={c.location}
-                                        tripDuration={c.tripDuration}
-                                        price={toNum(c.price) ?? 0}
-                                        oldPrice={toNum(c.oldPrice)}
-                                        discountPercent={c.discountPercent}
-                                        rating={c.rating}
-                                        reviews={c.reviews}
-                                        agencyName={c.agencyName}
-                                        priority={i < 2}
-                                    />
-                                </Link>
-                            );
-                        })}
+                        {filteredCards.map((c, i) => (
+                            <Link
+                                key={c.id}
+                                href={`/trip/${c.id}`}
+                                className="block"
+                                title={
+                                    c.agencyAbout
+                                        ? `${c.agencyName} — ${c.agencyAbout}`
+                                        : c.agencyName
+                                }
+                            >
+                                <TravelCard
+                                    imageUrl={c.imageUrl}
+                                    placeName={c.placeName}
+                                    location={c.location}
+                                    tripDuration={c.tripDuration}
+                                    price={toNum(c.price) ?? 0}
+                                    oldPrice={toNum(c.oldPrice)}
+                                    discountPercent={c.discountPercent}
+                                    rating={c.rating}
+                                    reviews={c.reviews}
+                                    agencyName={c.agencyName}
+                                    priority={i < 2}
+                                />
+                            </Link>
+                        ))}
                     </div>
                 </>
             )}
