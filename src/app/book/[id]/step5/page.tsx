@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import QRCode from "react-qr-code";
 import {
     Users,
@@ -111,6 +111,8 @@ const SecondaryDetailItem: React.FC<{
 
 export default function TicketPage() {
     const { id } = useParams<{ id: string }>();
+    const searchParams = useSearchParams();
+    const ticketId = searchParams.get("id"); //
     const numericId = useMemo(() => Number(id), [id]);
 
     const [loading, setLoading] = useState(true);
@@ -130,21 +132,6 @@ export default function TicketPage() {
     const [bookingId, setBookingId] = useState<string>("");
 
     // --- Original Logic for Data Fetching and State Initialization ---
-    useEffect(() => {
-        if (!numericId || Number.isNaN(numericId)) return;
-        const key = `bookingId:${numericId}`;
-        const existing =
-            typeof window !== "undefined" ? localStorage.getItem(key) : null;
-        if (existing) {
-            setBookingId(existing);
-        } else {
-            const bid = makeBookingId(numericId);
-            setBookingId(bid);
-            try {
-                localStorage.setItem(key, bid);
-            } catch {}
-        }
-    }, [numericId]);
 
     useEffect(() => {
         try {
@@ -160,6 +147,40 @@ export default function TicketPage() {
         setBookedOn(todayDDMMYYYY());
     }, []);
 
+    useEffect(() => {
+        let mounted = true;
+        (async () => {
+            if (!numericId || Number.isNaN(numericId)) {
+                setLoading(false);
+                return;
+            }
+            setLoading(true);
+            const { data: rowData, error } = await supabase
+                .from("tickets")
+                .select("*")
+                .eq("id", ticketId)
+                .maybeSingle();
+
+            if (!mounted) return;
+
+            if (!error && rowData) {
+                const row = rowData as Record<string, unknown>;
+
+                const people = getNumberField(row, "people");
+                const totalPaid = getNumberField(row, "total_price");
+                const publicTicketId = row["public_ticket_id"] as string;
+
+                setGroupSize(Number(people));
+                setTotalPaid(Number(totalPaid));
+                setBookingId(publicTicketId);
+            }
+
+            setLoading(false);
+        })();
+        return () => {
+            mounted = false;
+        };
+    }, [ticketId, bookingId, numericId]);
     useEffect(() => {
         let mounted = true;
         (async () => {
@@ -215,19 +236,6 @@ export default function TicketPage() {
                     duration,
                     guide,
                 });
-
-                const totalFromDb = getNumberField(row, "total");
-                const priceFromDb = getNumberField(row, "price");
-                const effectivePerPerson = totalFromDb ?? priceFromDb ?? 2700;
-                setPerPerson(effectivePerPerson);
-
-                if (!totalPaid || totalPaid <= 0) {
-                    const computed =
-                        effectivePerPerson * groupSize +
-                        serviceFee +
-                        processingFee;
-                    setTotalPaid(computed);
-                }
             }
 
             setLoading(false);
@@ -343,9 +351,7 @@ export default function TicketPage() {
                                 {shortTitle}
                             </p>
                             <p className="text-xs text-green-200">
-                                {bookingId
-                                    ? `ID: ${bookingId.slice(-6)}`
-                                    : "AG 865"}
+                                {bookingId ? `ID: ${bookingId}` : "AG 865"}
                             </p>
                         </div>
                         {/* Arrival (Title) - Using Title as destination */}
@@ -387,7 +393,7 @@ export default function TicketPage() {
                         <SecondaryDetailItem
                             Icon={IdCard} // Icon not visible, but kept for context
                             label=""
-                            value={`${bookingId.slice(-6)}`} // Hardcoded example
+                            value={`${bookingId}`} // Hardcoded example
                             loading={loading}
                             isSmall={true}
                         />
