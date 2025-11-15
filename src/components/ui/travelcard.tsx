@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, memo } from "react";
+import { useState, memo, useEffect } from "react";
 import Image from "next/image";
 import { Heart, Star, MapPin, Calendar } from "lucide-react";
-import type { TravelCardProps } from "@/types/type";
+import { TravelCardProps } from "@/types/type";
 import { optimizeImageUrl } from "@/lib/img";
 import { Skeleton } from "@/components/ui/skeleton";
+import { supabase } from "@/lib/supabaseClient";
+import { toast } from "sonner";
 
 type Extra = { priority?: boolean; imageWidth?: number; imageQuality?: number };
 
-// helpers
 function toNumber(v: number | string | undefined): number | undefined {
     if (typeof v === "number" && Number.isFinite(v)) return v;
     if (typeof v === "string") {
@@ -48,6 +49,7 @@ function TravelCardBase(props: TravelCardProps & Extra) {
         priority = false,
         imageWidth = 960,
         imageQuality = 70,
+        id: tripId,
     } = props;
 
     const [loaded, setLoaded] = useState(false);
@@ -60,7 +62,72 @@ function TravelCardBase(props: TravelCardProps & Extra) {
     const oldPriceNum = toNumber(oldPrice);
     const hasOldPrice = typeof oldPriceNum === "number";
     const hasRating = typeof rating === "number";
-    const ratingNum = hasRating ? (rating as number) : undefined;
+    const ratingNum = hasRating ? rating : undefined;
+
+    // Check if this trip is already liked by the user
+    useEffect(() => {
+        const checkLiked = async () => {
+            const { data: session } = await supabase.auth.getSession();
+            if (!session?.session) return;
+
+            const userId = session.session.user.id;
+
+            try {
+                const { data, error } = await supabase
+                    .from("wishlist")
+                    .select("*")
+                    .eq("user_id", userId)
+                    .eq("trip_id", tripId)
+                    .limit(1);
+
+                console.log("data", data);
+                setLiked(data && data.length > 0);
+            } catch (error) {
+                console.error("Error checking wishlist:", error);
+            }
+        };
+
+        void checkLiked();
+    }, [tripId]);
+
+    const toggleLike = async () => {
+        const { data: session } = await supabase.auth.getSession();
+        if (!session?.session) {
+            toast.error("Please login to add to favorites");
+            return;
+        }
+
+        const userId = session.session.user.id;
+
+        try {
+            if (!liked) {
+                // Only insert if it doesn't already exist
+                const { error } = await supabase.from("wishlist").upsert({
+                    user_id: userId,
+                    trip_id: tripId,
+                    favorite: props,
+                });
+
+                if (error) throw error;
+                toast.success("Added to wishlist");
+            } else {
+                // Remove from wishlist
+                const { error } = await supabase
+                    .from("wishlist")
+                    .delete()
+                    .eq("user_id", userId)
+                    .eq("trip_id", tripId);
+
+                if (error) throw error;
+                toast.success("Removed from wishlist");
+            }
+
+            setLiked(!liked);
+        } catch (error) {
+            toast.error("Failed to update wishlist");
+            console.error(error);
+        }
+    };
 
     return (
         <article
@@ -90,9 +157,8 @@ function TravelCardBase(props: TravelCardProps & Extra) {
                     className="absolute z-10 top-3 right-3 bg-white/70 backdrop-blur-sm rounded-full p-2 transition hover:bg-white"
                     onClick={(e) => {
                         e.stopPropagation();
-                        e.stopPropagation();
                         e.preventDefault();
-                        setLiked((prev) => !prev);
+                        void toggleLike();
                     }}
                 >
                     <Heart
@@ -150,22 +216,6 @@ function TravelCardBase(props: TravelCardProps & Extra) {
                                 {typeof reviews === "number" && (
                                     <span>{reviews}</span>
                                 )}
-                                <div className="flex -space-x-2">
-                                    <Image
-                                        src="/fox.jpg"
-                                        alt=""
-                                        width={20}
-                                        height={20}
-                                        className="rounded-full border-2 border-white"
-                                    />
-                                    <Image
-                                        src="/image1.jpg"
-                                        alt=""
-                                        width={20}
-                                        height={20}
-                                        className="rounded-full border-2 border-white"
-                                    />
-                                </div>
                             </div>
                         </div>
 

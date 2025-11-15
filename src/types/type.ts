@@ -78,6 +78,7 @@ export interface TravelCardProps {
     rating: number;
     reviews: number;
     agencyName: string;
+    id: string | number;
 }
 
 //BookingFormType

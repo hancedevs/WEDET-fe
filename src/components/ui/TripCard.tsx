@@ -101,9 +101,7 @@ export default function TripCard({ trip, onBook }: Props) {
                                         <Calendar className="w-[18px] h-[18px] text-[#28B872]" />
                                     }
                                     label="Days"
-                                    value={`${trip.durationDays} day${
-                                        trip.durationDays > 1 ? "’s" : ""
-                                    } trip`}
+                                    value={`${trip.durationDays}`}
                                 />
                             </div>
 

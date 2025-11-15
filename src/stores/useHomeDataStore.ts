@@ -10,7 +10,13 @@ interface HomeState {
     error?: string;
     lastFetched: number | null;
     query: string;
+    filters: {
+        minPrice?: string;
+        maxPrice?: string;
+        nearestDate?: boolean;
+    };
     setQuery: (q: string) => void;
+    setFilters: (f: Partial<HomeState["filters"]>) => void;
     clear: () => void;
     ensure: (minCount?: number) => Promise<void>;
     refresh: (minCount?: number) => Promise<void>;
@@ -18,55 +24,6 @@ interface HomeState {
 
 const STALE_MS = 5 * 60_000; // 5 minutes
 const KEY = "home-cards";
-const MAX_CACHE_CARDS = 24;
-
-// Light persisted subset
-type LightCard = Pick<
-    TravelCardVM,
-    | "id"
-    | "imageUrl"
-    | "placeName"
-    | "location"
-    | "tripDuration"
-    | "price"
-    | "oldPrice"
-    | "discountPercent"
-    | "rating"
-    | "reviews"
-    | "agencyName"
-    | "agencyAbout"
->;
-
-// Safe session storage wrapper (quota-safe)
-const safeSessionStorage: Storage = {
-    get length() {
-        return sessionStorage.length;
-    },
-    clear() {
-        sessionStorage.clear();
-    },
-    key(i: number) {
-        return sessionStorage.key(i);
-    },
-    getItem(k: string) {
-        return sessionStorage.getItem(k);
-    },
-    removeItem(k: string) {
-        sessionStorage.removeItem(k);
-    },
-    setItem(k: string, v: string) {
-        try {
-            sessionStorage.setItem(k, v);
-        } catch {
-            if (k) sessionStorage.removeItem(k);
-            try {
-                sessionStorage.setItem(k, v);
-            } catch {
-                // swallow
-            }
-        }
-    },
-};
 
 export const useHomeDataStore = create<HomeState>()(
     persist(
@@ -76,7 +33,9 @@ export const useHomeDataStore = create<HomeState>()(
             error: undefined,
             lastFetched: null,
             query: "",
-            setQuery: (q: string) => set({ query: q }),
+            filters: { minPrice: "", maxPrice: "", nearestDate: false },
+            setQuery: (q) => set({ query: q }),
+            setFilters: (f) => set({ filters: { ...get().filters, ...f } }),
             clear: () => {
                 set({ cards: [], lastFetched: null });
                 try {
@@ -121,26 +80,7 @@ export const useHomeDataStore = create<HomeState>()(
         }),
         {
             name: KEY,
-            storage: createJSONStorage(() => safeSessionStorage),
-            partialize: (s) => ({
-                cards: (s.cards ?? [])
-                    .slice(0, MAX_CACHE_CARDS)
-                    .map<LightCard>((c) => ({
-                        id: c.id,
-                        imageUrl: c.imageUrl,
-                        placeName: c.placeName,
-                        location: c.location,
-                        tripDuration: c.tripDuration,
-                        price: c.price,
-                        oldPrice: c.oldPrice,
-                        discountPercent: c.discountPercent,
-                        rating: c.rating,
-                        reviews: c.reviews,
-                        agencyName: c.agencyName,
-                        agencyAbout: c.agencyAbout,
-                    })),
-                lastFetched: s.lastFetched,
-            }),
+            storage: createJSONStorage(() => sessionStorage),
             version: 3,
         }
     )

@@ -24,21 +24,49 @@ export default function Page(): JSX.Element {
     const loading = useHomeDataStore((s) => s.loading);
     const ensure = useHomeDataStore((s) => s.ensure);
     const query = useHomeDataStore((s) => s.query);
+    const filters = useHomeDataStore((s) => s.filters);
 
     useEffect(() => {
-        void ensure(12);
+        void ensure(12); // fetch default trips on load
     }, [ensure]);
 
     const filteredCards = useMemo(() => {
-        if (!query.trim()) return cards;
-        const q = query.toLowerCase();
-        return cards.filter(
-            (c) =>
-                c.placeName?.toLowerCase().includes(q) ||
-                c.location?.toLowerCase().includes(q) ||
-                c.agencyName?.toLowerCase().includes(q)
-        );
-    }, [cards, query]);
+        let result = cards;
+        console.log(cards);
+
+        // query search
+        if (query.trim()) {
+            const q = query.toLowerCase();
+            result = result.filter(
+                (c) =>
+                    c.placeName?.toLowerCase().includes(q) ||
+                    c.location?.toLowerCase().includes(q) ||
+                    c.agencyName?.toLowerCase().includes(q)
+            );
+
+            return result;
+        }
+
+        // min/max price filter
+        const min = toNum(filters.minPrice);
+        const max = toNum(filters.maxPrice);
+        console.log(min, max);
+        if (min !== undefined)
+            result = result.filter((c) => (toNum(c.price) ?? 0) >= min);
+        if (max !== undefined)
+            result = result.filter((c) => (toNum(c.price) ?? 0) <= max);
+
+        // nearest date filter
+        if (filters.nearestDate) {
+            result = result.slice().sort((a, b) => {
+                const aDate = new Date(a.tripDuration); // replace with actual date field
+                const bDate = new Date(b.tripDuration);
+                return aDate.getTime() - bDate.getTime();
+            });
+        }
+
+        return result;
+    }, [cards, query, filters]);
 
     const showInitialSkeletons = loading && cards.length === 0;
 
@@ -53,22 +81,10 @@ export default function Page(): JSX.Element {
             <CategorySelector />
 
             <div className="flex items-center ml-5 justify-between mb-1">
-                <h2
-                    className="text-gray-500 text-xs"
-                    style={{
-                        fontFamily: "'Red Hat', sans-serif",
-                        fontWeight: 500,
-                    }}
-                >
+                <h2 className="text-gray-500 text-xs font-medium">
                     Tips for you
                 </h2>
-                <button
-                    className="text-gray-400 text-xs mr-4"
-                    style={{
-                        fontFamily: "'Red Hat', sans-serif",
-                        fontWeight: 300,
-                    }}
-                >
+                <button className="text-gray-400 text-xs font-light mr-4">
                     See all
                 </button>
             </div>
@@ -80,7 +96,7 @@ export default function Page(): JSX.Element {
                     ))}
                 </div>
             ) : filteredCards.length === 0 ? (
-                <div className="p-2 text-xs text-gray-400  text-center">
+                <div className="p-2 text-xs text-gray-400 text-center">
                     No trips found.
                 </div>
             ) : (
@@ -114,6 +130,7 @@ export default function Page(): JSX.Element {
                                     reviews={c.reviews}
                                     agencyName={c.agencyName}
                                     priority={i < 2}
+                                    id={c.id}
                                 />
                             </Link>
                         ))}

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Funnel } from "lucide-react";
+import { Funnel, Trash } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -15,6 +15,8 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
+import { useHomeDataStore } from "@/stores/useHomeDataStore";
+import { Button } from "../ui/button";
 
 const filterSchema = z.object({
     minPrice: z
@@ -22,7 +24,7 @@ const filterSchema = z.object({
         .optional()
         .refine(
             (val) => !val || !isNaN(Number(val)),
-            "Min Price must be a numberr"
+            "Min Price must be a number"
         ),
     maxPrice: z
         .string()
@@ -37,20 +39,53 @@ const filterSchema = z.object({
 type FilterFormValues = z.infer<typeof filterSchema>;
 
 export default function FilterDropdown() {
+    const filters = useHomeDataStore((s) => s.filters);
+    const setFilters = useHomeDataStore((s) => s.setFilters);
+    const refresh = useHomeDataStore((s) => s.refresh);
+
     const form = useForm<FilterFormValues>({
         resolver: zodResolver(filterSchema),
-        defaultValues: { minPrice: "", maxPrice: "", nearestDate: false },
+        defaultValues: {
+            minPrice: filters.minPrice || "",
+            maxPrice: filters.maxPrice || "",
+            nearestDate: filters.nearestDate || false,
+        },
     });
 
     const [active, setActive] = React.useState(false);
 
-    const onSubmit = (data: FilterFormValues) => {
-        console.log("Filters Applied:", data);
+    const onSubmit = async (data: FilterFormValues) => {
+        setFilters(data);
         setActive(false);
+        await refresh(12); // trigger API call after applying filters
+    };
+
+    const onReset = async () => {
+        // Reset the store filters
+        setFilters({
+            minPrice: undefined,
+            maxPrice: undefined,
+            nearestDate: false,
+        });
+        // Reset the form values
+        form.reset({ minPrice: "", maxPrice: "", nearestDate: false });
+        setActive(false);
+        // Refresh trips after clearing filters
+
+        await refresh(12);
     };
 
     return (
-        <DropdownMenu onOpenChange={(open) => setActive(open)}>
+        <DropdownMenu
+            onOpenChange={(open) => {
+                setActive(open);
+                setFilters({
+                    minPrice: undefined,
+                    maxPrice: undefined,
+                    nearestDate: false,
+                });
+            }}
+        >
             <DropdownMenuTrigger asChild>
                 <div
                     className={`relative flex items-center justify-center h-10 w-10 rounded-full shadow transition border border-green-100 focus:outline-none focus:ring-2 focus:ring-green-300 cursor-pointer ${
@@ -71,10 +106,14 @@ export default function FilterDropdown() {
                 align="end"
                 className="w-80 bg-white rounded-2xl shadow-xl border border-gray-100 p-4"
             >
-                <DropdownMenuLabel className="text-green-600 font-bold mb-4">
-                    Filter Options
-                </DropdownMenuLabel>
-
+                <div className="flex justify-between">
+                    <DropdownMenuLabel className="text-green-600 font-bold mb-4">
+                        Filter Options
+                    </DropdownMenuLabel>
+                    <Button variant="ghost" onClick={onReset}>
+                        <Trash />
+                    </Button>
+                </div>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
                     className="space-y-4"
@@ -137,6 +176,10 @@ export default function FilterDropdown() {
                             Show only trips with nearest date
                         </Label>
                     </div>
+
+                    <PrimaryButton type="submit" className="w-full p-2">
+                        Apply Filters
+                    </PrimaryButton>
                 </form>
             </DropdownMenuContent>
         </DropdownMenu>
