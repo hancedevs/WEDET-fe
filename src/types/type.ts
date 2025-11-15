@@ -211,7 +211,8 @@ export interface ProfileOption {
 
 export interface BookingItem {
     id: number;
-    name: string;
-    amount: number;
-    date: string;
+    tour_id: number;
+    title: string;
+    total_price: number;
+    created_at: string;
 }

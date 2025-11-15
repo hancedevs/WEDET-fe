@@ -74,26 +74,39 @@ function BookingsTab({
                 {bookings.map((booking) => (
                     <div
                         onClick={() => {
-                            router.push(`/book/${2}/step5?id=${2226}`);
+                            router.push(
+                                `/book/${booking.tour_id}/step5?id=${booking.id}`
+                            );
                         }}
                         key={booking.id}
-                        className="flex justify-between items-center pb-2  shadow-sm cursor-pointer p-4 h-20 rounded-3xl"
+                        className="flex justify-between items-center pb-2 border-1 border-[#28B872]  shadow-sm cursor-pointer p-4 h-20 rounded-3xl"
                     >
-                        <div className="font-bold text-lg text-[#28B872]">
-                            {booking.name}
+                        <div className="-mt-1">
+                            <Image
+                                src={"/logo.svg"}
+                                width={70}
+                                height={70}
+                                alt="logo"
+                            />
+                            <div className="font-bold text-lg text-[#28B872] ml-2">
+                                {booking.title}
+                            </div>
                         </div>
                         <div className="text-left">
                             <div
-                                className={`font-extrabold text-xl ${
-                                    booking.amount < 0
-                                        ? "text-[#28B872]"
-                                        : "text-[#28B872]"
-                                }`}
+                                className={`font-extrabold text-xl ${"text-[#28B872]"}`}
                             >
-                                {booking.amount.toLocaleString()}Br
+                                {booking.total_price.toLocaleString()}Br
                             </div>
                             <div className="text-xs text-gray-400">
-                                {booking.date}
+                                {new Date(booking.created_at).toLocaleString(
+                                    "en-US",
+                                    {
+                                        year: "numeric",
+                                        month: "short",
+                                        day: "numeric",
+                                    }
+                                )}
                             </div>
                         </div>
                     </div>
