@@ -1,6 +1,6 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import NextImage from "next/image";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import QRCode from "react-qr-code";
 import {
@@ -10,10 +10,10 @@ import {
     Calendar,
     Clock,
     Home,
-    User, // Using User for Passenger icon
-    Plane, // Using Plane for the 'flight' element
-    CreditCard, // Using CreditCard for payment/total paid
-    Ticket, // Using Ticket for the main section
+    User,
+    Plane,
+    CreditCard,
+    Ticket,
     Tag,
     ArrowBigDownDash,
     TrainTrack,
@@ -23,25 +23,25 @@ import {
     CircleUser,
     Clock1,
     IdCard,
-    ArrowLeft, // New icon for Guide/Host
+    ArrowLeft,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/lib/supabaseClient";
-import Pintick from "../../../../../public/Pintick.png"; // Assuming Pintick.png is the logo/avatar
+import Pintick from "../../../../../public/Pintick.png";
 import {
     diffDaysInclusive,
     formatDateRange,
     getNumberField,
     getStringArray,
     getStringField,
+    handleDownloadTicket,
     makeBookingId,
     todayDDMMYYYY,
     toImageUrlFromStorageKey,
 } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
-// --- Utility Functions (Kept as is for functionality) ---
-
-const FALLBACK_IMG = "/image2.jpg"; // ensure this exists in /public
+const FALLBACK_IMG = "/image2.jpg";
 
 type TripSummaryData = {
     imageUrl: string;
@@ -54,17 +54,14 @@ type TripSummaryData = {
 
 const TicketDivider = () => (
     <div className="relative my-6">
-        {/* Dashed line */}
         <div className="border-t border-dashed border-gray-300 w-full" />
-        {/* Left Cutout Circle */}
         <div
             className="absolute top-1/2 -left-3 transform -translate-y-1/2 h-6 w-6 rounded-full bg-white z-10"
-            style={{ boxShadow: "inset 0 2px 4px rgba(0,0,0,0.06)" }} // Simulate inner shadow for depth
+            style={{ boxShadow: "inset 0 2px 4px rgba(0,0,0,0.06)" }}
         />
-        {/* Right Cutout Circle */}
         <div
             className="absolute top-1/2 -right-3 transform -translate-y-1/2 h-6 w-6 rounded-full bg-white z-10"
-            style={{ boxShadow: "inset 0 2px 4px rgba(0,0,0,0.06)" }} // Simulate inner shadow for depth
+            style={{ boxShadow: "inset 0 2px 4px rgba(0,0,0,0.06)" }}
         />
     </div>
 );
@@ -74,13 +71,9 @@ const SecondaryDetailItem: React.FC<{
     label: string;
     value: string | undefined | null;
     loading: boolean;
-    // New prop to apply the style for the desired look
     isSmall?: boolean;
 }> = ({ Icon, label, value, loading, isSmall = false }) => (
     <div className="flex flex-col items-center justify-center text-center">
-        {" "}
-        {/* Center content */}
-        {/* Icon removed for closer resemblance to image's small detail section */}
         <div>
             <div className="flex ">
                 {Icon ? (
@@ -98,7 +91,7 @@ const SecondaryDetailItem: React.FC<{
                 />
             ) : (
                 <p
-                    className={`text-gray-400  leading-snug ${
+                    className={`text-gray-400  leading-snug ${
                         isSmall ? "text-sm" : "text-sm"
                     }`}
                 >
@@ -112,9 +105,9 @@ const SecondaryDetailItem: React.FC<{
 export default function TicketPage() {
     const { id } = useParams<{ id: string }>();
     const searchParams = useSearchParams();
-    const ticketId = searchParams.get("id"); //
+    const ticketId = searchParams.get("id");
     const numericId = useMemo(() => Number(id), [id]);
-
+    const qrCodeRef = useRef(null);
     const [loading, setLoading] = useState(true);
     const [trip, setTrip] = useState<TripSummaryData | null>(null);
     const [tripImage, setTripImage] = useState<string>(FALLBACK_IMG);
@@ -125,13 +118,11 @@ export default function TicketPage() {
     const [bookedOn, setBookedOn] = useState<string>(todayDDMMYYYY());
     const [totalPaid, setTotalPaid] = useState<number>(2900);
 
-    const [perPerson, setPerPerson] = useState<number>(2700);
-    const serviceFee = 100;
-    const processingFee = 25;
+    const [qrCodeDataURL, setQrCodeDataURL] = useState<string>("");
+    const [qrCodePNGDataURL, setQrCodePNGDataURL] = useState<string>("");
+    const [logoDataURL, setLogoDataURL] = useState<string>("");
 
     const [bookingId, setBookingId] = useState<string>("");
-
-    // --- Original Logic for Data Fetching and State Initialization ---
 
     useEffect(() => {
         try {
@@ -217,9 +208,9 @@ export default function TicketPage() {
 
                 const title =
                     tourName && destination
-                        ? `${tourName}` // Using tourName as the main title
+                        ? `${tourName}`
                         : tourName || destination || "Trip";
-                const location = destination; // Using destination as the location
+                const location = destination;
                 const dateRange = formatDateRange(start_date, end_date);
                 const days = diffDaysInclusive(start_date, end_date);
                 const duration = days > 0 ? `${days} days` : "";
@@ -256,12 +247,91 @@ export default function TicketPage() {
         };
         return JSON.stringify(payload);
     }, [bookingId, numericId, travelerName]);
-    // --- End of Original Logic ---
 
-    // Derived values for the UI slots
+    useEffect(() => {
+        if (bookingId && qrCodeRef.current) {
+            console.log(qrCodeRef.current);
+            const timeoutId = setTimeout(() => {
+                const svg = document.getElementById("ticket-qr-svg");
+
+                if (svg) {
+                    const svgData = new XMLSerializer().serializeToString(svg);
+                    setQrCodeDataURL(
+                        `data:image/svg+xml;base64,${btoa(svgData)}`
+                    );
+                } else {
+                    console.log("QR code SVG not found");
+                }
+            }, 1000);
+
+            return () => clearTimeout(timeoutId);
+        }
+    }, [bookingId, qrPayload]);
+
+    useEffect(() => {
+        if (qrCodeDataURL) {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                // Use a fixed size for the canvas if the output size is predictable
+                canvas.width = 200;
+                canvas.height = 200;
+
+                const ctx = canvas.getContext("2d");
+                // Ensure background is white if the SVG is transparent (common for QR codes)
+                ctx.fillStyle = "#FFFFFF";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.drawImage(img, 0, 0, 200, 200);
+
+                // Convert to PNG data URL
+                const pngDataUrl = canvas.toDataURL("image/png");
+                setQrCodePNGDataURL(pngDataUrl);
+            };
+            img.onerror = (e) => {
+                console.error("Error loading SVG for conversion:", e);
+            };
+            img.src = qrCodeDataURL;
+        }
+    }, [qrCodeDataURL]);
+    useEffect(() => {
+        // Fetch the SVG file from the public folder
+        fetch("/logo.svg")
+            .then((response) => response.text()) // Get the SVG content as text
+            .then((svgText) => {
+                // Encode the SVG text as a Data URL
+                const svgDataUrl = `data:image/svg+xml;base64,${btoa(
+                    unescape(encodeURIComponent(svgText))
+                )}`;
+
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    // Set size based on how you want the logo to appear in the PDF (e.g., 50x50)
+                    const logoSize = 50;
+                    canvas.width = logoSize;
+                    canvas.height = logoSize;
+
+                    const ctx = canvas.getContext("2d");
+                    // Draw the SVG onto the canvas
+                    ctx.drawImage(img, 0, 0, logoSize, logoSize);
+
+                    // Convert to PNG data URL (which jsPDF requires)
+                    const pngDataUrl = canvas.toDataURL("image/png");
+                    setLogoDataURL(pngDataUrl);
+                };
+                img.onerror = (e) => {
+                    console.error("Error loading logo SVG for conversion:", e);
+                };
+                img.src = svgDataUrl;
+            })
+            .catch((error) => {
+                console.error("Failed to fetch logo SVG:", error);
+            });
+    }, []); // Empty dependency array means this runs once on mount
     const departureCityCode =
         trip?.location.split(/\s|,/)[0]?.toUpperCase().slice(0, 3) || "TRP";
-    const arrivalCityCode = "DST"; // Destination is the end
+    const arrivalCityCode = "DST";
     const shortTitle = trip?.title.split(/\s/)[0] || "TOUR";
     const dateForPass = bookedOn.replace(/\//g, "-");
     const tripImageForAvatar = tripImage;
@@ -280,23 +350,19 @@ export default function TicketPage() {
                 </button>
             </div>
 
-            {/* Main Ticket Container */}
-            <div className="w-full lg:w-[500px]   bg-white shadow-2xl rounded-3xl overflow-hidden">
-                {/* Boarding Pass Header (Dark green Section) */}
+            <div className="w-full lg:w-[500px]   bg-white shadow-2xl rounded-3xl overflow-hidden">
                 <div className="bg-[#28B872] text-white p-6 sm:p-8 rounded-t-3xl">
                     <h1 className="text-xl font-extrabold mb-4 flex justify-center tracking-wide">
                         Your Ticket
                     </h1>
 
-                    {/* Passenger & Date Row */}
                     <div className="flex justify-between items-center mb-6">
                         <div className="flex items-center space-x-3">
-                            {/* Passenger Avatar (using trip image) */}
                             <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border-2 border-white shadow-md">
                                 {loading ? (
                                     <Skeleton className="w-full h-full rounded-full bg-white/50" />
                                 ) : (
-                                    <Image
+                                    <NextImage
                                         src={tripImageForAvatar}
                                         alt="Traveler"
                                         width={40}
@@ -332,9 +398,7 @@ export default function TicketPage() {
                         </div>
                     </div>
 
-                    {/* Trip Route Row */}
                     <div className="flex justify-between items-center text-center mt-4">
-                        {/* Departure (Location) */}
                         <div className="flex flex-col items-start">
                             <p className="text-4xl font-extrabold">
                                 {departureCityCode}
@@ -344,7 +408,6 @@ export default function TicketPage() {
                             </p>
                         </div>
 
-                        {/* Middle Icon and Name (Trip ID) */}
                         <div className="flex flex-col items-center">
                             <Ticket className="w-8 h-8 text-green-200 mb-1 " />
                             <p className="text-sm font-bold tracking-wider">
@@ -354,7 +417,6 @@ export default function TicketPage() {
                                 {bookingId ? `ID: ${bookingId}` : "AG 865"}
                             </p>
                         </div>
-                        {/* Arrival (Title) - Using Title as destination */}
                         <div className="flex flex-col items-end">
                             <p className="text-4xl font-extrabold">
                                 {arrivalCityCode}
@@ -366,20 +428,18 @@ export default function TicketPage() {
                     </div>
                 </div>
 
-                {/* Ticket Body (White Section) */}
                 <div className="p-6 sm:p-8">
-                    {/* Main QR Code Section */}
                     <div className="flex flex-col items-center justify-center mb-6">
-                        {/* Title Above QR Code */}
-
                         <div className="bg-white p-4 rounded-xl shadow-xl border border-gray-100">
                             {bookingId ? (
                                 <QRCode
+                                    ref={qrCodeRef}
                                     value={qrPayload}
-                                    size={200} // Slightly larger for prominence
+                                    size={200}
                                     level="H"
                                     className="p-1"
-                                    viewBox={`0 0 200 200`} // Ensure proper scaling
+                                    viewBox={`0 0 200 200`}
+                                    id="ticket-qr-svg"
                                 />
                             ) : (
                                 <Skeleton className="w-[200px] h-[200px] rounded-lg" />
@@ -391,32 +451,32 @@ export default function TicketPage() {
 
                     <div className="grid grid-cols-4 gap-y-2 gap-x-2 text-sm text-center">
                         <SecondaryDetailItem
-                            Icon={IdCard} // Icon not visible, but kept for context
+                            Icon={IdCard}
                             label=""
-                            value={`${bookingId}`} // Hardcoded example
+                            value={`${bookingId}`}
                             loading={loading}
                             isSmall={true}
                         />
                         <SecondaryDetailItem
-                            Icon={Users} // Icon not visible, but kept for context
+                            Icon={Users}
                             label=""
                             value={`${groupSize} ${
                                 groupSize === 1 ? " person" : " people"
-                            }`} // Hardcoded example
+                            }`}
                             loading={loading}
                             isSmall={true}
                         />
                         <SecondaryDetailItem
-                            Icon={CircleUser} // Icon not visible, but kept for context
+                            Icon={CircleUser}
                             label=""
-                            value={trip?.guide} // Hardcoded example
+                            value={trip?.guide}
                             loading={loading}
                             isSmall={true}
                         />
                         <SecondaryDetailItem
-                            Icon={Clock1} // Icon not visible, but kept for context
+                            Icon={Clock1}
                             label=""
-                            value={trip?.duration} // Hardcoded example
+                            value={trip?.duration}
                             loading={loading}
                             isSmall={true}
                         />
@@ -424,7 +484,6 @@ export default function TicketPage() {
 
                     <TicketDivider />
 
-                    {/* Total Paid / Cost Summary */}
                     <div className="bg-green-50 border border-green-100 rounded-2xl p-4 sm:p-5 flex flex-row items-center justify-between shadow-sm">
                         <div className="flex items-center gap-2">
                             <CreditCard className="w-6 h-6 text-green-500" />
@@ -443,7 +502,22 @@ export default function TicketPage() {
                     </div>
                 </div>
                 <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-center rounded-b-3xl">
-                    <button className="w-full max-w-sm py-3 px-6 bg-[#28B872] text-white font-bold rounded-full text-lg shadow-lg hover:bg-green-600 transition duration-300 flex items-center justify-center">
+                    <Button
+                        className="w-full max-w-sm py-6 px-6 bg-[#28B872] text-white font-bold rounded-full text-lg shadow-lg hover:bg-green-600 transition duration-300 flex items-center justify-center"
+                        disabled={loading || !bookingId || !trip}
+                        onClick={() =>
+                            handleDownloadTicket({
+                                trip,
+                                travelerName,
+                                bookingId,
+                                groupSize,
+                                totalPaid,
+                                bookingDate: bookedOn,
+                                qrCodeDataURL: qrCodePNGDataURL,
+                                logoDataURL: logoDataURL,
+                            })
+                        }
+                    >
                         <span className="mr-2">Download Ticket</span>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -461,7 +535,7 @@ export default function TicketPage() {
                             <polyline points="7 10 12 15 17 10" />
                             <line x1="12" x2="12" y1="15" y2="3" />
                         </svg>
-                    </button>
+                    </Button>
                 </div>
             </div>
             <div className="h-10"></div>
