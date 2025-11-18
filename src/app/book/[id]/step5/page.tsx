@@ -91,7 +91,7 @@ const SecondaryDetailItem: React.FC<{
                 />
             ) : (
                 <p
-                    className={`text-gray-400  leading-snug ${
+                    className={`text-gray-400   leading-snug w-28 text-start ${
                         isSmall ? "text-sm" : "text-sm"
                     }`}
                 >
@@ -140,56 +140,45 @@ export default function TicketPage() {
 
     useEffect(() => {
         let mounted = true;
+
         (async () => {
-            if (!numericId || Number.isNaN(numericId)) {
+            if (!numericId || Number.isNaN(numericId) || !ticketId) {
                 setLoading(false);
                 return;
             }
             setLoading(true);
-            const { data: rowData, error } = await supabase
+
+            let publicTicketId = bookingId;
+            let tripImg = FALLBACK_IMG;
+
+            const { data: ticketData, error: ticketError } = await supabase
                 .from("tickets")
-                .select("*")
+                .select("people, total_price, public_ticket_id")
                 .eq("id", ticketId)
                 .maybeSingle();
 
             if (!mounted) return;
 
-            if (!error && rowData) {
-                const row = rowData as Record<string, unknown>;
+            if (!ticketError && ticketData) {
+                const row = ticketData as Record<string, unknown>;
 
-                const people = getNumberField(row, "people");
-                const totalPaid = getNumberField(row, "total_price");
-                const publicTicketId = row["public_ticket_id"] as string;
-
-                setGroupSize(Number(people));
-                setTotalPaid(Number(totalPaid));
+                setGroupSize(Number(getNumberField(row, "people")));
+                setTotalPaid(Number(getNumberField(row, "total_price")));
+                publicTicketId =
+                    getStringField(row, "public_ticket_id") || publicTicketId;
                 setBookingId(publicTicketId);
             }
 
-            setLoading(false);
-        })();
-        return () => {
-            mounted = false;
-        };
-    }, [ticketId, bookingId, numericId]);
-    useEffect(() => {
-        let mounted = true;
-        (async () => {
-            if (!numericId || Number.isNaN(numericId)) {
-                setLoading(false);
-                return;
-            }
-            setLoading(true);
-            const { data: rowData, error } = await supabase
+            const { data: tourData, error: tourError } = await supabase
                 .from("tours")
-                .select("*")
+                .select("tourName, destination, photos, start_date, end_date")
                 .eq("id", numericId)
                 .maybeSingle();
 
             if (!mounted) return;
 
-            if (!error && rowData) {
-                const row = rowData as Record<string, unknown>;
+            if (!tourError && tourData) {
+                const row = tourData as Record<string, unknown>;
 
                 const tourName = getStringField(row, "tourName") ?? "";
                 const destination = getStringField(row, "destination") ?? "";
@@ -197,14 +186,13 @@ export default function TicketPage() {
                 const start_date = getStringField(row, "start_date") ?? null;
                 const end_date = getStringField(row, "end_date") ?? null;
 
-                let img = FALLBACK_IMG;
                 if (photos.length) {
                     try {
                         const url = await toImageUrlFromStorageKey(photos[0]);
-                        if (url && url.trim() !== "") img = url;
+                        if (url && url.trim() !== "") tripImg = url;
                     } catch {}
                 }
-                setTripImage(img);
+                setTripImage(tripImg);
 
                 const title =
                     tourName && destination
@@ -220,7 +208,7 @@ export default function TicketPage() {
                     "Local guide";
 
                 setTrip({
-                    imageUrl: img,
+                    imageUrl: tripImg,
                     title,
                     location,
                     dateRange,
@@ -231,10 +219,11 @@ export default function TicketPage() {
 
             setLoading(false);
         })();
+
         return () => {
             mounted = false;
         };
-    }, [numericId, totalPaid, groupSize]);
+    }, [numericId, ticketId]);
 
     const qrPayload = useMemo(() => {
         const payload = {
@@ -250,7 +239,6 @@ export default function TicketPage() {
 
     useEffect(() => {
         if (bookingId && qrCodeRef.current) {
-            console.log(qrCodeRef.current);
             const timeoutId = setTimeout(() => {
                 const svg = document.getElementById("ticket-qr-svg");
 
@@ -273,18 +261,15 @@ export default function TicketPage() {
             const img = new Image();
             img.onload = () => {
                 const canvas = document.createElement("canvas");
-                // Use a fixed size for the canvas if the output size is predictable
                 canvas.width = 200;
                 canvas.height = 200;
 
                 const ctx = canvas.getContext("2d");
-                // Ensure background is white if the SVG is transparent (common for QR codes)
                 ctx.fillStyle = "#FFFFFF";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 ctx.drawImage(img, 0, 0, 200, 200);
 
-                // Convert to PNG data URL
                 const pngDataUrl = canvas.toDataURL("image/png");
                 setQrCodePNGDataURL(pngDataUrl);
             };
@@ -294,12 +279,11 @@ export default function TicketPage() {
             img.src = qrCodeDataURL;
         }
     }, [qrCodeDataURL]);
+
     useEffect(() => {
-        // Fetch the SVG file from the public folder
         fetch("/logo.svg")
-            .then((response) => response.text()) // Get the SVG content as text
+            .then((response) => response.text())
             .then((svgText) => {
-                // Encode the SVG text as a Data URL
                 const svgDataUrl = `data:image/svg+xml;base64,${btoa(
                     unescape(encodeURIComponent(svgText))
                 )}`;
@@ -307,16 +291,13 @@ export default function TicketPage() {
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement("canvas");
-                    // Set size based on how you want the logo to appear in the PDF (e.g., 50x50)
                     const logoSize = 50;
                     canvas.width = logoSize;
                     canvas.height = logoSize;
 
                     const ctx = canvas.getContext("2d");
-                    // Draw the SVG onto the canvas
                     ctx.drawImage(img, 0, 0, logoSize, logoSize);
 
-                    // Convert to PNG data URL (which jsPDF requires)
                     const pngDataUrl = canvas.toDataURL("image/png");
                     setLogoDataURL(pngDataUrl);
                 };
@@ -328,7 +309,8 @@ export default function TicketPage() {
             .catch((error) => {
                 console.error("Failed to fetch logo SVG:", error);
             });
-    }, []); // Empty dependency array means this runs once on mount
+    }, []);
+
     const departureCityCode =
         trip?.location.split(/\s|,/)[0]?.toUpperCase().slice(0, 3) || "TRP";
     const arrivalCityCode = "DST";
@@ -358,7 +340,7 @@ export default function TicketPage() {
 
                     <div className="flex justify-between items-center mb-6">
                         <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border-2 border-white shadow-md">
+                            {/* <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border-2 border-white shadow-md">
                                 {loading ? (
                                     <Skeleton className="w-full h-full rounded-full bg-white/50" />
                                 ) : (
@@ -370,9 +352,14 @@ export default function TicketPage() {
                                         className="object-cover w-full h-full"
                                     />
                                 )}
-                            </div>
+                            </div> */}
                             <div className="flex flex-col items-start">
-                                <p className="text-sm text-green-200 font-medium uppercase leading-snug">
+                                <p
+                                    className="text-sm text-green-200 font-medium uppercase leading-snug"
+                                    onClick={() => {
+                                        router.push(`../../trip/${numericId}`);
+                                    }}
+                                >
                                     {trip?.location}
                                 </p>
                                 <div className="text-base font-bold leading-snug">
@@ -449,7 +436,7 @@ export default function TicketPage() {
 
                     <TicketDivider />
 
-                    <div className="grid grid-cols-4 gap-y-2 gap-x-2 text-sm text-center">
+                    <div className="grid grid-cols-3  lg:grid-cols-4 gap-y-2 gap-x-2 text-sm text-center">
                         <SecondaryDetailItem
                             Icon={IdCard}
                             label=""
